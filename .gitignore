@@ -1,0 +1,20 @@
+# Godot 4+ specific ignores
+.godot/
+*.translation
+
+# Mono/C# cache
+.mono/
+[Bb]in/
+[Oo]bj/
+
+# OS and Editor ignores
+.DS_Store
+Thumbs.db
+*.tmp
+*.bak
+*.log
+godot_run.log
+.vscode/*
+!.vscode/tasks.json
+!.vscode/settings.json
+!.vscode/extensions.json

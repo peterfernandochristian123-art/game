@@ -1,0 +1,20 @@
+# Game Dev Studio Workflow Status
+project_name: game
+project_type: game
+user_name: User
+created_at: '2026-10-16'
+
+workflow_status:
+  brainstorm-game: _bmad-output/brainstorming-session-2026-10-16.md
+  game-brief: _bmad-output/planning-artifacts/briefs/brief-game-2026-10-16/brief.md
+  domain-research: pending
+  gdd: _bmad-output/planning-artifacts/gdds/gdd-game-2026-10-16/gdd.md
+  narrative: pending
+  game-ux: pending
+  game-prd: pending
+  game-architecture: _bmad-output/game-architecture.md
+  create-epics-and-stories: pending
+  check-implementation-readiness: pending
+  test-framework: pending
+  test-design: pending
+  sprint-planning: pending
