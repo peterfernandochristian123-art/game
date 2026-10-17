@@ -13,8 +13,8 @@ workflow_status:
   game-ux: pending
   game-prd: pending
   game-architecture: _bmad-output/game-architecture.md
-  create-epics-and-stories: pending
-  check-implementation-readiness: pending
+  create-epics-and-stories: _bmad-output/planning-artifacts/epics.md
+  check-implementation-readiness: _bmad-output/planning-artifacts/implementation-readiness-report-2026-10-17.md
   test-framework: pending
   test-design: pending
-  sprint-planning: pending
+  sprint-planning: _bmad-output/implementation-artifacts/sprint-status.yaml

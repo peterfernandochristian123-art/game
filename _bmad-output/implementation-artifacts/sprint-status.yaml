@@ -1,0 +1,85 @@
+# generated: 2026-10-17 15:31
+# last_updated: 2026-10-17 15:35
+# project: game
+# project_key: NOKEY
+# story_location: _bmad-output/implementation-artifacts
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog → in-progress: Automatically when first story is created (via create-story)
+#   - in-progress → done: Manually when all stories reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in stories folder
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review (via Dev's code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when first story is created
+# - Stories can be worked in parallel if team capacity allows
+# - Developer typically creates next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+
+generated: 2026-10-17 15:31
+last_updated: 2026-10-17 16:34
+project: game
+project_key: NOKEY
+tracking_system: file-system
+story_location: _bmad-output/implementation-artifacts
+
+development_status:
+  epic-1: done
+  1-1-project-setup-autoload-infrastructure-movement-state-machine: done
+  1-2-8-way-thruster-vector-dash-system: done
+  1-3-unified-5-frame-input-buffer-coyote-time: done
+  1-4-base-normal-attacks-frame-based-hit-hurtbox-collision: done
+  epic-1-retrospective: optional
+
+  epic-2: backlog
+  2-1-heat-gauge-component-passive-cooling-logic: backlog
+  2-2-overclock-zone-buffs-emergency-meltdown-shutdown: backlog
+  2-3-spark-parry-system-with-frame-exact-window: backlog
+  2-4-normal-blocking-chip-damage-mechanics: backlog
+  epic-2-retrospective: optional
+
+  epic-3: backlog
+  3-1-data-driven-attack-architecture-target-chain-scaling: backlog
+  3-2-apex-0-viper-rushdown-character-implementation: backlog
+  3-3-titan-v-bulwark-heavy-grappler-implementation: backlog
+  epic-3-retrospective: optional
+
+  epic-4: backlog
+  4-1-zero-g-skyscraper-platform-arena-boundaries: backlog
+  4-2-cliffhanger-struggle-state-machine-actions: backlog
+  4-3-ledge-stomp-ring-out-elimination: backlog
+  4-4-match-rules-round-timers-win-conditions: backlog
+  epic-4-retrospective: optional
+
+  epic-5: backlog
+  5-1-main-menu-navigation-flow: backlog
+  5-2-dual-input-system-mobile-touch-overlay-gamepad-autodetect: backlog
+  5-3-in-game-combat-hud-visual-status-meters: backlog
+  5-4-training-mode-suite-with-real-time-frame-inspector: backlog
+  5-5-versus-ai-controller-with-3-difficulty-profiles: backlog
+  5-6-local-2-player-versus-mode-configuration-persistence: backlog
+  epic-5-retrospective: optional
+
+  epic-6: backlog
+  6-1-local-frame-hitstop-dynamic-screen-shake: backlog
+  6-2-32-bit-pixel-vfx-welding-spark-particles: backlog
+  6-3-arcade-announcer-sound-effects-audio-server-bus-setup: backlog
+  6-4-performance-profiling-memory-audit-60-fps-lock: backlog
+  epic-6-retrospective: optional

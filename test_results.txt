@@ -1,0 +1,22 @@
+==================================================
+[TEST RUNNER] Memulai pengujian Story 1.1...
+==================================================
+
+--- Test 1: Combat Constants ---
+ [PASS] Seluruh nilai CombatConstants terverifikasi sesuai spesifikasi.
+
+--- Test 2: Autoloads ---
+ [PASS] Autoload EventBus dan InputBuffer berfungsi dengan benar.
+
+--- Test 3: Physics Collision Layers ---
+ [PASS] Layer names 2D physics terkonfigurasi sesuai matrix arsitektur.
+
+--- Test 4: State Machine Lifecycle & Safe Fallback ---
+ [PASS] FSM lifecycle, transisi gerak, dan safe degradation terverifikasi sukses.
+
+--- Test 5: TestArena Scene Composition ---
+ [PASS] Scene test_arena.tscn terverifikasi menggunakan hierarki BaseMecha dan FSM.
+==================================================
+[TEST RUNNER] Hasil Pengujian: 5 / 5 Lulus
+==================================================
+>>> SEMUA TES STORY 1.1 BERHASIL! <<<

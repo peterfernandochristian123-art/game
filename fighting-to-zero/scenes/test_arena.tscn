@@ -1,6 +1,15 @@
-[gd_scene load_steps=4 format=3 uid="uid://d1testarena01"]
+[gd_scene load_steps=13 format=3 uid="uid://d1testarena01"]
 
-[ext_resource type="Script" path="res://scripts/player_controller.gd" id="1_pc"]
+[ext_resource type="Script" path="res://scripts/characters/base_mecha.gd" id="1_mecha"]
+[ext_resource type="Script" path="res://scripts/combat/fsm/state_machine.gd" id="2_fsm"]
+[ext_resource type="Script" path="res://scripts/combat/fsm/idle_state.gd" id="3_idle"]
+[ext_resource type="Script" path="res://scripts/combat/fsm/walk_state.gd" id="4_walk"]
+[ext_resource type="Script" path="res://scripts/combat/fsm/jump_state.gd" id="5_jump"]
+[ext_resource type="Script" path="res://scripts/combat/fsm/fall_state.gd" id="6_fall"]
+[ext_resource type="Script" path="res://scripts/combat/fsm/dash_state.gd" id="7_dash"]
+[ext_resource type="Script" path="res://scripts/combat/fsm/air_dash_state.gd" id="8_airdash"]
+[ext_resource type="Script" path="res://scripts/combat/fsm/attack_state.gd" id="9_attack"]
+[ext_resource type="Script" path="res://scripts/combat/fsm/hitstun_state.gd" id="10_hitstun"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_platform"]
 size = Vector2(500, 24)
@@ -58,7 +67,7 @@ color = Color(1, 0.8, 0.1, 1)
 
 [node name="Player" type="CharacterBody2D" parent="."]
 position = Vector2(320, 220)
-script = ExtResource("1_pc")
+script = ExtResource("1_mecha")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
 shape = SubResource("RectangleShape2D_player")
@@ -78,6 +87,67 @@ offset_right = 18.0
 offset_bottom = 8.0
 color = Color(1, 0.1, 0.3, 1)
 
+[node name="StateMachine" type="Node" parent="Player"]
+script = ExtResource("2_fsm")
+
+[node name="Idle" type="Node" parent="Player/StateMachine"]
+script = ExtResource("3_idle")
+
+[node name="Walk" type="Node" parent="Player/StateMachine"]
+script = ExtResource("4_walk")
+
+[node name="Jump" type="Node" parent="Player/StateMachine"]
+script = ExtResource("5_jump")
+
+[node name="Fall" type="Node" parent="Player/StateMachine"]
+script = ExtResource("6_fall")
+
+[node name="Dash" type="Node" parent="Player/StateMachine"]
+script = ExtResource("7_dash")
+
+[node name="AirDash" type="Node" parent="Player/StateMachine"]
+script = ExtResource("8_airdash")
+
+[node name="Attack" type="Node" parent="Player/StateMachine"]
+script = ExtResource("9_attack")
+
+[node name="Hitstun" type="Node" parent="Player/StateMachine"]
+script = ExtResource("10_hitstun")
+
+[node name="DummyTarget" type="CharacterBody2D" parent="."]
+position = Vector2(460, 220)
+script = ExtResource("1_mecha")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DummyTarget"]
+shape = SubResource("RectangleShape2D_player")
+
+[node name="MechaVisual" type="ColorRect" parent="DummyTarget"]
+offset_left = -12.0
+offset_top = -19.0
+offset_right = 12.0
+offset_bottom = 19.0
+pivot_offset = Vector2(12, 19)
+color = Color(0.95, 0.45, 0.15, 1)
+
+[node name="Visor" type="ColorRect" parent="DummyTarget/MechaVisual"]
+offset_left = -10.0
+offset_top = 4.0
+offset_right = 2.0
+offset_bottom = 8.0
+color = Color(0.1, 1, 0.4, 1)
+
+[node name="StateMachine" type="Node" parent="DummyTarget"]
+script = ExtResource("2_fsm")
+
+[node name="Idle" type="Node" parent="DummyTarget/StateMachine"]
+script = ExtResource("3_idle")
+
+[node name="Hitstun" type="Node" parent="DummyTarget/StateMachine"]
+script = ExtResource("10_hitstun")
+
+[node name="Fall" type="Node" parent="DummyTarget/StateMachine"]
+script = ExtResource("6_fall")
+
 [node name="UI" type="CanvasLayer" parent="."]
 
 [node name="HUD" type="Control" parent="UI"]
@@ -94,7 +164,7 @@ offset_left = 16.0
 offset_top = 10.0
 offset_right = 624.0
 offset_bottom = 33.0
-text = "A/D atau Panah: Gerak | SPACE: Lompat | SHIFT: Vector Dash"
+text = "A/D: Gerak | SPACE: Lompat | SHIFT/X: Dash | J/Z: Light Attack | K/C: Heavy Attack"
 
 [node name="HeatLabel" type="Label" parent="UI/HUD"]
 layout_mode = 0
@@ -118,4 +188,12 @@ offset_left = 16.0
 offset_top = 76.0
 offset_right = 580.0
 offset_bottom = 99.0
-text = "STATUS: NOMINAL"
+text = "STATE: IDLE"
+
+[node name="DummyHPLabel" type="Label" parent="UI/HUD"]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 98.0
+offset_right = 580.0
+offset_bottom = 121.0
+text = "TARGET DUMMY HP: 1000 / 1000"

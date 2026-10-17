@@ -1,0 +1,356 @@
+class_name BaseMecha
+extends CharacterBody2D
+
+const CombatConstants = preload("res://scripts/combat/combat_constants.gd")
+const StateMachine = preload("res://scripts/combat/fsm/state_machine.gd")
+
+## Base Controller untuk Mecha Tempur dalam Fighting to Zero
+## Mengintegrasikan Hierarchical State Machine (Mecha HSM), Physics 60 FPS, dan Orientasi Visual
+
+@export_group("Movement Stats")
+@export var walk_speed: float = CombatConstants.DEFAULT_WALK_SPEED
+@export var jump_velocity: float = CombatConstants.JUMP_VELOCITY
+@export var gravity: float = CombatConstants.GRAVITY
+
+@export_group("Combat Stats")
+@export var max_hp: int = 1000
+@export var max_heat: float = 100.0
+
+var current_hp: int = 1000
+var heat_gauge: float = 0.0
+var facing_direction: int = 1 # 1: Kanan, -1: Kiri
+
+# Dash State & Cooldown Variables (Story 1.2)
+var can_air_dash: bool = true
+var dash_cooldown_frames: int = 0
+
+# Coyote Time & Platform Tracking (Story 1.3)
+var coyote_frames_left: int = 0
+var was_on_floor_last_frame: bool = true
+
+# Hitbox & Hurtbox Components (Story 1.4)
+var hurtbox: Area2D = null
+var hitbox: Area2D = null
+
+@onready var state_machine: StateMachine = $StateMachine
+@onready var visual_root: Node2D = _find_visual_node()
+
+func _ready() -> void:
+	current_hp = max_hp
+	_setup_combat_colliders()
+	_setup_input_fallbacks()
+	
+	# Set default layer dan mask: Layer 1 (World)
+	collision_layer = 1
+	collision_mask = 1
+
+	if OS.is_debug_build():
+		print("[STATE][%s] BaseMecha siap. Kecepatan jalan: %.1f px/s, Lompat: %.1f px/s." % [
+			name, walk_speed, jump_velocity
+		])
+
+func _setup_combat_colliders() -> void:
+	# Hurtbox (Layer 2)
+	if has_node("Hurtbox"):
+		hurtbox = get_node("Hurtbox") as Area2D
+	else:
+		hurtbox = Area2D.new()
+		hurtbox.name = "Hurtbox"
+		var shape := CollisionShape2D.new()
+		var rect := RectangleShape2D.new()
+		rect.size = Vector2(24, 38)
+		shape.shape = rect
+		hurtbox.add_child(shape)
+		add_child(hurtbox)
+
+	hurtbox.collision_layer = 1 << (CombatConstants.LAYER_HURTBOX - 1)
+	hurtbox.collision_mask = 0
+
+	# Hitbox (Layer 3 memantau Layer 2)
+	if has_node("Hitbox"):
+		hitbox = get_node("Hitbox") as Area2D
+	else:
+		hitbox = Area2D.new()
+		hitbox.name = "Hitbox"
+		var shape := CollisionShape2D.new()
+		var rect := RectangleShape2D.new()
+		rect.size = Vector2(28, 20)
+		shape.shape = rect
+		shape.position = Vector2(18 * facing_direction, -4)
+		hitbox.add_child(shape)
+		add_child(hitbox)
+
+	# Visual Slash Effect untuk feedback pukulan
+	if not hitbox.has_node("SlashVisual"):
+		var slash := ColorRect.new()
+		slash.name = "SlashVisual"
+		slash.size = Vector2(30, 20)
+		slash.position = Vector2(6 * facing_direction, -10)
+		slash.color = Color(1.0, 0.9, 0.2, 0.9) # Golden energy blade
+		slash.visible = false
+		hitbox.add_child(slash)
+
+	hitbox.collision_layer = 1 << (CombatConstants.LAYER_STRIKE_HITBOX - 1)
+	hitbox.collision_mask = 1 << (CombatConstants.LAYER_HURTBOX - 1)
+	hitbox.monitoring = false
+	hitbox.monitorable = false
+
+	if not hitbox.area_entered.is_connected(_on_hitbox_area_entered):
+		hitbox.area_entered.connect(_on_hitbox_area_entered)
+
+func _on_hitbox_area_entered(area: Area2D) -> void:
+	var victim: Node2D = area.owner if area.owner else area.get_parent()
+	if not victim or victim == self:
+		return
+	if not state_machine:
+		return
+	var attack_state = state_machine.get_node_or_null("Attack")
+	if attack_state and attack_state.has_method("can_hit_target") and attack_state.can_hit_target(victim):
+		attack_state.register_hit_target(victim)
+		if victim.has_method("take_hit"):
+			victim.take_hit(self, attack_state.current_attack_data)
+
+func set_hitbox_active(active: bool) -> void:
+	if hitbox:
+		hitbox.monitoring = active
+		hitbox.monitorable = active
+		# Sinkronisasi posisi offset hitbox dengan arah hadap mecha
+		if hitbox.has_node("CollisionShape2D"):
+			var shape = hitbox.get_node("CollisionShape2D")
+			shape.position.x = absf(shape.position.x) * float(facing_direction)
+		if hitbox.has_node("SlashVisual"):
+			var slash = hitbox.get_node("SlashVisual") as ColorRect
+			slash.visible = active
+			if facing_direction > 0:
+				slash.position.x = 4.0
+			else:
+				slash.position.x = -34.0
+
+func is_hitbox_active() -> bool:
+	return hitbox != null and hitbox.monitoring
+
+func take_hit(attacker: Node2D, hit_data: Dictionary) -> void:
+	var dmg: int = hit_data.get("damage", 40)
+	current_hp = max(0, current_hp - dmg)
+
+	var kb_val: float = hit_data.get("knockback", 120.0)
+	var kb_dir: float = 1.0 if (attacker and attacker.global_position.x < global_position.x) else -1.0
+	var kb_vec: Vector2 = Vector2(kb_dir * kb_val, 0.0)
+
+	if state_machine:
+		var hitstun_state = state_machine.get_node_or_null("Hitstun")
+		if hitstun_state and hitstun_state.has_method("setup_hitstun"):
+			hitstun_state.setup_hitstun(hit_data.get("hitstun", 14), kb_vec)
+			state_machine.change_state(&"Hitstun")
+
+	if is_instance_valid(EventBus):
+		EventBus.hit_confirmed.emit(attacker, self, hit_data)
+	else:
+		var bus = get_node_or_null("/root/EventBus")
+		if bus:
+			bus.hit_confirmed.emit(attacker, self, hit_data)
+
+func request_attack(attack_data: Dictionary) -> void:
+	if state_machine:
+		var attack_state = state_machine.get_node_or_null("Attack")
+		if attack_state and attack_state.has_method("setup_attack"):
+			attack_state.setup_attack(attack_data)
+			state_machine.change_state(&"Attack")
+
+func _unhandled_input(event: InputEvent) -> void:
+	var buffer = get_node_or_null("/root/InputBuffer")
+	if not buffer:
+		return
+	if event.is_action_pressed("jump") or event.is_action_pressed("ui_up") or event.is_action_pressed("ui_accept"):
+		buffer.buffer_action(&"jump")
+	elif event.is_action_pressed("dash"):
+		buffer.buffer_action(&"dash", get_dash_vector())
+	elif event.is_action_pressed("attack_light"):
+		buffer.buffer_action(&"attack_light")
+	elif event.is_action_pressed("attack_heavy"):
+		buffer.buffer_action(&"attack_heavy")
+
+func _physics_process(delta: float) -> void:
+	tick_cooldowns()
+
+	# Deteksi pelepasan kontak platform tanpa lompat (Ledge Departure -> Coyote Time AC 2)
+	if was_on_floor_last_frame and not is_on_floor():
+		if state_machine and state_machine.current_state and state_machine.current_state.name != &"Jump" and state_machine.current_state.name != &"AirDash":
+			notify_ledge_drop()
+	was_on_floor_last_frame = is_on_floor()
+
+	# Reset hak air dash dan coyote time secara otomatis begitu mendarat di platform (AC 2, AC 3)
+	if is_on_floor():
+		coyote_frames_left = 0
+		reset_air_dash()
+
+	if state_machine:
+		state_machine.physics_update(delta)
+
+	move_and_slide()
+	_update_hud()
+
+func _find_visual_node() -> Node2D:
+	if has_node("MechaVisual"):
+		return get_node("MechaVisual") as Node2D
+	for child in get_children():
+		if child is CanvasItem and child != state_machine and not (child is CollisionShape2D):
+			return child as Node2D
+	return null
+
+func set_facing_direction(dir: int) -> void:
+	if dir == 0:
+		return
+	facing_direction = 1 if dir > 0 else -1
+	if visual_root:
+		visual_root.scale.x = absf(visual_root.scale.x) * facing_direction
+
+func get_horizontal_axis() -> float:
+	var axis: float = Input.get_axis("move_left", "move_right")
+	if is_zero_approx(axis):
+		axis = Input.get_axis("ui_left", "ui_right")
+	return clampf(axis, -1.0, 1.0)
+
+func is_jump_requested() -> bool:
+	if (
+		Input.is_action_just_pressed("jump")
+		or Input.is_action_just_pressed("ui_up")
+		or Input.is_action_just_pressed("ui_accept")
+	):
+		return true
+	return has_buffered_action(&"jump")
+
+func is_dash_requested() -> bool:
+	if Input.is_action_just_pressed("dash"):
+		return true
+	return has_buffered_action(&"dash")
+
+func is_attack_light_requested() -> bool:
+	if Input.is_action_just_pressed("attack_light"):
+		return true
+	return has_buffered_action(&"attack_light")
+
+func is_attack_heavy_requested() -> bool:
+	if Input.is_action_just_pressed("attack_heavy"):
+		return true
+	return has_buffered_action(&"attack_heavy")
+
+func can_dash() -> bool:
+	return dash_cooldown_frames <= 0
+
+func tick_cooldowns() -> void:
+	if dash_cooldown_frames > 0:
+		dash_cooldown_frames -= 1
+
+func reset_air_dash() -> void:
+	can_air_dash = true
+
+func notify_ledge_drop() -> void:
+	coyote_frames_left = CombatConstants.COYOTE_TIME_FRAMES
+
+func tick_coyote_time() -> void:
+	if coyote_frames_left > 0:
+		coyote_frames_left -= 1
+
+func can_coyote_jump() -> bool:
+	return coyote_frames_left > 0
+
+func consume_coyote_jump() -> void:
+	coyote_frames_left = 0
+
+func has_buffered_action(action_name: StringName) -> bool:
+	var buffer = get_node_or_null("/root/InputBuffer")
+	if buffer and buffer.has_method("has_action"):
+		return buffer.has_action(action_name)
+	return false
+
+func try_consume_buffered_action(action_name: StringName) -> bool:
+	var buffer = get_node_or_null("/root/InputBuffer")
+	if buffer and buffer.has_method("consume_action"):
+		return buffer.consume_action(action_name)
+	return false
+
+func try_consume_buffered_action_with_data(action_name: StringName) -> Dictionary:
+	var buffer = get_node_or_null("/root/InputBuffer")
+	if buffer and buffer.has_method("consume_action_with_data"):
+		return buffer.consume_action_with_data(action_name)
+	return {}
+
+func get_dash_vector() -> Vector2:
+	var h: float = Input.get_axis("move_left", "move_right")
+	if is_zero_approx(h):
+		h = Input.get_axis("ui_left", "ui_right")
+
+	var v: float = Input.get_axis("move_up", "move_down")
+	if is_zero_approx(v):
+		v = Input.get_axis("ui_up", "ui_down")
+
+	return resolve_dash_vector(Vector2(h, v), is_on_floor())
+
+func resolve_dash_vector(raw_input: Vector2, on_floor: bool = false) -> Vector2:
+	var sign_x: float = 0.0
+	var sign_y: float = 0.0
+
+	if raw_input.x > 0.2:
+		sign_x = 1.0
+	elif raw_input.x < -0.2:
+		sign_x = -1.0
+
+	if raw_input.y > 0.2:
+		sign_y = 1.0
+	elif raw_input.y < -0.2:
+		sign_y = -1.0
+
+	# Fallback ke arah hadap mecha jika input vektor nol
+	if sign_x == 0.0 and sign_y == 0.0:
+		return Vector2(float(facing_direction), 0.0)
+
+	# Di darat, dash bawah murni (Vector2(0, 1)) dibatasi horizontal ke arah hadap (AC 1)
+	if on_floor and sign_x == 0.0 and sign_y > 0.0:
+		return Vector2(float(facing_direction), 0.0)
+
+	return Vector2(sign_x, sign_y).normalized()
+
+func _setup_input_fallbacks() -> void:
+	_bind_key("ui_left", KEY_A)
+	_bind_key("ui_right", KEY_D)
+	_bind_key("ui_up", KEY_W)
+	_bind_key("ui_down", KEY_S)
+	_bind_key("move_left", KEY_A)
+	_bind_key("move_right", KEY_D)
+	_bind_key("move_up", KEY_W)
+	_bind_key("move_down", KEY_S)
+	_bind_key("jump", KEY_SPACE)
+	_bind_key("dash", KEY_SHIFT)
+	_bind_key("dash", KEY_X)
+	_bind_key("attack_light", KEY_J)
+	_bind_key("attack_light", KEY_Z)
+	_bind_key("attack_heavy", KEY_K)
+	_bind_key("attack_heavy", KEY_C)
+
+func _bind_key(action: StringName, key: Key) -> void:
+	if not InputMap.has_action(action):
+		InputMap.add_action(action)
+	for event in InputMap.action_get_events(action):
+		if event is InputEventKey and (event.physical_keycode == key or event.keycode == key):
+			return
+	var ev := InputEventKey.new()
+	ev.physical_keycode = key
+	ev.keycode = key
+	InputMap.action_add_event(action, ev)
+
+func _update_hud() -> void:
+	var heat_bar := get_node_or_null("../UI/HUD/HeatBar") as ProgressBar
+	if heat_bar:
+		heat_bar.value = heat_gauge
+	var heat_label := get_node_or_null("../UI/HUD/HeatLabel") as Label
+	if heat_label:
+		heat_label.text = "HEAT: %d%%" % int(heat_gauge)
+	var status_label := get_node_or_null("../UI/HUD/StatusLabel") as Label
+	if status_label and state_machine and state_machine.current_state:
+		status_label.text = "STATE: %s" % state_machine.current_state.name.to_upper()
+	var dummy := get_node_or_null("../DummyTarget") as CharacterBody2D
+	var dummy_label := get_node_or_null("../UI/HUD/DummyHPLabel") as Label
+	if dummy and dummy_label:
+		var dummy_state = dummy.state_machine.current_state.name.to_upper() if (dummy.state_machine and dummy.state_machine.current_state) else "IDLE"
+		dummy_label.text = "TARGET DUMMY HP: %d / %d | STATE: %s" % [dummy.current_hp, dummy.max_hp, dummy_state]
