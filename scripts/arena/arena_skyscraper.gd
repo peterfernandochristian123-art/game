@@ -74,6 +74,8 @@ func _physics_process(_delta: float) -> void:
 
 func notify_ledge_cross(fighter: Node2D, side: StringName) -> void:
 	ledge_reached.emit(fighter, side)
+	if fighter.has_method("trigger_cliffhanger"):
+		fighter.trigger_cliffhanger(side)
 	var bus = get_node_or_null("/root/EventBus")
 	if bus and bus.has_signal("cliffhanger_triggered"):
 		bus.cliffhanger_triggered.emit(fighter.get_instance_id(), side)

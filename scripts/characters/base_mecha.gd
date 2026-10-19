@@ -7,6 +7,7 @@ const HeatComponentScript = preload("res://scripts/combat/components/heat_compon
 const MeltdownState = preload("res://scripts/combat/fsm/meltdown_state.gd")
 const ParryState = preload("res://scripts/combat/fsm/parry_state.gd")
 const BlockstunState = preload("res://scripts/combat/fsm/blockstun_state.gd")
+const CliffhangerState = preload("res://scripts/combat/fsm/cliffhanger_state.gd")
 const AttackData = preload("res://scripts/combat/resources/attack_data.gd")
 
 ## Base Controller untuk Mecha Tempur dalam Fighting to Zero
@@ -35,6 +36,26 @@ var hitstop_frames: int = 0
 var invulnerability_frames: int = 0
 var super_armor_frames: int = 0
 var simulated_horizontal_input: float = 0.0
+
+# Cliffhanger System (Story 4.2)
+var cliffhanger_grabs_used: int = 0
+
+func can_cliffhanger() -> bool:
+	return cliffhanger_grabs_used < CombatConstants.CLIFFHANGER_MAX_GRAB_COUNT and current_hp > 0
+
+func trigger_cliffhanger(side: StringName) -> bool:
+	if not can_cliffhanger():
+		return false
+	if state_machine:
+		var ch_state = state_machine.get_node_or_null("Cliffhanger")
+		if ch_state and ch_state.has_method("setup_ledge"):
+			ch_state.setup_ledge(side)
+		state_machine.change_state(&"Cliffhanger")
+		return true
+	return false
+
+func reset_cliffhanger() -> void:
+	cliffhanger_grabs_used = 0
 
 func has_super_armor() -> bool:
 	return super_armor_frames > 0
@@ -105,6 +126,12 @@ func _setup_fsm_states() -> void:
 		state_machine.add_child(blockstun_node)
 		state_machine.states[&"Blockstun"] = blockstun_node
 		blockstun_node.setup(self, state_machine)
+	if not state_machine.has_node("Cliffhanger"):
+		var cliffhanger_node := CliffhangerState.new()
+		cliffhanger_node.name = "Cliffhanger"
+		state_machine.add_child(cliffhanger_node)
+		state_machine.states[&"Cliffhanger"] = cliffhanger_node
+		cliffhanger_node.setup(self, state_machine)
 
 func is_overclocked() -> bool:
 	return heat_component != null and heat_component.is_overclocked()

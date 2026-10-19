@@ -98,10 +98,21 @@ const BULWARK_RIOT_SHIELD_HEAT_COST: float = 15.0
 const INPUT_BUFFER_WINDOW_FRAMES: int = 5
 const COYOTE_TIME_FRAMES: int = 5
 
-# Batas Platform Arena (Zero-G Skyscraper)
+# Batas Platform Arena (Zero-G Skyscraper) & Cliffhanger System (Story 4.1 & 4.2)
 const ARENA_PLATFORM_WIDTH: float = 1280.0
 const ARENA_LEFT_BOUND: float = 64.0
 const ARENA_RIGHT_BOUND: float = 1344.0
+const CLIFFHANGER_MAX_GRAB_COUNT: int = 1 # Maksimal 1 kali per ronde
+const CLIFFHANGER_HANG_TIME_FRAMES: int = 120 # 2.0 detik pada 60 FPS
+const CLIFFHANGER_CLIMB_STARTUP_FRAMES: int = 18
+const CLIFFHANGER_SWEEP_STARTUP_FRAMES: int = 12
+const CLIFFHANGER_SWEEP_ACTIVE_FRAMES: int = 4
+const CLIFFHANGER_SWEEP_RECOVERY_FRAMES: int = 16
+const CLIFFHANGER_SWEEP_DAMAGE: int = 100 # 10% damage
+const LEDGE_STOMP_STARTUP_FRAMES: int = 15
+const LEDGE_STOMP_ACTIVE_FRAMES: int = 4
+const LEDGE_STOMP_RECOVERY_FRAMES: int = 20
+const RING_OUT_KILL_Y: float = 600.0
 
 # Kategori Collision Layer
 const LAYER_WORLD: int = 1

@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://cliffhangertest01"]
+
+[ext_resource type="Script" path="res://tests/test_cliffhanger_system.gd" id="1_test"]
+
+[node name="TestCliffhangerSystem" type="Node"]
+script = ExtResource("1_test")
