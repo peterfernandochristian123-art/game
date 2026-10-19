@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://sparkparry001"]
+
+[ext_resource type="Script" path="res://tests/test_spark_parry.gd" id="1_test"]
+
+[node name="TestSparkParry" type="Node"]
+script = ExtResource("1_test")

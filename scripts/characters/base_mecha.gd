@@ -5,6 +5,7 @@ const CombatConstants = preload("res://scripts/combat/combat_constants.gd")
 const StateMachine = preload("res://scripts/combat/fsm/state_machine.gd")
 const HeatComponentScript = preload("res://scripts/combat/components/heat_component.gd")
 const MeltdownState = preload("res://scripts/combat/fsm/meltdown_state.gd")
+const ParryState = preload("res://scripts/combat/fsm/parry_state.gd")
 
 ## Base Controller untuk Mecha Tempur dalam Fighting to Zero
 ## Mengintegrasikan Hierarchical State Machine (Mecha HSM), Physics 60 FPS, dan Orientasi Visual
@@ -18,9 +19,17 @@ const MeltdownState = preload("res://scripts/combat/fsm/meltdown_state.gd")
 @export var max_hp: int = 1000
 @export var max_heat: float = 100.0
 
+@export_group("Ultimate Stats")
+@export var max_ultimate: float = CombatConstants.MAX_ULTIMATE
+
 var current_hp: int = 1000
 var heat_gauge: float = 0.0
+var current_ultimate: float = 0.0
 var facing_direction: int = 1 # 1: Kanan, -1: Kiri
+
+# Hitstop & Invulnerability Frames (Story 2.3)
+var hitstop_frames: int = 0
+var invulnerability_frames: int = 0
 
 # Dash State & Cooldown Variables (Story 1.2)
 var can_air_dash: bool = true
@@ -65,6 +74,12 @@ func _setup_fsm_states() -> void:
 		state_machine.add_child(meltdown_node)
 		state_machine.states[&"Meltdown"] = meltdown_node
 		meltdown_node.setup(self, state_machine)
+	if not state_machine.has_node("Parry"):
+		var parry_node := ParryState.new()
+		parry_node.name = "Parry"
+		state_machine.add_child(parry_node)
+		state_machine.states[&"Parry"] = parry_node
+		parry_node.setup(self, state_machine)
 
 func is_overclocked() -> bool:
 	return heat_component != null and heat_component.is_overclocked()
@@ -190,6 +205,17 @@ func is_hitbox_active() -> bool:
 	return hitbox != null and hitbox.monitoring
 
 func take_hit(attacker: Node2D, hit_data: Dictionary) -> void:
+	if invulnerability_frames > 0:
+		return
+
+	# Cek apakah sedang berada di ParryState dan jendela aktif parry terbuka (Story 2.3 AC 3)
+	if state_machine and state_machine.current_state and state_machine.current_state.name == &"Parry":
+		var parry_state = state_machine.current_state
+		if parry_state.has_method("is_parry_active") and parry_state.is_parry_active():
+			if parry_state.has_method("handle_parry_hit"):
+				parry_state.handle_parry_hit(attacker, hit_data)
+				return
+
 	var dmg: int = hit_data.get("damage", 40)
 
 	# Penalti Kerusakan Masuk Meltdown (+25% damage jika mecha sedang di MeltdownShutdown - Story 2.2 AC 3)
@@ -246,8 +272,17 @@ func _unhandled_input(event: InputEvent) -> void:
 		buffer.buffer_action(&"attack_light")
 	elif event.is_action_pressed("attack_heavy"):
 		buffer.buffer_action(&"attack_heavy")
+	elif event.is_action_pressed("parry"):
+		buffer.buffer_action(&"parry")
 
 func _physics_process(delta: float) -> void:
+	if invulnerability_frames > 0:
+		invulnerability_frames -= 1
+
+	if hitstop_frames > 0:
+		hitstop_frames -= 1
+		return
+
 	tick_cooldowns()
 
 	# Deteksi pelepasan kontak platform tanpa lompat (Ledge Departure -> Coyote Time AC 2)
@@ -314,6 +349,25 @@ func is_attack_heavy_requested() -> bool:
 	if Input.is_action_just_pressed("attack_heavy"):
 		return true
 	return has_buffered_action(&"attack_heavy")
+
+func is_parry_requested() -> bool:
+	if Input.is_action_just_pressed("parry"):
+		return true
+	return has_buffered_action(&"parry")
+
+func apply_hitstop(frames: int) -> void:
+	hitstop_frames = max(hitstop_frames, frames)
+
+func grant_invulnerability(frames: int) -> void:
+	invulnerability_frames = max(invulnerability_frames, frames)
+
+func add_ultimate(amount: float) -> void:
+	current_ultimate = clampf(current_ultimate + amount, 0.0, max_ultimate)
+
+func drain_ultimate(amount: float) -> float:
+	var actual_drain: float = minf(current_ultimate, amount)
+	current_ultimate = maxf(0.0, current_ultimate - actual_drain)
+	return actual_drain
 
 func can_dash() -> bool:
 	return dash_cooldown_frames <= 0
@@ -407,6 +461,8 @@ func _setup_input_fallbacks() -> void:
 	_bind_key("attack_light", KEY_Z)
 	_bind_key("attack_heavy", KEY_K)
 	_bind_key("attack_heavy", KEY_C)
+	_bind_key("parry", KEY_L)
+	_bind_key("parry", KEY_V)
 
 func _bind_key(action: StringName, key: Key) -> void:
 	if not InputMap.has_action(action):
@@ -438,6 +494,8 @@ func _update_hud() -> void:
 			state_text += " (OVERCLOCK BUFF ACTIVE)"
 		elif state_machine.current_state.name == &"Meltdown":
 			state_text += " (PENALTY +25% DMG TAKEN)"
+		elif state_machine.current_state.name == &"Parry":
+			state_text += " (SPARK PARRY)"
 		status_label.text = "STATE: %s" % state_text
 	var dummy := get_node_or_null("../DummyTarget") as CharacterBody2D
 	var dummy_label := get_node_or_null("../UI/HUD/DummyHPLabel") as Label

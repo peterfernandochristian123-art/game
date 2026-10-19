@@ -11,6 +11,10 @@ func enter() -> void:
 		character.velocity.x = 0.0
 
 	# Langsung eksekusi aksi buffer pada frame pertama actionable (AC 1)
+	if _is_parry_pressed():
+		_consume_buffered_action(&"parry")
+		state_machine.change_state(&"Parry")
+		return
 	if _is_attack_heavy_pressed():
 		_consume_buffered_action(&"attack_heavy")
 		if character and character.has_method("request_attack"):
@@ -37,6 +41,12 @@ func physics_update(delta: float) -> void:
 	# Cek apakah mecha kehilangan pijakan tanah
 	if not character.is_on_floor():
 		state_machine.change_state(&"Fall")
+		return
+
+	# Cek input parry (Story 2.3)
+	if _is_parry_pressed():
+		_consume_buffered_action(&"parry")
+		state_machine.change_state(&"Parry")
 		return
 
 	# Cek input serangan (Heavy / Light)
@@ -105,6 +115,11 @@ func _is_attack_light_pressed() -> bool:
 	if character and character.has_method("is_attack_light_requested"):
 		return character.is_attack_light_requested()
 	return Input.is_action_just_pressed("attack_light")
+
+func _is_parry_pressed() -> bool:
+	if character and character.has_method("is_parry_requested"):
+		return character.is_parry_requested()
+	return Input.is_action_just_pressed("parry")
 
 func _consume_buffered_action(action_name: StringName) -> void:
 	if character and character.has_method("try_consume_buffered_action"):

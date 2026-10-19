@@ -36,6 +36,16 @@ const OVERCLOCK_DAMAGE_MULTIPLIER: float = 1.2
 const MELTDOWN_DAMAGE_RECEIVED_MULTIPLIER: float = 1.25
 const MELTDOWN_DURATION_FRAMES: int = 90
 
+# Spark Parry & Ultimate Parameters (Story 2.3)
+const SPARK_PARRY_STARTUP_FRAMES: int = 1
+const SPARK_PARRY_ACTIVE_FRAMES: int = 4 # Window aktif: frame 2 hingga frame 5
+const SPARK_PARRY_RECOVERY_FRAMES: int = 14 # Whiff recovery: frame 6 hingga frame 19
+const SPARK_PARRY_TOTAL_FRAMES: int = 19
+const SPARK_PARRY_HITSTOP_FRAMES: int = 12
+const SPARK_PARRY_HEAT_COOLING: float = 20.0
+const SPARK_PARRY_ULTIMATE_STEAL: float = 15.0
+const MAX_ULTIMATE: float = 100.0
+
 # Toleransi Input (Buffer & Coyote Time)
 const INPUT_BUFFER_WINDOW_FRAMES: int = 5
 const COYOTE_TIME_FRAMES: int = 5
