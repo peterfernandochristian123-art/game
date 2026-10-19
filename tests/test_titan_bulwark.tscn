@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://titanbulwarktest01"]
+
+[ext_resource type="Script" path="res://tests/test_titan_bulwark.gd" id="1_test"]
+
+[node name="TestTitanBulwark" type="Node"]
+script = ExtResource("1_test")

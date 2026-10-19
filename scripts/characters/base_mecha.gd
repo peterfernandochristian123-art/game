@@ -20,6 +20,7 @@ const AttackData = preload("res://scripts/combat/resources/attack_data.gd")
 @export_group("Combat Stats")
 @export var max_hp: int = 1000
 @export var max_heat: float = 100.0
+@export var passive_damage_reduction: float = 0.0
 
 @export_group("Ultimate Stats")
 @export var max_ultimate: float = CombatConstants.MAX_ULTIMATE
@@ -29,10 +30,14 @@ var heat_gauge: float = 0.0
 var current_ultimate: float = 0.0
 var facing_direction: int = 1 # 1: Kanan, -1: Kiri
 
-# Hitstop & Invulnerability Frames (Story 2.3)
+# Hitstop, Super Armor, & Invulnerability Frames (Story 2.3, 3.3)
 var hitstop_frames: int = 0
 var invulnerability_frames: int = 0
+var super_armor_frames: int = 0
 var simulated_horizontal_input: float = 0.0
+
+func has_super_armor() -> bool:
+	return super_armor_frames > 0
 
 # Combo Tracking & Bounce Limits (Story 3.1)
 var combo_hit_count: int = 0
@@ -236,8 +241,9 @@ func take_hit(attacker: Node2D, hit_data: Dictionary) -> void:
 				parry_state.handle_parry_hit(attacker, hit_data)
 				return
 
-	# Cek Normal Blocking & Chip Damage (Story 2.4 AC 1 & 2)
-	if can_block() and is_holding_block(attacker):
+	# Cek Normal Blocking & Chip Damage (Story 2.4 AC 1 & 2; Story 3.3 Grabs/Unblockables ignore block)
+	var is_unblockable: bool = hit_data.get("is_unblockable", false) or hit_data.get("is_grab", false)
+	if can_block() and is_holding_block(attacker) and not is_unblockable:
 		var is_energy: bool = hit_data.get("is_energy", false) or hit_data.get("type", "") == "energy"
 		var block_dmg: int = 0
 		if is_energy:
@@ -282,6 +288,11 @@ func take_hit(attacker: Node2D, hit_data: Dictionary) -> void:
 	var base_dmg: int = hit_data.get("damage", 40)
 	var dmg: int = CombatConstants.calculate_combo_damage(base_dmg, combo_hit_count)
 
+	# Reduksi pasif damage (Story 3.3 Titan-V Bulwark -5% passive armor reduction)
+	if passive_damage_reduction > 0.0:
+		dmg = int(round(float(dmg) * (1.0 - passive_damage_reduction)))
+		dmg = max(1, dmg)
+
 	# Evaluasi Ground Bounce & Wall Bounce Limits (Story 3.1 AC 3)
 	var allows_ground_bounce: bool = false
 	if hit_data.get("causes_ground_bounce", false):
@@ -301,15 +312,22 @@ func take_hit(attacker: Node2D, hit_data: Dictionary) -> void:
 
 	current_hp = max(0, current_hp - dmg)
 
-	# 1-Hit Super Armor pada fase startup serangan saat Overclock (Story 2.2 AC 2)
+	# Super Armor: Full Super Armor (Story 3.3 Bulwark Riot Shield) & 1-Hit Startup Super Armor (Story 2.2 AC 2)
 	var absorbed_by_armor: bool = false
-	if state_machine and state_machine.current_state and state_machine.current_state.name == &"Attack":
-		var attack_state = state_machine.current_state
-		if attack_state.has_method("is_startup_super_armor_active") and attack_state.is_startup_super_armor_active():
-			attack_state.consume_super_armor()
+	var is_grab: bool = hit_data.get("is_grab", false)
+
+	if not is_grab:
+		if has_super_armor():
 			absorbed_by_armor = true
 			if OS.is_debug_build():
-				print("[COMBAT][%s] 1-Hit Super Armor menyerap hitstun!" % name)
+				print("[COMBAT][%s] Full Super Armor menyerap hitstun!" % name)
+		elif state_machine and state_machine.current_state and state_machine.current_state.name == &"Attack":
+			var attack_state = state_machine.current_state
+			if attack_state.has_method("is_startup_super_armor_active") and attack_state.is_startup_super_armor_active():
+				attack_state.consume_super_armor()
+				absorbed_by_armor = true
+				if OS.is_debug_build():
+					print("[COMBAT][%s] 1-Hit Super Armor menyerap hitstun!" % name)
 
 	var kb_val: float = hit_data.get("knockback", 120.0)
 	var kb_dir: float = 1.0 if (attacker and attacker.global_position.x < global_position.x) else -1.0
@@ -374,6 +392,9 @@ func _unhandled_input(event: InputEvent) -> void:
 func _physics_process(delta: float) -> void:
 	if invulnerability_frames > 0:
 		invulnerability_frames -= 1
+
+	if super_armor_frames > 0:
+		super_armor_frames -= 1
 
 	if hitstop_frames > 0:
 		hitstop_frames -= 1

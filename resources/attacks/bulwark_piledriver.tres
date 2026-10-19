@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3 uid="uid://bulwarkpiledriver03"]
+
+[ext_resource type="Script" path="res://scripts/combat/resources/attack_data.gd" id="1_atk"]
+
+[resource]
+script = ExtResource("1_atk")
+attack_name = &"HydraulicPiledriver"
+startup = 6
+active = 2
+recovery = 22
+damage = 220
+hitstun = 25
+blockstun = 0
+knockback = 350.0
+heat_cost = 35.0
+is_energy = false
+causes_ground_bounce = true
+causes_wall_bounce = false
+is_unblockable = true
+is_grab = true
+chain_level = 3

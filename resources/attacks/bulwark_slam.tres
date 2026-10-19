@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3 uid="uid://bulwarkslam02"]
+
+[ext_resource type="Script" path="res://scripts/combat/resources/attack_data.gd" id="1_atk"]
+
+[resource]
+script = ExtResource("1_atk")
+attack_name = &"5H"
+startup = 14
+active = 4
+recovery = 18
+damage = 120
+hitstun = 28
+blockstun = 16
+knockback = 300.0
+heat_cost = 0.0
+is_energy = false
+causes_ground_bounce = true
+causes_wall_bounce = true
+is_unblockable = false
+is_grab = false
+chain_level = 2

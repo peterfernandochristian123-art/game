@@ -82,6 +82,18 @@ const VIPER_DEFLECTION_DURATION_FRAMES: int = 30
 const VIPER_CRYOGENIC_DURATION_FRAMES: int = 480 # 8 detik pada 60 FPS
 const VIPER_CRYOGENIC_DASH_BUFF: float = 1.30 # +30% dash speed
 
+# Karakter Titan-V Bulwark Parameters (Story 3.3)
+const BULWARK_MAX_HP: int = 1200
+const BULWARK_PASSIVE_ARMOR_REDUCTION: float = 0.05 # 5% passive damage reduction
+const BULWARK_WALK_SPEED: float = 260.0
+const BULWARK_DASH_SPEED: float = 650.0
+const BULWARK_DASH_DURATION_FRAMES: int = 16
+const BULWARK_RIOT_SHIELD_DURATION_FRAMES: int = 45
+const BULWARK_PILEDRIVER_DAMAGE: int = 220
+const BULWARK_SIEGE_CANNON_DAMAGE: int = 450
+const BULWARK_PILEDRIVER_HEAT_COST: float = 35.0
+const BULWARK_RIOT_SHIELD_HEAT_COST: float = 15.0
+
 # Toleransi Input (Buffer & Coyote Time)
 const INPUT_BUFFER_WINDOW_FRAMES: int = 5
 const COYOTE_TIME_FRAMES: int = 5

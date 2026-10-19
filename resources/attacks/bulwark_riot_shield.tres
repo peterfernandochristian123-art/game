@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3 uid="uid://bulwarkriotshield04"]
+
+[ext_resource type="Script" path="res://scripts/combat/resources/attack_data.gd" id="1_atk"]
+
+[resource]
+script = ExtResource("1_atk")
+attack_name = &"RiotShield"
+startup = 4
+active = 45
+recovery = 15
+damage = 40
+hitstun = 20
+blockstun = 18
+knockback = 220.0
+heat_cost = 15.0
+is_energy = false
+causes_ground_bounce = false
+causes_wall_bounce = false
+is_unblockable = false
+is_grab = false
+chain_level = 3

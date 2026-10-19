@@ -55,14 +55,14 @@ development_status:
   2-4-normal-blocking-chip-damage-mechanics: done
   epic-2-retrospective: optional
 
-  epic-3: in-progress
+  epic-3: done
   3-1-data-driven-attack-architecture-target-chain-scaling: done
   3-2-apex-0-viper-rushdown-character-implementation: done
-  3-3-titan-v-bulwark-heavy-grappler-implementation: in-progress
+  3-3-titan-v-bulwark-heavy-grappler-implementation: done
   epic-3-retrospective: optional
 
-  epic-4: backlog
-  4-1-zero-g-skyscraper-platform-arena-boundaries: backlog
+  epic-4: in-progress
+  4-1-zero-g-skyscraper-platform-arena-boundaries: in-progress
   4-2-cliffhanger-struggle-state-machine-actions: backlog
   4-3-ledge-stomp-ring-out-elimination: backlog
   4-4-match-rules-round-timers-win-conditions: backlog
