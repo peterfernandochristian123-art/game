@@ -114,6 +114,12 @@ const LEDGE_STOMP_ACTIVE_FRAMES: int = 4
 const LEDGE_STOMP_RECOVERY_FRAMES: int = 20
 const RING_OUT_KILL_Y: float = 600.0
 
+# Aturan Pertandingan Best of 3 & Timer (Story 4.4)
+const ROUND_TIME_SECONDS: float = 90.0
+const SUDDEN_DEATH_SECONDS: float = 30.0
+const ROUNDS_TO_WIN: int = 2
+const SUDDEN_DEATH_STARTING_HEAT: float = 90.0
+
 # Kategori Collision Layer
 const LAYER_WORLD: int = 1
 const LAYER_HURTBOX: int = 2

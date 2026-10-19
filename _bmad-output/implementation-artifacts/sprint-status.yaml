@@ -61,15 +61,15 @@ development_status:
   3-3-titan-v-bulwark-heavy-grappler-implementation: done
   epic-3-retrospective: optional
 
-  epic-4: in-progress
+  epic-4: done
   4-1-zero-g-skyscraper-platform-arena-boundaries: done
   4-2-cliffhanger-struggle-state-machine-actions: done
   4-3-ledge-stomp-ring-out-elimination: done
-  4-4-match-rules-round-timers-win-conditions: in-progress
+  4-4-match-rules-round-timers-win-conditions: done
   epic-4-retrospective: optional
 
-  epic-5: backlog
-  5-1-main-menu-navigation-flow: backlog
+  epic-5: in-progress
+  5-1-main-menu-navigation-flow: in-progress
   5-2-dual-input-system-mobile-touch-overlay-gamepad-autodetect: backlog
   5-3-in-game-combat-hud-visual-status-meters: backlog
   5-4-training-mode-suite-with-real-time-frame-inspector: backlog
