@@ -46,6 +46,11 @@ const SPARK_PARRY_HEAT_COOLING: float = 20.0
 const SPARK_PARRY_ULTIMATE_STEAL: float = 15.0
 const MAX_ULTIMATE: float = 100.0
 
+# Blocking & Chip Damage Parameters (Story 2.4)
+const CHIP_DAMAGE_RATIO: float = 0.20 # 20% chip damage untuk serangan energi saat di-block
+const DEFAULT_BLOCKSTUN_FRAMES: int = 10
+const BLOCK_KNOCKBACK_MULTIPLIER: float = 0.60
+
 # Toleransi Input (Buffer & Coyote Time)
 const INPUT_BUFFER_WINDOW_FRAMES: int = 5
 const COYOTE_TIME_FRAMES: int = 5

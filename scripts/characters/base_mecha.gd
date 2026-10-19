@@ -6,6 +6,7 @@ const StateMachine = preload("res://scripts/combat/fsm/state_machine.gd")
 const HeatComponentScript = preload("res://scripts/combat/components/heat_component.gd")
 const MeltdownState = preload("res://scripts/combat/fsm/meltdown_state.gd")
 const ParryState = preload("res://scripts/combat/fsm/parry_state.gd")
+const BlockstunState = preload("res://scripts/combat/fsm/blockstun_state.gd")
 
 ## Base Controller untuk Mecha Tempur dalam Fighting to Zero
 ## Mengintegrasikan Hierarchical State Machine (Mecha HSM), Physics 60 FPS, dan Orientasi Visual
@@ -30,6 +31,7 @@ var facing_direction: int = 1 # 1: Kanan, -1: Kiri
 # Hitstop & Invulnerability Frames (Story 2.3)
 var hitstop_frames: int = 0
 var invulnerability_frames: int = 0
+var simulated_horizontal_input: float = 0.0
 
 # Dash State & Cooldown Variables (Story 1.2)
 var can_air_dash: bool = true
@@ -80,6 +82,12 @@ func _setup_fsm_states() -> void:
 		state_machine.add_child(parry_node)
 		state_machine.states[&"Parry"] = parry_node
 		parry_node.setup(self, state_machine)
+	if not state_machine.has_node("Blockstun"):
+		var blockstun_node := BlockstunState.new()
+		blockstun_node.name = "Blockstun"
+		state_machine.add_child(blockstun_node)
+		state_machine.states[&"Blockstun"] = blockstun_node
+		blockstun_node.setup(self, state_machine)
 
 func is_overclocked() -> bool:
 	return heat_component != null and heat_component.is_overclocked()
@@ -215,6 +223,41 @@ func take_hit(attacker: Node2D, hit_data: Dictionary) -> void:
 			if parry_state.has_method("handle_parry_hit"):
 				parry_state.handle_parry_hit(attacker, hit_data)
 				return
+
+	# Cek Normal Blocking & Chip Damage (Story 2.4 AC 1 & 2)
+	if can_block() and is_holding_block(attacker):
+		var is_energy: bool = hit_data.get("is_energy", false) or hit_data.get("type", "") == "energy"
+		var block_dmg: int = 0
+		if is_energy:
+			var base_dmg: int = hit_data.get("damage", 40)
+			block_dmg = int(round(float(base_dmg) * CombatConstants.CHIP_DAMAGE_RATIO))
+			if base_dmg > 0 and block_dmg == 0:
+				block_dmg = 1
+
+		current_hp = max(0, current_hp - block_dmg)
+
+		# Terapkan blockstun dan knockback teredam (60%)
+		var kb_val: float = hit_data.get("knockback", 120.0) * CombatConstants.BLOCK_KNOCKBACK_MULTIPLIER
+		var kb_dir: float = 1.0 if (attacker and attacker.global_position.x < global_position.x) else -1.0
+		var kb_vec: Vector2 = Vector2(kb_dir * kb_val, 0.0)
+		var blockstun_frames: int = hit_data.get("blockstun", CombatConstants.DEFAULT_BLOCKSTUN_FRAMES)
+
+		if state_machine:
+			var blockstun_state = state_machine.get_node_or_null("Blockstun")
+			if blockstun_state and blockstun_state.has_method("setup_blockstun"):
+				blockstun_state.setup_blockstun(blockstun_frames, kb_vec)
+				state_machine.change_state(&"Blockstun")
+
+		var blocked_data: Dictionary = hit_data.duplicate()
+		blocked_data["blocked"] = true
+		blocked_data["chip_damage"] = block_dmg
+		if is_instance_valid(EventBus):
+			EventBus.hit_confirmed.emit(attacker, self, blocked_data)
+		else:
+			var bus = get_node_or_null("/root/EventBus")
+			if bus:
+				bus.hit_confirmed.emit(attacker, self, blocked_data)
+		return
 
 	var dmg: int = hit_data.get("damage", 40)
 
@@ -369,6 +412,32 @@ func drain_ultimate(amount: float) -> float:
 	current_ultimate = maxf(0.0, current_ultimate - actual_drain)
 	return actual_drain
 
+func get_horizontal_axis() -> float:
+	if not is_zero_approx(simulated_horizontal_input):
+		return simulated_horizontal_input
+	var val: float = Input.get_axis("move_left", "move_right")
+	if is_zero_approx(val):
+		val = Input.get_axis("ui_left", "ui_right")
+	return val
+
+func can_block() -> bool:
+	if not state_machine or not state_machine.current_state:
+		return false
+	var sname: StringName = state_machine.current_state.name
+	return sname == &"Idle" or sname == &"Walk" or sname == &"Blockstun"
+
+func is_holding_block(attacker: Node2D) -> bool:
+	if not attacker:
+		return false
+	var h_input: float = get_horizontal_axis()
+	# Jika penyerang di sebelah kiri (attacker.x < mecha.x), holding away adalah menahan kanan (h_input > 0.2)
+	if attacker.global_position.x < global_position.x:
+		return h_input > 0.2
+	# Jika penyerang di sebelah kanan (attacker.x > mecha.x), holding away adalah menahan kiri (h_input < -0.2)
+	elif attacker.global_position.x > global_position.x:
+		return h_input < -0.2
+	return false
+
 func can_dash() -> bool:
 	return dash_cooldown_frames <= 0
 
@@ -496,6 +565,8 @@ func _update_hud() -> void:
 			state_text += " (PENALTY +25% DMG TAKEN)"
 		elif state_machine.current_state.name == &"Parry":
 			state_text += " (SPARK PARRY)"
+		elif state_machine.current_state.name == &"Blockstun":
+			state_text += " (GUARDING)"
 		status_label.text = "STATE: %s" % state_text
 	var dummy := get_node_or_null("../DummyTarget") as CharacterBody2D
 	var dummy_label := get_node_or_null("../UI/HUD/DummyHPLabel") as Label

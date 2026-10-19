@@ -51,8 +51,8 @@ development_status:
   epic-2: in-progress
   2-1-heat-gauge-component-passive-cooling-logic: done
   2-2-overclock-zone-buffs-emergency-meltdown-shutdown: done
-  2-3-spark-parry-system-with-frame-exact-window: review
-  2-4-normal-blocking-chip-damage-mechanics: backlog
+  2-3-spark-parry-system-with-frame-exact-window: done
+  2-4-normal-blocking-chip-damage-mechanics: review
   epic-2-retrospective: optional
 
   epic-3: backlog
