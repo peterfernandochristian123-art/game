@@ -32,6 +32,10 @@ func enter() -> void:
 	character.velocity = dash_direction * CombatConstants.DASH_SPEED
 	current_dash_frame = 0
 
+	# Setiap dash menambah panas (Story 2.1)
+	if character.has_method("add_heat"):
+		character.add_heat(CombatConstants.DASH_HEAT_COST)
+
 	if OS.is_debug_build():
 		print("[STATE][%s] Transisi ke Dash. Arah: %s, Kecepatan: %.1f px/s" % [
 			character.name, dash_direction, CombatConstants.DASH_SPEED

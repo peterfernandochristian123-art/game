@@ -34,7 +34,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-10-17 15:31
-last_updated: 2026-10-17 16:34
+last_updated: 2026-10-19 16:56
 project: game
 project_key: NOKEY
 tracking_system: file-system
@@ -48,9 +48,9 @@ development_status:
   1-4-base-normal-attacks-frame-based-hit-hurtbox-collision: done
   epic-1-retrospective: optional
 
-  epic-2: backlog
-  2-1-heat-gauge-component-passive-cooling-logic: backlog
-  2-2-overclock-zone-buffs-emergency-meltdown-shutdown: backlog
+  epic-2: in-progress
+  2-1-heat-gauge-component-passive-cooling-logic: review
+  2-2-overclock-zone-buffs-emergency-meltdown-shutdown: review
   2-3-spark-parry-system-with-frame-exact-window: backlog
   2-4-normal-blocking-chip-damage-mechanics: backlog
   epic-2-retrospective: optional

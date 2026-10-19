@@ -3,6 +3,8 @@ extends CharacterBody2D
 
 const CombatConstants = preload("res://scripts/combat/combat_constants.gd")
 const StateMachine = preload("res://scripts/combat/fsm/state_machine.gd")
+const HeatComponentScript = preload("res://scripts/combat/components/heat_component.gd")
+const MeltdownState = preload("res://scripts/combat/fsm/meltdown_state.gd")
 
 ## Base Controller untuk Mecha Tempur dalam Fighting to Zero
 ## Mengintegrasikan Hierarchical State Machine (Mecha HSM), Physics 60 FPS, dan Orientasi Visual
@@ -32,12 +34,17 @@ var was_on_floor_last_frame: bool = true
 var hurtbox: Area2D = null
 var hitbox: Area2D = null
 
+# Heat Component (Story 2.1 & 2.2)
+var heat_component: HeatComponentScript = null
+
 @onready var state_machine: StateMachine = $StateMachine
 @onready var visual_root: Node2D = _find_visual_node()
 
 func _ready() -> void:
 	current_hp = max_hp
 	_setup_combat_colliders()
+	_setup_heat_component()
+	_setup_fsm_states()
 	_setup_input_fallbacks()
 	
 	# Set default layer dan mask: Layer 1 (World)
@@ -48,6 +55,54 @@ func _ready() -> void:
 		print("[STATE][%s] BaseMecha siap. Kecepatan jalan: %.1f px/s, Lompat: %.1f px/s." % [
 			name, walk_speed, jump_velocity
 		])
+
+func _setup_fsm_states() -> void:
+	if not state_machine:
+		return
+	if not state_machine.has_node("Meltdown"):
+		var meltdown_node := MeltdownState.new()
+		meltdown_node.name = "Meltdown"
+		state_machine.add_child(meltdown_node)
+		state_machine.states[&"Meltdown"] = meltdown_node
+		meltdown_node.setup(self, state_machine)
+
+func is_overclocked() -> bool:
+	return heat_component != null and heat_component.is_overclocked()
+
+func _setup_heat_component() -> void:
+	if has_node("HeatComponent"):
+		heat_component = get_node("HeatComponent")
+	else:
+		heat_component = HeatComponentScript.new()
+		heat_component.name = "HeatComponent"
+		add_child(heat_component)
+
+	if not heat_component.heat_changed.is_connected(_on_heat_changed):
+		heat_component.heat_changed.connect(_on_heat_changed)
+	if not heat_component.meltdown_triggered.is_connected(_on_meltdown_triggered):
+		heat_component.meltdown_triggered.connect(_on_meltdown_triggered)
+	heat_gauge = heat_component.current_heat
+
+func _on_meltdown_triggered() -> void:
+	if state_machine:
+		state_machine.change_state(&"Meltdown")
+
+func _on_heat_changed(current: float, _max_val: float) -> void:
+	heat_gauge = current
+
+## Pendinginan pasif: hanya saat state aktif Idle atau Walk (-0.2 heat per physics frame)
+func _update_heat_cooling() -> void:
+	if not heat_component:
+		return
+	var can_cool: bool = false
+	if state_machine and state_machine.current_state:
+		var state_name: StringName = state_machine.current_state.name
+		can_cool = state_name == &"Idle" or state_name == &"Walk"
+	heat_component.process_frame(can_cool)
+
+func add_heat(amount: float) -> void:
+	if heat_component:
+		heat_component.add_heat(amount)
 
 func _setup_combat_colliders() -> void:
 	# Hurtbox (Layer 2)
@@ -108,7 +163,12 @@ func _on_hitbox_area_entered(area: Area2D) -> void:
 	if attack_state and attack_state.has_method("can_hit_target") and attack_state.can_hit_target(victim):
 		attack_state.register_hit_target(victim)
 		if victim.has_method("take_hit"):
-			victim.take_hit(self, attack_state.current_attack_data)
+			var outgoing_data: Dictionary = attack_state.current_attack_data.duplicate()
+			# Buff Damage Overclock (+20% damage jika attacker di zona Overclock - Story 2.2 AC 2)
+			if is_overclocked():
+				var base_dmg: int = outgoing_data.get("damage", 40)
+				outgoing_data["damage"] = int(round(float(base_dmg) * CombatConstants.OVERCLOCK_DAMAGE_MULTIPLIER))
+			victim.take_hit(self, outgoing_data)
 
 func set_hitbox_active(active: bool) -> void:
 	if hitbox:
@@ -131,17 +191,34 @@ func is_hitbox_active() -> bool:
 
 func take_hit(attacker: Node2D, hit_data: Dictionary) -> void:
 	var dmg: int = hit_data.get("damage", 40)
+
+	# Penalti Kerusakan Masuk Meltdown (+25% damage jika mecha sedang di MeltdownShutdown - Story 2.2 AC 3)
+	if state_machine and state_machine.current_state and state_machine.current_state.name == &"Meltdown":
+		dmg = int(round(float(dmg) * CombatConstants.MELTDOWN_DAMAGE_RECEIVED_MULTIPLIER))
+
 	current_hp = max(0, current_hp - dmg)
+
+	# 1-Hit Super Armor pada fase startup serangan saat Overclock (Story 2.2 AC 2)
+	var absorbed_by_armor: bool = false
+	if state_machine and state_machine.current_state and state_machine.current_state.name == &"Attack":
+		var attack_state = state_machine.current_state
+		if attack_state.has_method("is_startup_super_armor_active") and attack_state.is_startup_super_armor_active():
+			attack_state.consume_super_armor()
+			absorbed_by_armor = true
+			if OS.is_debug_build():
+				print("[COMBAT][%s] 1-Hit Super Armor menyerap hitstun!" % name)
 
 	var kb_val: float = hit_data.get("knockback", 120.0)
 	var kb_dir: float = 1.0 if (attacker and attacker.global_position.x < global_position.x) else -1.0
 	var kb_vec: Vector2 = Vector2(kb_dir * kb_val, 0.0)
 
-	if state_machine:
-		var hitstun_state = state_machine.get_node_or_null("Hitstun")
-		if hitstun_state and hitstun_state.has_method("setup_hitstun"):
-			hitstun_state.setup_hitstun(hit_data.get("hitstun", 14), kb_vec)
-			state_machine.change_state(&"Hitstun")
+	# Jika armor menyerap hitstun atau sedang dalam Meltdown (sudah terkunci), jangan beralih ke Hitstun
+	if not absorbed_by_armor:
+		if state_machine and state_machine.current_state and state_machine.current_state.name != &"Meltdown":
+			var hitstun_state = state_machine.get_node_or_null("Hitstun")
+			if hitstun_state and hitstun_state.has_method("setup_hitstun"):
+				hitstun_state.setup_hitstun(hit_data.get("hitstun", 14), kb_vec)
+				state_machine.change_state(&"Hitstun")
 
 	if is_instance_valid(EventBus):
 		EventBus.hit_confirmed.emit(attacker, self, hit_data)
@@ -183,6 +260,9 @@ func _physics_process(delta: float) -> void:
 	if is_on_floor():
 		coyote_frames_left = 0
 		reset_air_dash()
+
+	# Pendinginan heat dihitung sebelum update state (atau memakai state aktif saat tick dimulai)
+	_update_heat_cooling()
 
 	if state_machine:
 		state_machine.physics_update(delta)
@@ -345,10 +425,20 @@ func _update_hud() -> void:
 		heat_bar.value = heat_gauge
 	var heat_label := get_node_or_null("../UI/HUD/HeatLabel") as Label
 	if heat_label:
-		heat_label.text = "HEAT: %d%%" % int(heat_gauge)
+		if is_overclocked():
+			heat_label.text = "HEAT: %d%% [OVERCLOCK! +20%% DMG]" % int(heat_gauge)
+		elif state_machine and state_machine.current_state and state_machine.current_state.name == &"Meltdown":
+			heat_label.text = "HEAT: %d%% [MELTDOWN SHUTDOWN!]" % int(heat_gauge)
+		else:
+			heat_label.text = "HEAT: %d%%" % int(heat_gauge)
 	var status_label := get_node_or_null("../UI/HUD/StatusLabel") as Label
 	if status_label and state_machine and state_machine.current_state:
-		status_label.text = "STATE: %s" % state_machine.current_state.name.to_upper()
+		var state_text: String = state_machine.current_state.name.to_upper()
+		if is_overclocked():
+			state_text += " (OVERCLOCK BUFF ACTIVE)"
+		elif state_machine.current_state.name == &"Meltdown":
+			state_text += " (PENALTY +25% DMG TAKEN)"
+		status_label.text = "STATE: %s" % state_text
 	var dummy := get_node_or_null("../DummyTarget") as CharacterBody2D
 	var dummy_label := get_node_or_null("../UI/HUD/DummyHPLabel") as Label
 	if dummy and dummy_label:

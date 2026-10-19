@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://dne20rs62aiye"]
+
+[ext_resource type="Script" path="res://tests/test_overclock_meltdown.gd" id="1_test"]
+
+[node name="TestOverclockMeltdown" type="Node"]
+script = ExtResource("1_test")

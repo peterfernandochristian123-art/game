@@ -21,6 +21,21 @@ const DASH_SPEED: float = 750.0
 const DASH_DURATION_FRAMES: int = 14
 const DASH_COOLDOWN_FRAMES: int = 18
 
+# Heat Gauge (Story 2.1 & 2.2)
+const MAX_HEAT: float = 100.0
+const DASH_HEAT_COST: float = 10.0
+const SKILL_HEAT_MIN: float = 15.0
+const SKILL_HEAT_MAX: float = 35.0
+const PASSIVE_COOLING_PER_SECOND: float = 12.0
+const PASSIVE_COOLING_PER_FRAME: float = PASSIVE_COOLING_PER_SECOND / 60.0 # 0.2 per physics frame
+
+# Overclock & Meltdown Parameters (Story 2.2)
+const OVERCLOCK_THRESHOLD: float = 80.0
+const MELTDOWN_THRESHOLD: float = 100.0
+const OVERCLOCK_DAMAGE_MULTIPLIER: float = 1.2
+const MELTDOWN_DAMAGE_RECEIVED_MULTIPLIER: float = 1.25
+const MELTDOWN_DURATION_FRAMES: int = 90
+
 # Toleransi Input (Buffer & Coyote Time)
 const INPUT_BUFFER_WINDOW_FRAMES: int = 5
 const COYOTE_TIME_FRAMES: int = 5

@@ -9,13 +9,26 @@ const CombatConstants = preload("res://scripts/combat/combat_constants.gd")
 var current_attack_data: Dictionary = {}
 var current_attack_frame: int = 0
 var hit_targets: Array[Node2D] = []
+var has_super_armor: bool = false
 
 func setup_attack(attack_data: Dictionary) -> void:
 	current_attack_data = attack_data
 
+func is_startup_super_armor_active() -> bool:
+	var startup: int = current_attack_data.get("startup", 5)
+	return has_super_armor and current_attack_frame < startup
+
+func consume_super_armor() -> void:
+	has_super_armor = false
+
 func enter() -> void:
 	current_attack_frame = 0
 	hit_targets.clear()
+
+	# 1-Hit Super Armor jika mecha berada di zona Overclock (Story 2.2 AC 2)
+	has_super_armor = false
+	if character and character.has_method("is_overclocked") and character.is_overclocked():
+		has_super_armor = true
 
 	if character and character.has_method("set_hitbox_active"):
 		character.set_hitbox_active(false)
@@ -26,7 +39,9 @@ func enter() -> void:
 
 	if OS.is_debug_build() and character:
 		var atk_name: String = current_attack_data.get("name", "Normal")
-		print("[STATE][%s] Mengeksekusi serangan: %s" % [character.name, atk_name])
+		print("[STATE][%s] Mengeksekusi serangan: %s (Super Armor: %s)" % [
+			character.name, atk_name, str(has_super_armor)
+		])
 
 func physics_update(_delta: float) -> void:
 	if not character:
