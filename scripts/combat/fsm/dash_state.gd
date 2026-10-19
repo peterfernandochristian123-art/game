@@ -29,7 +29,8 @@ func enter() -> void:
 		character.set_facing_direction(1 if dash_direction.x > 0 else -1)
 
 	# Terapkan kecepatan dash konstan dan reset frame counter
-	character.velocity = dash_direction * CombatConstants.DASH_SPEED
+	var dash_spd: float = character.get_dash_speed() if character.has_method("get_dash_speed") else CombatConstants.DASH_SPEED
+	character.velocity = dash_direction * dash_spd
 	current_dash_frame = 0
 
 	# Setiap dash menambah panas (Story 2.1)
@@ -38,7 +39,7 @@ func enter() -> void:
 
 	if OS.is_debug_build():
 		print("[STATE][%s] Transisi ke Dash. Arah: %s, Kecepatan: %.1f px/s" % [
-			character.name, dash_direction, CombatConstants.DASH_SPEED
+			character.name, dash_direction, dash_spd
 		])
 
 func physics_update(_delta: float) -> void:
@@ -48,10 +49,12 @@ func physics_update(_delta: float) -> void:
 	current_dash_frame += 1
 
 	# Pertahankan kecepatan konstan dan lintasan lurus (abaikan gravitasi)
-	character.velocity = dash_direction * CombatConstants.DASH_SPEED
+	var dash_spd: float = character.get_dash_speed() if character.has_method("get_dash_speed") else CombatConstants.DASH_SPEED
+	var dash_dur: int = character.get_dash_duration() if character.has_method("get_dash_duration") else CombatConstants.DASH_DURATION_FRAMES
+	character.velocity = dash_direction * dash_spd
 
-	# Periksa batas akhir durasi dash (14 frame)
-	if current_dash_frame >= CombatConstants.DASH_DURATION_FRAMES:
+	# Periksa batas akhir durasi dash
+	if current_dash_frame >= dash_dur:
 		if character.is_on_floor():
 			var input_x: float = character.get_horizontal_axis() if character.has_method("get_horizontal_axis") else 0.0
 			if not is_zero_approx(input_x):

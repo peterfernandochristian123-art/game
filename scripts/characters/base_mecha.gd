@@ -364,6 +364,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		buffer.buffer_action(&"attack_heavy")
 	elif event.is_action_pressed("skill1"):
 		buffer.buffer_action(&"skill1")
+	elif event.is_action_pressed("skill2"):
+		buffer.buffer_action(&"skill2")
+	elif event.is_action_pressed("ultimate"):
+		buffer.buffer_action(&"ultimate")
 	elif event.is_action_pressed("parry"):
 		buffer.buffer_action(&"parry")
 
@@ -451,6 +455,22 @@ func is_skill_requested() -> bool:
 	if Input.is_action_just_pressed("skill1"):
 		return true
 	return has_buffered_action(&"skill1")
+
+func is_skill2_requested() -> bool:
+	if Input.is_action_just_pressed("skill2"):
+		return true
+	return has_buffered_action(&"skill2")
+
+func is_ultimate_requested() -> bool:
+	if Input.is_action_just_pressed("ultimate"):
+		return true
+	return has_buffered_action(&"ultimate")
+
+func get_dash_speed() -> float:
+	return CombatConstants.DASH_SPEED
+
+func get_dash_duration() -> int:
+	return CombatConstants.DASH_DURATION_FRAMES
 
 func apply_hitstop(frames: int) -> void:
 	hitstop_frames = max(hitstop_frames, frames)
@@ -587,7 +607,8 @@ func _setup_input_fallbacks() -> void:
 	_bind_key("parry", KEY_L)
 	_bind_key("parry", KEY_V)
 	_bind_key("skill1", KEY_U)
-	_bind_key("skill1", KEY_I)
+	_bind_key("skill2", KEY_I)
+	_bind_key("ultimate", KEY_O)
 
 func _bind_key(action: StringName, key: Key) -> void:
 	if not InputMap.has_action(action):

@@ -56,9 +56,9 @@ development_status:
   epic-2-retrospective: optional
 
   epic-3: in-progress
-  3-1-data-driven-attack-architecture-target-chain-scaling: review
-  3-2-apex-0-viper-rushdown-character-implementation: backlog
-  3-3-titan-v-bulwark-heavy-grappler-implementation: backlog
+  3-1-data-driven-attack-architecture-target-chain-scaling: done
+  3-2-apex-0-viper-rushdown-character-implementation: done
+  3-3-titan-v-bulwark-heavy-grappler-implementation: in-progress
   epic-3-retrospective: optional
 
   epic-4: backlog

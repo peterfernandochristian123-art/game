@@ -72,6 +72,16 @@ static func calculate_combo_damage(base_dmg: int, hit_number: int) -> int:
 		multiplier = maxf(COMBO_SCALING_FLOOR, COMBO_SCALING_HIT_3 - float(hit_number - 3) * COMBO_SCALING_HIT_4_PLUS_DECAY)
 	return max(1, int(round(float(base_dmg) * multiplier)))
 
+# Karakter Apex-0 Viper Parameters (Story 3.2)
+const VIPER_MAX_HP: int = 900
+const VIPER_WALK_SPEED: float = 350.0
+const VIPER_DASH_SPEED: float = 820.0
+const VIPER_DASH_DURATION_FRAMES: int = 12
+const VIPER_BLINK_SLASH_DISTANCE: float = 400.0
+const VIPER_DEFLECTION_DURATION_FRAMES: int = 30
+const VIPER_CRYOGENIC_DURATION_FRAMES: int = 480 # 8 detik pada 60 FPS
+const VIPER_CRYOGENIC_DASH_BUFF: float = 1.30 # +30% dash speed
+
 # Toleransi Input (Buffer & Coyote Time)
 const INPUT_BUFFER_WINDOW_FRAMES: int = 5
 const COYOTE_TIME_FRAMES: int = 5

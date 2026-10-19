@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3 uid="uid://viperblinkslash01"]
+
+[ext_resource type="Script" path="res://scripts/combat/resources/attack_data.gd" id="1_atk"]
+
+[resource]
+script = ExtResource("1_atk")
+attack_name = &"BlinkSlash"
+startup = 10
+active = 4
+recovery = 18
+damage = 110
+hitstun = 26
+blockstun = 14
+knockback = 240.0
+heat_cost = 25.0
+is_energy = true
+causes_ground_bounce = false
+causes_wall_bounce = false
+chain_level = 4
