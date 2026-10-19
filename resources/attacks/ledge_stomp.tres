@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3 uid="uid://ledgestomp01"]
+
+[ext_resource type="Script" path="res://scripts/combat/resources/attack_data.gd" id="1_atk"]
+
+[resource]
+script = ExtResource("1_atk")
+attack_name = &"LedgeStomp"
+startup = 15
+active = 4
+recovery = 20
+damage = 120
+hitstun = 30
+blockstun = 10
+knockback = 400.0
+heat_cost = 0.0
+is_energy = false
+causes_ground_bounce = true
+causes_wall_bounce = false
+is_unblockable = true
+is_grab = false
+is_ledge_stomp = true
+chain_level = 2

@@ -8,6 +8,7 @@ const CombatConstants = preload("res://scripts/combat/combat_constants.gd")
 ## Memantau batas tepi kiri (X < 64) dan kanan (X > 1344) untuk memicu Cliffhanger System
 
 signal ledge_reached(mecha: Node2D, side: StringName)
+signal ring_out_detected(mecha: Node2D)
 
 @export var platform_width: float = CombatConstants.ARENA_PLATFORM_WIDTH
 @export var left_bound: float = CombatConstants.ARENA_LEFT_BOUND
@@ -71,6 +72,12 @@ func _physics_process(_delta: float) -> void:
 				notify_ledge_cross(fighter, &"left")
 			elif f_pos.x > right_bound:
 				notify_ledge_cross(fighter, &"right")
+
+		# Melewati batas dasar arena (Ring-Out)
+		if f_pos.y > CombatConstants.RING_OUT_KILL_Y:
+			ring_out_detected.emit(fighter)
+			if fighter.has_method("eliminate_by_ring_out"):
+				fighter.eliminate_by_ring_out()
 
 func notify_ledge_cross(fighter: Node2D, side: StringName) -> void:
 	ledge_reached.emit(fighter, side)

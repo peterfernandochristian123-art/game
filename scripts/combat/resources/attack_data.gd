@@ -18,6 +18,7 @@ extends Resource
 @export var causes_wall_bounce: bool = false
 @export var is_unblockable: bool = false
 @export var is_grab: bool = false
+@export var is_ledge_stomp: bool = false
 
 ## Tingkatan rantai serangan untuk Target Chain Cancel (1 = Normal 1, 2 = Normal 2, 3 = Skill, 4 = Ultimate)
 @export var chain_level: int = 1
@@ -39,6 +40,7 @@ func to_dict() -> Dictionary:
 		"causes_wall_bounce": causes_wall_bounce,
 		"is_unblockable": is_unblockable,
 		"is_grab": is_grab,
+		"is_ledge_stomp": is_ledge_stomp,
 		"chain_level": chain_level
 	}
 
@@ -58,5 +60,6 @@ static func from_dict(data: Dictionary) -> AttackData:
 	atk.causes_wall_bounce = data.get("causes_wall_bounce", false)
 	atk.is_unblockable = data.get("is_unblockable", false)
 	atk.is_grab = data.get("is_grab", false)
+	atk.is_ledge_stomp = data.get("is_ledge_stomp", false)
 	atk.chain_level = data.get("chain_level", 1)
 	return atk

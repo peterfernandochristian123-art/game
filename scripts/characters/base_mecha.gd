@@ -60,6 +60,21 @@ func reset_cliffhanger() -> void:
 func has_super_armor() -> bool:
 	return super_armor_frames > 0
 
+signal ring_out_eliminated(mecha: Node2D)
+var is_eliminated: bool = false
+
+func eliminate_by_ring_out() -> void:
+	if is_eliminated:
+		return
+	is_eliminated = true
+	current_hp = 0
+	ring_out_eliminated.emit(self)
+	var bus = get_node_or_null("/root/EventBus")
+	if bus and bus.has_signal("round_ended"):
+		bus.round_ended.emit(get_instance_id(), &"ring_out")
+	if OS.is_debug_build():
+		print("[COMBAT][%s] TERELIMINASI: RING OUT!" % name)
+
 # Combo Tracking & Bounce Limits (Story 3.1)
 var combo_hit_count: int = 0
 var ground_bounce_count: int = 0
@@ -68,7 +83,8 @@ var wall_bounce_count: int = 0
 var attack_resources: Dictionary = {
 	&"5L": preload("res://resources/attacks/normal_light.tres"),
 	&"5H": preload("res://resources/attacks/normal_heavy.tres"),
-	&"Skill1": preload("res://resources/attacks/skill_slash.tres")
+	&"Skill1": preload("res://resources/attacks/skill_slash.tres"),
+	&"LedgeStomp": preload("res://resources/attacks/ledge_stomp.tres")
 }
 
 # Dash State & Cooldown Variables (Story 1.2)
@@ -260,6 +276,12 @@ func take_hit(attacker: Node2D, hit_data: Dictionary) -> void:
 	if invulnerability_frames > 0:
 		return
 
+	# Cek jika mecha sedang bergelantungan di CliffhangerState dan terkena Ledge Stomp (Story 4.3 AC 1)
+	if state_machine and state_machine.current_state and state_machine.current_state.name == &"Cliffhanger":
+		if hit_data.get("is_ledge_stomp", false):
+			eliminate_by_ring_out()
+			return
+
 	# Cek apakah sedang berada di ParryState dan jendela aktif parry terbuka (Story 2.3 AC 3)
 	if state_machine and state_machine.current_state and state_machine.current_state.name == &"Parry":
 		var parry_state = state_machine.current_state
@@ -448,6 +470,10 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 	_update_hud()
+
+	# Deteksi Ring-Out saat mecha jatuh melewati batas bawah arena (Story 4.3 AC 2)
+	if global_position.y > CombatConstants.RING_OUT_KILL_Y and not is_eliminated:
+		eliminate_by_ring_out()
 
 func _find_visual_node() -> Node2D:
 	if has_node("MechaVisual"):
