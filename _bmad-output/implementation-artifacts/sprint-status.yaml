@@ -34,7 +34,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-10-17 15:31
-last_updated: 2026-10-19 22:15
+last_updated: 2026-10-19 22:40
 project: game
 project_key: NOKEY
 tracking_system: file-system
@@ -48,15 +48,15 @@ development_status:
   1-4-base-normal-attacks-frame-based-hit-hurtbox-collision: done
   epic-1-retrospective: optional
 
-  epic-2: in-progress
+  epic-2: done
   2-1-heat-gauge-component-passive-cooling-logic: done
   2-2-overclock-zone-buffs-emergency-meltdown-shutdown: done
   2-3-spark-parry-system-with-frame-exact-window: done
-  2-4-normal-blocking-chip-damage-mechanics: review
+  2-4-normal-blocking-chip-damage-mechanics: done
   epic-2-retrospective: optional
 
-  epic-3: backlog
-  3-1-data-driven-attack-architecture-target-chain-scaling: backlog
+  epic-3: in-progress
+  3-1-data-driven-attack-architecture-target-chain-scaling: review
   3-2-apex-0-viper-rushdown-character-implementation: backlog
   3-3-titan-v-bulwark-heavy-grappler-implementation: backlog
   epic-3-retrospective: optional

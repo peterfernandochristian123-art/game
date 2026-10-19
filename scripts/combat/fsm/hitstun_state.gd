@@ -36,6 +36,9 @@ func physics_update(delta: float) -> void:
 	current_stun_frame += 1
 
 	if current_stun_frame >= hitstun_duration:
+		if character and character.has_method("reset_combo_state"):
+			character.reset_combo_state()
+
 		if character.is_on_floor() or not state_machine.has_node("Fall"):
 			state_machine.change_state(&"Idle")
 		else:

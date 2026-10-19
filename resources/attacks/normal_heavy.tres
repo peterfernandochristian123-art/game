@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3 uid="uid://atknormalheavy01"]
+
+[ext_resource type="Script" path="res://scripts/combat/resources/attack_data.gd" id="1_atk"]
+
+[resource]
+script = ExtResource("1_atk")
+attack_name = &"5H"
+startup = 10
+active = 4
+recovery = 16
+damage = 90
+hitstun = 22
+blockstun = 16
+knockback = 260.0
+heat_cost = 0.0
+is_energy = false
+causes_ground_bounce = true
+causes_wall_bounce = false
+chain_level = 2

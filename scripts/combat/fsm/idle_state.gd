@@ -9,20 +9,31 @@ const CombatConstants = preload("res://scripts/combat/combat_constants.gd")
 func enter() -> void:
 	if character:
 		character.velocity.x = 0.0
+		if character.has_method("reset_combo_state"):
+			character.reset_combo_state()
 
 	# Langsung eksekusi aksi buffer pada frame pertama actionable (AC 1)
 	if _is_parry_pressed():
 		_consume_buffered_action(&"parry")
 		state_machine.change_state(&"Parry")
 		return
+	if _is_skill_pressed():
+		_consume_buffered_action(&"skill1")
+		if character and character.has_method("request_attack_by_name"):
+			character.request_attack_by_name(&"Skill1")
+		return
 	if _is_attack_heavy_pressed():
 		_consume_buffered_action(&"attack_heavy")
-		if character and character.has_method("request_attack"):
+		if character and character.has_method("request_attack_by_name"):
+			character.request_attack_by_name(&"5H")
+		elif character and character.has_method("request_attack"):
 			character.request_attack(CombatConstants.HEAVY_ATTACK)
 		return
 	if _is_attack_light_pressed():
 		_consume_buffered_action(&"attack_light")
-		if character and character.has_method("request_attack"):
+		if character and character.has_method("request_attack_by_name"):
+			character.request_attack_by_name(&"5L")
+		elif character and character.has_method("request_attack"):
 			character.request_attack(CombatConstants.LIGHT_ATTACK)
 		return
 	if _is_dash_pressed():
@@ -49,15 +60,26 @@ func physics_update(delta: float) -> void:
 		state_machine.change_state(&"Parry")
 		return
 
+	# Cek input skill (Story 3.1)
+	if _is_skill_pressed():
+		_consume_buffered_action(&"skill1")
+		if character and character.has_method("request_attack_by_name"):
+			character.request_attack_by_name(&"Skill1")
+		return
+
 	# Cek input serangan (Heavy / Light)
 	if _is_attack_heavy_pressed():
 		_consume_buffered_action(&"attack_heavy")
-		if character and character.has_method("request_attack"):
+		if character and character.has_method("request_attack_by_name"):
+			character.request_attack_by_name(&"5H")
+		elif character and character.has_method("request_attack"):
 			character.request_attack(CombatConstants.HEAVY_ATTACK)
 		return
 	if _is_attack_light_pressed():
 		_consume_buffered_action(&"attack_light")
-		if character and character.has_method("request_attack"):
+		if character and character.has_method("request_attack_by_name"):
+			character.request_attack_by_name(&"5L")
+		elif character and character.has_method("request_attack"):
 			character.request_attack(CombatConstants.LIGHT_ATTACK)
 		return
 
@@ -120,6 +142,11 @@ func _is_parry_pressed() -> bool:
 	if character and character.has_method("is_parry_requested"):
 		return character.is_parry_requested()
 	return Input.is_action_just_pressed("parry")
+
+func _is_skill_pressed() -> bool:
+	if character and character.has_method("is_skill_requested"):
+		return character.is_skill_requested()
+	return Input.is_action_just_pressed("skill1")
 
 func _consume_buffered_action(action_name: StringName) -> void:
 	if character and character.has_method("try_consume_buffered_action"):

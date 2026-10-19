@@ -7,6 +7,7 @@ const HeatComponentScript = preload("res://scripts/combat/components/heat_compon
 const MeltdownState = preload("res://scripts/combat/fsm/meltdown_state.gd")
 const ParryState = preload("res://scripts/combat/fsm/parry_state.gd")
 const BlockstunState = preload("res://scripts/combat/fsm/blockstun_state.gd")
+const AttackData = preload("res://scripts/combat/resources/attack_data.gd")
 
 ## Base Controller untuk Mecha Tempur dalam Fighting to Zero
 ## Mengintegrasikan Hierarchical State Machine (Mecha HSM), Physics 60 FPS, dan Orientasi Visual
@@ -32,6 +33,17 @@ var facing_direction: int = 1 # 1: Kanan, -1: Kiri
 var hitstop_frames: int = 0
 var invulnerability_frames: int = 0
 var simulated_horizontal_input: float = 0.0
+
+# Combo Tracking & Bounce Limits (Story 3.1)
+var combo_hit_count: int = 0
+var ground_bounce_count: int = 0
+var wall_bounce_count: int = 0
+
+var attack_resources: Dictionary = {
+	&"5L": preload("res://resources/attacks/normal_light.tres"),
+	&"5H": preload("res://resources/attacks/normal_heavy.tres"),
+	&"Skill1": preload("res://resources/attacks/skill_slash.tres")
+}
 
 # Dash State & Cooldown Variables (Story 1.2)
 var can_air_dash: bool = true
@@ -259,7 +271,29 @@ func take_hit(attacker: Node2D, hit_data: Dictionary) -> void:
 				bus.hit_confirmed.emit(attacker, self, blocked_data)
 		return
 
-	var dmg: int = hit_data.get("damage", 40)
+	# Combo Hit Tracking & Scaling (Story 3.1 AC 2)
+	if state_machine and state_machine.current_state and state_machine.current_state.name == &"Hitstun":
+		combo_hit_count += 1
+	else:
+		combo_hit_count = 1
+		ground_bounce_count = 0
+		wall_bounce_count = 0
+
+	var base_dmg: int = hit_data.get("damage", 40)
+	var dmg: int = CombatConstants.calculate_combo_damage(base_dmg, combo_hit_count)
+
+	# Evaluasi Ground Bounce & Wall Bounce Limits (Story 3.1 AC 3)
+	var allows_ground_bounce: bool = false
+	if hit_data.get("causes_ground_bounce", false):
+		if ground_bounce_count < CombatConstants.MAX_GROUND_BOUNCES_PER_COMBO:
+			ground_bounce_count += 1
+			allows_ground_bounce = true
+
+	var allows_wall_bounce: bool = false
+	if hit_data.get("causes_wall_bounce", false):
+		if wall_bounce_count < CombatConstants.MAX_WALL_BOUNCES_PER_COMBO:
+			wall_bounce_count += 1
+			allows_wall_bounce = true
 
 	# Penalti Kerusakan Masuk Meltdown (+25% damage jika mecha sedang di MeltdownShutdown - Story 2.2 AC 3)
 	if state_machine and state_machine.current_state and state_machine.current_state.name == &"Meltdown":
@@ -296,12 +330,25 @@ func take_hit(attacker: Node2D, hit_data: Dictionary) -> void:
 		if bus:
 			bus.hit_confirmed.emit(attacker, self, hit_data)
 
-func request_attack(attack_data: Dictionary) -> void:
+func request_attack(attack_data: Variant) -> void:
 	if state_machine:
 		var attack_state = state_machine.get_node_or_null("Attack")
 		if attack_state and attack_state.has_method("setup_attack"):
 			attack_state.setup_attack(attack_data)
 			state_machine.change_state(&"Attack")
+
+func request_attack_by_name(atk_name: StringName) -> void:
+	if atk_name in attack_resources:
+		request_attack(attack_resources[atk_name])
+	elif atk_name == &"5L":
+		request_attack(CombatConstants.LIGHT_ATTACK)
+	elif atk_name == &"5H":
+		request_attack(CombatConstants.HEAVY_ATTACK)
+
+func reset_combo_state() -> void:
+	combo_hit_count = 0
+	ground_bounce_count = 0
+	wall_bounce_count = 0
 
 func _unhandled_input(event: InputEvent) -> void:
 	var buffer = get_node_or_null("/root/InputBuffer")
@@ -315,6 +362,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		buffer.buffer_action(&"attack_light")
 	elif event.is_action_pressed("attack_heavy"):
 		buffer.buffer_action(&"attack_heavy")
+	elif event.is_action_pressed("skill1"):
+		buffer.buffer_action(&"skill1")
 	elif event.is_action_pressed("parry"):
 		buffer.buffer_action(&"parry")
 
@@ -397,6 +446,11 @@ func is_parry_requested() -> bool:
 	if Input.is_action_just_pressed("parry"):
 		return true
 	return has_buffered_action(&"parry")
+
+func is_skill_requested() -> bool:
+	if Input.is_action_just_pressed("skill1"):
+		return true
+	return has_buffered_action(&"skill1")
 
 func apply_hitstop(frames: int) -> void:
 	hitstop_frames = max(hitstop_frames, frames)
@@ -532,6 +586,8 @@ func _setup_input_fallbacks() -> void:
 	_bind_key("attack_heavy", KEY_C)
 	_bind_key("parry", KEY_L)
 	_bind_key("parry", KEY_V)
+	_bind_key("skill1", KEY_U)
+	_bind_key("skill1", KEY_I)
 
 func _bind_key(action: StringName, key: Key) -> void:
 	if not InputMap.has_action(action):

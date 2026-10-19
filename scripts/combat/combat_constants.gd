@@ -51,6 +51,27 @@ const CHIP_DAMAGE_RATIO: float = 0.20 # 20% chip damage untuk serangan energi sa
 const DEFAULT_BLOCKSTUN_FRAMES: int = 10
 const BLOCK_KNOCKBACK_MULTIPLIER: float = 0.60
 
+# Combo & Target Chain Scaling Parameters (Story 3.1)
+const COMBO_SCALING_HIT_1: float = 1.00
+const COMBO_SCALING_HIT_2: float = 0.85
+const COMBO_SCALING_HIT_3: float = 0.70
+const COMBO_SCALING_HIT_4_PLUS_DECAY: float = 0.10
+const COMBO_SCALING_FLOOR: float = 0.25
+const MAX_GROUND_BOUNCES_PER_COMBO: int = 1
+const MAX_WALL_BOUNCES_PER_COMBO: int = 1
+
+static func calculate_combo_damage(base_dmg: int, hit_number: int) -> int:
+	var multiplier: float = 1.0
+	if hit_number <= 1:
+		multiplier = COMBO_SCALING_HIT_1
+	elif hit_number == 2:
+		multiplier = COMBO_SCALING_HIT_2
+	elif hit_number == 3:
+		multiplier = COMBO_SCALING_HIT_3
+	else:
+		multiplier = maxf(COMBO_SCALING_FLOOR, COMBO_SCALING_HIT_3 - float(hit_number - 3) * COMBO_SCALING_HIT_4_PLUS_DECAY)
+	return max(1, int(round(float(base_dmg) * multiplier)))
+
 # Toleransi Input (Buffer & Coyote Time)
 const INPUT_BUFFER_WINDOW_FRAMES: int = 5
 const COYOTE_TIME_FRAMES: int = 5
