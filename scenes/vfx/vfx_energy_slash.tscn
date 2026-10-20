@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://vfxslash01zero"]
+
+[ext_resource type="Script" path="res://scripts/visual/vfx_slash.gd" id="1_slash"]
+
+[node name="VFXEnergySlash" type="Node2D"]
+script = ExtResource("1_slash")

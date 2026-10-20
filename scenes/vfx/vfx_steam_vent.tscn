@@ -1,0 +1,17 @@
+[gd_scene load_steps=2 format=3 uid="uid://vfxsteam01zero"]
+
+[ext_resource type="Script" path="res://scripts/visual/vfx_steam_vent.gd" id="1_steam"]
+
+[node name="VFXSteamVent" type="CPUParticles2D"]
+emitting = false
+amount = 12
+lifetime = 0.4
+direction = Vector2(0, -1)
+spread = 25.0
+gravity = Vector2(0, -80)
+initial_velocity_min = 30.0
+initial_velocity_max = 60.0
+scale_amount_min = 2.0
+scale_amount_max = 4.5
+color = Color(0.85, 0.95, 1, 0.5)
+script = ExtResource("1_steam")

@@ -122,9 +122,17 @@ var hitbox: Area2D = null
 
 # Heat Component (Story 2.1 & 2.2)
 var heat_component: HeatComponentScript = null
+var steam_vent: CPUParticles2D = null
 
 @onready var state_machine: StateMachine = $StateMachine
 @onready var visual_root: Node2D = _find_visual_node()
+
+func _setup_steam_vent() -> void:
+	var vent_script = preload("res://scripts/visual/vfx_steam_vent.gd")
+	steam_vent = vent_script.new()
+	steam_vent.name = "SteamVent"
+	add_child(steam_vent)
+	steam_vent.bind_mecha(self)
 
 func _ready() -> void:
 	set_hp(max_hp)
@@ -133,6 +141,7 @@ func _ready() -> void:
 	_setup_fsm_states()
 	_setup_input_fallbacks()
 	_setup_p2_input_fallbacks()
+	_setup_steam_vent()
 	
 	# Set default layer dan mask: Layer 1 (World)
 	collision_layer = 1
