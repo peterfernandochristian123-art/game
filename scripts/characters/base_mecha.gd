@@ -36,6 +36,17 @@ var hitstop_frames: int = 0
 var invulnerability_frames: int = 0
 var super_armor_frames: int = 0
 var simulated_horizontal_input: float = 0.0
+var simulated_vertical_input: float = 0.0
+var simulated_actions: Dictionary = {}
+
+func trigger_simulated_action(action_name: StringName) -> void:
+	simulated_actions[action_name] = true
+
+func is_simulated_action_pressed(action_name: StringName) -> bool:
+	if simulated_actions.get(action_name, false):
+		simulated_actions[action_name] = false
+		return true
+	return false
 
 # Cliffhanger System (Story 4.2)
 var cliffhanger_grabs_used: int = 0
@@ -508,6 +519,8 @@ func get_horizontal_axis() -> float:
 	return clampf(val, -1.0, 1.0)
 
 func is_jump_requested() -> bool:
+	if is_simulated_action_pressed(&"jump"):
+		return true
 	if (
 		Input.is_action_just_pressed("jump")
 		or Input.is_action_just_pressed("ui_up")
@@ -517,36 +530,50 @@ func is_jump_requested() -> bool:
 	return has_buffered_action(&"jump")
 
 func is_dash_requested() -> bool:
+	if is_simulated_action_pressed(&"dash"):
+		return true
 	if Input.is_action_just_pressed("dash"):
 		return true
 	return has_buffered_action(&"dash")
 
 func is_attack_light_requested() -> bool:
+	if is_simulated_action_pressed(&"attack_light"):
+		return true
 	if Input.is_action_just_pressed("attack_light"):
 		return true
 	return has_buffered_action(&"attack_light")
 
 func is_attack_heavy_requested() -> bool:
+	if is_simulated_action_pressed(&"attack_heavy"):
+		return true
 	if Input.is_action_just_pressed("attack_heavy"):
 		return true
 	return has_buffered_action(&"attack_heavy")
 
 func is_parry_requested() -> bool:
+	if is_simulated_action_pressed(&"parry"):
+		return true
 	if Input.is_action_just_pressed("parry"):
 		return true
 	return has_buffered_action(&"parry")
 
 func is_skill_requested() -> bool:
+	if is_simulated_action_pressed(&"skill1"):
+		return true
 	if Input.is_action_just_pressed("skill1"):
 		return true
 	return has_buffered_action(&"skill1")
 
 func is_skill2_requested() -> bool:
+	if is_simulated_action_pressed(&"skill2"):
+		return true
 	if Input.is_action_just_pressed("skill2"):
 		return true
 	return has_buffered_action(&"skill2")
 
 func is_ultimate_requested() -> bool:
+	if is_simulated_action_pressed(&"ultimate"):
+		return true
 	if Input.is_action_just_pressed("ultimate"):
 		return true
 	return has_buffered_action(&"ultimate")
@@ -634,11 +661,11 @@ func try_consume_buffered_action_with_data(action_name: StringName) -> Dictionar
 	return {}
 
 func get_dash_vector() -> Vector2:
-	var h: float = Input.get_axis("move_left", "move_right")
+	var h: float = simulated_horizontal_input if not is_zero_approx(simulated_horizontal_input) else Input.get_axis("move_left", "move_right")
 	if is_zero_approx(h):
 		h = Input.get_axis("ui_left", "ui_right")
 
-	var v: float = Input.get_axis("move_up", "move_down")
+	var v: float = simulated_vertical_input if not is_zero_approx(simulated_vertical_input) else Input.get_axis("move_up", "move_down")
 	if is_zero_approx(v):
 		v = Input.get_axis("ui_up", "ui_down")
 

@@ -73,7 +73,7 @@ development_status:
   5-2-dual-input-system-mobile-touch-overlay-gamepad-autodetect: done
   5-3-in-game-combat-hud-visual-status-meters: done
   5-4-training-mode-suite-with-real-time-frame-inspector: done
-  5-5-versus-ai-controller-with-3-difficulty-profiles: backlog
+  5-5-versus-ai-controller-with-3-difficulty-profiles: done
   5-6-local-2-player-versus-mode-configuration-persistence: backlog
   epic-5-retrospective: optional
 
