@@ -20,7 +20,7 @@ enum MenuItem {
 
 const MENU_DATA: Array[Dictionary] = [
 	{"id": &"versus_ai", "label": "VERSUS AI", "scene": "res://scenes/arena_skyscraper.tscn", "subtext": "SOLO DUEL VS AI (NOVICE / VETERAN / ACE)"},
-	{"id": &"training", "label": "TRAINING MODE", "scene": "res://scenes/arena_skyscraper.tscn", "subtext": "PRACTICE LAB & FRAME DATA INSPECTOR"},
+	{"id": &"training", "label": "TRAINING MODE", "scene": "res://scenes/training_mode.tscn", "subtext": "PRACTICE LAB & FRAME DATA INSPECTOR"},
 	{"id": &"local_2p", "label": "LOCAL 2P VERSUS", "scene": "res://scenes/arena_skyscraper.tscn", "subtext": "2-PLAYER BATTLE ON A SINGLE SCREEN"},
 	{"id": &"settings", "label": "SETTINGS", "scene": "", "subtext": "AUDIO BUSSES, CONTROLS & DISPLAY"},
 	{"id": &"exit", "label": "EXIT", "scene": "", "subtext": "SHUTDOWN SYSTEM & EXIT GAME"}

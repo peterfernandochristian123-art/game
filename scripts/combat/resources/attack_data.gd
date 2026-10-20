@@ -44,8 +44,8 @@ func to_dict() -> Dictionary:
 		"chain_level": chain_level
 	}
 
-static func from_dict(data: Dictionary) -> AttackData:
-	var atk := AttackData.new()
+static func from_dict(data: Dictionary) -> Resource:
+	var atk = (load("res://scripts/combat/resources/attack_data.gd") as GDScript).new()
 	atk.attack_name = data.get("name", &"Normal")
 	atk.startup = data.get("startup", 5)
 	atk.active = data.get("active", 3)
