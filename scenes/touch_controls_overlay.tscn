@@ -1,0 +1,149 @@
+[gd_scene load_steps=3 format=3 uid="uid://touchoverlay01zero"]
+
+[ext_resource type="Script" path="res://scripts/ui/touch_controls_overlay.gd" id="1_overlay"]
+[ext_resource type="Script" path="res://scripts/ui/virtual_joystick.gd" id="2_joystick"]
+
+[node name="TouchControlsOverlay" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+script = ExtResource("1_overlay")
+
+[node name="LeftTouchZone" type="Control" parent="."]
+layout_mode = 1
+anchor_right = 0.5
+anchor_bottom = 1.0
+grow_vertical = 2
+mouse_filter = 1
+
+[node name="VirtualJoystick" type="Control" parent="LeftTouchZone"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+script = ExtResource("2_joystick")
+
+[node name="Base" type="Control" parent="LeftTouchZone/VirtualJoystick"]
+layout_mode = 0
+offset_left = 32.0
+offset_top = 212.0
+offset_right = 128.0
+offset_bottom = 308.0
+mouse_filter = 2
+
+[node name="RingVisual" type="ColorRect" parent="LeftTouchZone/VirtualJoystick/Base"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.08, 0.16, 0.28, 0.45)
+
+[node name="Knob" type="Control" parent="LeftTouchZone/VirtualJoystick/Base"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -18.0
+offset_top = -18.0
+offset_right = 18.0
+offset_bottom = 18.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="KnobVisual" type="ColorRect" parent="LeftTouchZone/VirtualJoystick/Base/Knob"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.2, 0.9, 1, 0.85)
+
+[node name="RightActionZone" type="Control" parent="."]
+layout_mode = 1
+anchor_left = 0.5
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 0
+grow_vertical = 2
+mouse_filter = 1
+
+[node name="BtnNormal" type="Button" parent="RightActionZone"]
+layout_mode = 0
+offset_left = 190.0
+offset_top = 230.0
+offset_right = 246.0
+offset_bottom = 286.0
+focus_mode = 0
+theme_override_colors/font_color = Color(0.9, 0.98, 1, 1)
+theme_override_font_sizes/font_size = 11
+text = "ATK"
+
+[node name="BtnDash" type="Button" parent="RightActionZone"]
+layout_mode = 0
+offset_left = 126.0
+offset_top = 252.0
+offset_right = 176.0
+offset_bottom = 302.0
+focus_mode = 0
+theme_override_colors/font_color = Color(0.4, 1, 0.6, 1)
+theme_override_font_sizes/font_size = 10
+text = "DASH"
+
+[node name="BtnSkill1" type="Button" parent="RightActionZone"]
+layout_mode = 0
+offset_left = 136.0
+offset_top = 188.0
+offset_right = 186.0
+offset_bottom = 238.0
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 0.85, 0.25, 1)
+theme_override_font_sizes/font_size = 9
+text = "SKL 1"
+
+[node name="BtnSkill2" type="Button" parent="RightActionZone"]
+layout_mode = 0
+offset_left = 200.0
+offset_top = 168.0
+offset_right = 250.0
+offset_bottom = 218.0
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 0.6, 0.2, 1)
+theme_override_font_sizes/font_size = 9
+text = "SKL 2"
+
+[node name="BtnParry" type="Button" parent="RightActionZone"]
+layout_mode = 0
+offset_left = 256.0
+offset_top = 214.0
+offset_right = 306.0
+offset_bottom = 264.0
+focus_mode = 0
+theme_override_colors/font_color = Color(0.9, 0.45, 1, 1)
+theme_override_font_sizes/font_size = 9
+text = "PARRY"
+
+[node name="BtnUltimate" type="Button" parent="RightActionZone"]
+layout_mode = 0
+offset_left = 256.0
+offset_top = 150.0
+offset_right = 306.0
+offset_bottom = 200.0
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 0.3, 0.45, 1)
+theme_override_font_sizes/font_size = 9
+text = "ULTI"
