@@ -491,10 +491,12 @@ func set_facing_direction(dir: int) -> void:
 		visual_root.scale.x = absf(visual_root.scale.x) * facing_direction
 
 func get_horizontal_axis() -> float:
-	var axis: float = Input.get_axis("move_left", "move_right")
-	if is_zero_approx(axis):
-		axis = Input.get_axis("ui_left", "ui_right")
-	return clampf(axis, -1.0, 1.0)
+	if not is_zero_approx(simulated_horizontal_input):
+		return simulated_horizontal_input
+	var val: float = Input.get_axis("move_left", "move_right")
+	if is_zero_approx(val):
+		val = Input.get_axis("ui_left", "ui_right")
+	return clampf(val, -1.0, 1.0)
 
 func is_jump_requested() -> bool:
 	if (
@@ -560,13 +562,6 @@ func drain_ultimate(amount: float) -> float:
 	current_ultimate = maxf(0.0, current_ultimate - actual_drain)
 	return actual_drain
 
-func get_horizontal_axis() -> float:
-	if not is_zero_approx(simulated_horizontal_input):
-		return simulated_horizontal_input
-	var val: float = Input.get_axis("move_left", "move_right")
-	if is_zero_approx(val):
-		val = Input.get_axis("ui_left", "ui_right")
-	return val
 
 func can_block() -> bool:
 	if not state_machine or not state_machine.current_state:

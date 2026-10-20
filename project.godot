@@ -13,7 +13,7 @@ config_version=5
 config/name="Fighting to Zero"
 config/description="Fast-paced 2D 1v1 mecha duel arcade fighting game with 90s retro 32-bit pixel art."
 config/version="1.0.0"
-run/main_scene="res://scenes/test_arena.tscn"
+run/main_scene="res://scenes/main_menu.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 

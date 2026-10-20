@@ -10,6 +10,8 @@ signal screen_shake_requested(intensity: float, duration_frames: int)
 signal cliffhanger_triggered(mecha_id: int, side: StringName)
 signal round_ended(winner_id: int, reason: StringName)
 signal state_changed(character: Node2D, previous_state: StringName, new_state: StringName)
+signal game_mode_selected(mode: StringName)
+signal menu_navigated()
 
 func _ready() -> void:
 	if OS.is_debug_build():

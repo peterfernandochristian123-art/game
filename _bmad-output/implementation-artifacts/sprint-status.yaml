@@ -34,7 +34,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-10-17 15:31
-last_updated: 2026-10-19 22:40
+last_updated: 2026-10-20 16:30
 project: game
 project_key: NOKEY
 tracking_system: file-system
@@ -69,7 +69,7 @@ development_status:
   epic-4-retrospective: optional
 
   epic-5: in-progress
-  5-1-main-menu-navigation-flow: in-progress
+  5-1-main-menu-navigation-flow: done
   5-2-dual-input-system-mobile-touch-overlay-gamepad-autodetect: backlog
   5-3-in-game-combat-hud-visual-status-meters: backlog
   5-4-training-mode-suite-with-real-time-frame-inspector: backlog

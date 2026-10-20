@@ -131,8 +131,8 @@ func _test_match_winner_declaration() -> void:
 	mm.setup_match(p1, p2)
 	mm.start_match()
 
-	var match_winner: int = 0
-	mm.match_ended.connect(func(w_id): match_winner = w_id)
+	var winner_box := {"id": 0}
+	mm.match_ended.connect(func(w_id): winner_box["id"] = w_id)
 
 	# Kemenangan 1 untuk P1
 	p2.current_hp = 0
@@ -145,7 +145,7 @@ func _test_match_winner_declaration() -> void:
 
 	_check(mm.p1_wins == 2, "P1 harus memiliki 2 kemenangan")
 	_check(mm.current_state == MatchManager.MatchState.MATCH_OVER, "State harus berubah menjadi MATCH_OVER")
-	_check(match_winner == 1, "Pemenang pertandingan harus dinyatakan Player 1")
+	_check(winner_box["id"] == 1, "Pemenang pertandingan harus dinyatakan Player 1")
 
 	mm.queue_free()
 	p1.queue_free()
@@ -181,8 +181,8 @@ func _test_sudden_death_trigger() -> void:
 	mm.setup_match(p1, p2)
 	mm.start_match()
 
-	var sudden_death_fired: bool = false
-	mm.sudden_death_started.connect(func(): sudden_death_fired = true)
+	var sd_box := {"fired": false}
+	mm.sudden_death_started.connect(func(): sd_box["fired"] = true)
 
 	# Double K.O. memicu Sudden Death
 	p1.current_hp = 0
@@ -190,7 +190,7 @@ func _test_sudden_death_trigger() -> void:
 	mm.check_win_conditions()
 
 	_check(mm.is_sudden_death == true, "Harus mengaktifkan mode Sudden Death")
-	_check(sudden_death_fired == true, "Sinyal sudden_death_started harus dipancarkan")
+	_check(sd_box["fired"] == true, "Sinyal sudden_death_started harus dipancarkan")
 	_check(is_equal_approx(mm.round_time_remaining, CombatConstants.SUDDEN_DEATH_SECONDS), "Timer Sudden Death harus 30 detik")
 	_check(is_equal_approx(p1.heat_gauge, CombatConstants.SUDDEN_DEATH_STARTING_HEAT), "P1 harus mulai dengan 90% Heat pada Sudden Death")
 	_check(is_equal_approx(p2.heat_gauge, CombatConstants.SUDDEN_DEATH_STARTING_HEAT), "P2 harus mulai dengan 90% Heat pada Sudden Death")
