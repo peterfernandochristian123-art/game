@@ -99,11 +99,10 @@ func _test_mecha_on_platform_bounds() -> void:
 func _test_airborne_ledge_crossing_detection() -> void:
 	var arena = _create_arena()
 
-	var left_signal_received: bool = false
-	var left_signal_side: StringName = &""
+	var tracker := {"received": false, "side": &""}
 	arena.ledge_reached.connect(func(_mecha, side):
-		left_signal_received = true
-		left_signal_side = side
+		tracker["received"] = true
+		tracker["side"] = side
 	)
 
 	var airborne_mecha := CharacterBody2D.new()
@@ -112,12 +111,13 @@ func _test_airborne_ledge_crossing_detection() -> void:
 	airborne_mecha.global_position = Vector2(50.0, 320.0) # X < 64
 
 	arena.notify_ledge_cross(airborne_mecha, &"left")
-	_check(left_signal_received and left_signal_side == &"left", "Ledge cross kiri harus memancarkan signal dengan side 'left'")
+	_check(tracker["received"] and tracker["side"] == &"left", "Ledge cross kiri harus memancarkan signal dengan side 'left'")
 
-	left_signal_received = false
+	tracker["received"] = false
+	tracker["side"] = &""
 	airborne_mecha.global_position = Vector2(1360.0, 320.0) # X > 1344
 	arena.notify_ledge_cross(airborne_mecha, &"right")
-	_check(left_signal_received and left_signal_side == &"right", "Ledge cross kanan harus memancarkan signal dengan side 'right'")
+	_check(tracker["received"] and tracker["side"] == &"right", "Ledge cross kanan harus memancarkan signal dengan side 'right'")
 
 	airborne_mecha.queue_free()
 	arena.queue_free()

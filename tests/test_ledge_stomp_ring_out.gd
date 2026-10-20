@@ -96,15 +96,15 @@ func _test_ledge_stomp_instakill_on_cliffhanger() -> void:
 	victim.trigger_cliffhanger(&"left")
 	_check(victim.state_machine.current_state.name == &"Cliffhanger", "Victim harus dalam CliffhangerState")
 
-	var ring_out_fired: bool = false
-	victim.ring_out_eliminated.connect(func(_m): ring_out_fired = true)
+	var ring_out_fired := [false]
+	victim.ring_out_eliminated.connect(func(_m): ring_out_fired[0] = true)
 
 	var stomp_res = load("res://resources/attacks/ledge_stomp.tres")
 	victim.take_hit(attacker, stomp_res.to_dict())
 
 	_check(victim.is_eliminated == true, "Victim harus tereliminasi (is_eliminated == true)")
 	_check(victim.current_hp == 0, "HP Victim harus menjadi 0")
-	_check(ring_out_fired == true, "Sinyal ring_out_eliminated harus dipancarkan")
+	_check(ring_out_fired[0] == true, "Sinyal ring_out_eliminated harus dipancarkan")
 
 	attacker.queue_free()
 	victim.queue_free()
@@ -115,14 +115,14 @@ func _test_fall_below_y_ring_out() -> void:
 	# Posisikan mecha jatuh bebas di bawah batas kill-Y (650 > 600)
 	mecha.global_position = Vector2(704.0, 650.0)
 
-	var ring_out_fired: bool = false
-	mecha.ring_out_eliminated.connect(func(_m): ring_out_fired = true)
+	var ring_out_fired := [false]
+	mecha.ring_out_eliminated.connect(func(_m): ring_out_fired[0] = true)
 
 	mecha._physics_process(1.0 / 60.0)
 
 	_check(mecha.is_eliminated == true, "Mecha yang jatuh di bawah Y=600 harus tereliminasi Ring-Out")
 	_check(mecha.current_hp == 0, "HP Mecha jatuh harus 0")
-	_check(ring_out_fired == true, "Sinyal ring_out_eliminated harus terpicu")
+	_check(ring_out_fired[0] == true, "Sinyal ring_out_eliminated harus terpicu")
 
 	mecha.queue_free()
 

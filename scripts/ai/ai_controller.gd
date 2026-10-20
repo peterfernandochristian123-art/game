@@ -290,8 +290,8 @@ func _execute_attack() -> void:
 
 	_action_cooldown = 15
 
-func _on_hit_confirmed(attacker_id: int, _defender_id: int, _hit_info: Dictionary) -> void:
-	if not mecha or mecha.get_instance_id() != attacker_id:
+func _on_hit_confirmed(attacker: Node2D, _defender: Node2D, _hit_info: Variant) -> void:
+	if not mecha or attacker != mecha:
 		return
 
 	# Lanjutkan Target Chain Cancel jika roll berhasil

@@ -77,9 +77,9 @@ development_status:
   5-6-local-2-player-versus-mode-configuration-persistence: done
   epic-5-retrospective: optional
 
-  epic-6: in-progress
+  epic-6: done
   6-1-local-frame-hitstop-dynamic-screen-shake: done
   6-2-32-bit-pixel-vfx-welding-spark-particles: done
   6-3-arcade-announcer-sound-effects-audio-server-bus-setup: done
-  6-4-performance-profiling-memory-audit-60-fps-lock: backlog
+  6-4-performance-profiling-memory-audit-60-fps-lock: done
   epic-6-retrospective: optional

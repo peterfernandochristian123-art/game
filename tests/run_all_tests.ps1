@@ -1,0 +1,80 @@
+# Master Test Runner for Fighting to Zero
+# Runs all 25 automated test suites across Epic 1 through Epic 6 headless
+
+$godotPath = "C:\Users\game\.godot_bin\Godot_v4.7.2-stable_win64_console.exe"
+$projectPath = "c:\Users\game"
+
+$testScenes = @(
+    # Epic 1: Core Physics & Combat Mechanics
+    "res://tests/test_movement_fsm.tscn",
+    "res://tests/test_input_buffer_coyote.tscn",
+    "res://tests/test_vector_dash.tscn",
+    "res://tests/test_combat_attacks.tscn",
+    # Epic 2: Heat System & Defensive Mechanics
+    "res://tests/test_heat_component.tscn",
+    "res://tests/test_overclock_meltdown.tscn",
+    "res://tests/test_blocking_chip.tscn",
+    "res://tests/test_spark_parry.tscn",
+    # Epic 3: Mecha Archetypes & Roster Implementation
+    "res://tests/test_attack_chain_scaling.tscn",
+    "res://tests/test_apex_viper.tscn",
+    "res://tests/test_titan_bulwark.tscn",
+    "res://tests/test_dual_input_system.tscn",
+    # Epic 4: Arena, Cliffhanger & Stage Hazards
+    "res://tests/test_arena_skyscraper.tscn",
+    "res://tests/test_cliffhanger_system.tscn",
+    "res://tests/test_ledge_stomp_ring_out.tscn",
+    "res://tests/test_match_rules.tscn",
+    # Epic 5: Game Modes, UI & Artificial Intelligence
+    "res://tests/test_combat_hud.tscn",
+    "res://tests/test_main_menu.tscn",
+    "res://tests/test_local_versus.tscn",
+    "res://tests/test_versus_ai.tscn",
+    "res://tests/test_training_mode.tscn",
+    # Epic 6: Visual Juice, Sound Effects & Final Polish
+    "res://tests/test_hitstop_screen_shake.tscn",
+    "res://tests/test_pixel_vfx.tscn",
+    "res://tests/test_audio_system.tscn",
+    "res://tests/test_performance_stress.tscn"
+)
+
+Write-Host "==========================================================" -ForegroundColor Cyan
+Write-Host " [MASTER TEST RUNNER] FIGHTING TO ZERO (GODOT 4.7)       " -ForegroundColor Cyan
+Write-Host " Total Test Suites to Execute: $($testScenes.Count)     " -ForegroundColor Cyan
+Write-Host "==========================================================" -ForegroundColor Cyan
+
+$passed = 0
+$failed = 0
+$failedSuites = @()
+
+$index = 1
+foreach ($scene in $testScenes) {
+    Write-Host ("[{0:D2}/{1:D2}] Menjalankan {2}..." -f $index, $testScenes.Count, $scene) -NoNewline
+    
+    $proc = Start-Process -FilePath $godotPath -ArgumentList "--headless", "--path", $projectPath, $scene -Wait -NoNewWindow -PassThru
+    
+    if ($proc.ExitCode -eq 0) {
+        Write-Host " [PASS]" -ForegroundColor Green
+        $passed++
+    } else {
+        Write-Host (" [FAIL] (Exit Code: {0})" -f $proc.ExitCode) -ForegroundColor Red
+        $failed++
+        $failedSuites += $scene
+    }
+    $index++
+}
+
+Write-Host "==========================================================" -ForegroundColor Cyan
+Write-Host (" HASIL AKHIR: {0}/{1} Test Suites LULUS" -f $passed, $testScenes.Count) -ForegroundColor $(if ($failed -eq 0) { "Green" } else { "Red" })
+Write-Host "==========================================================" -ForegroundColor Cyan
+
+if ($failed -gt 0) {
+    Write-Host "Test Suites yang Gagal:" -ForegroundColor Red
+    foreach ($f in $failedSuites) {
+        Write-Host " - $f" -ForegroundColor Red
+    }
+    exit 1
+} else {
+    Write-Host "SEMUA 25 TEST SUITES DARI EPIC 1 - 6 BERHASIL 100%!" -ForegroundColor Green
+    exit 0
+}
