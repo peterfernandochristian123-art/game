@@ -18,6 +18,8 @@ const AttackData = preload("res://scripts/combat/resources/attack_data.gd")
 @export var jump_velocity: float = CombatConstants.JUMP_VELOCITY
 @export var gravity: float = CombatConstants.GRAVITY
 
+@export var player_index: int = 1
+
 @export_group("Combat Stats")
 @export var max_hp: int = 1000
 @export var max_heat: float = 100.0
@@ -130,6 +132,7 @@ func _ready() -> void:
 	_setup_heat_component()
 	_setup_fsm_states()
 	_setup_input_fallbacks()
+	_setup_p2_input_fallbacks()
 	
 	# Set default layer dan mask: Layer 1 (World)
 	collision_layer = 1
@@ -510,73 +513,88 @@ func set_facing_direction(dir: int) -> void:
 	if visual_root:
 		visual_root.scale.x = absf(visual_root.scale.x) * facing_direction
 
+func get_player_action(action_name: StringName) -> StringName:
+	if player_index == 2:
+		var p2_name := StringName("p2_" + String(action_name))
+		if InputMap.has_action(p2_name):
+			return p2_name
+	return action_name
+
 func get_horizontal_axis() -> float:
 	if not is_zero_approx(simulated_horizontal_input):
 		return simulated_horizontal_input
-	var val: float = Input.get_axis("move_left", "move_right")
-	if is_zero_approx(val):
+	var act_left := get_player_action(&"move_left")
+	var act_right := get_player_action(&"move_right")
+	var val: float = Input.get_axis(act_left, act_right)
+	if is_zero_approx(val) and player_index == 1:
 		val = Input.get_axis("ui_left", "ui_right")
 	return clampf(val, -1.0, 1.0)
 
 func is_jump_requested() -> bool:
 	if is_simulated_action_pressed(&"jump"):
 		return true
-	if (
-		Input.is_action_just_pressed("jump")
-		or Input.is_action_just_pressed("ui_up")
-		or Input.is_action_just_pressed("ui_accept")
-	):
+	var act := get_player_action(&"jump")
+	if Input.is_action_just_pressed(act):
 		return true
-	return has_buffered_action(&"jump")
+	if player_index == 1 and (Input.is_action_just_pressed("ui_up") or Input.is_action_just_pressed("ui_accept")):
+		return true
+	return has_buffered_action(act)
 
 func is_dash_requested() -> bool:
 	if is_simulated_action_pressed(&"dash"):
 		return true
-	if Input.is_action_just_pressed("dash"):
+	var act := get_player_action(&"dash")
+	if Input.is_action_just_pressed(act):
 		return true
-	return has_buffered_action(&"dash")
+	return has_buffered_action(act)
 
 func is_attack_light_requested() -> bool:
 	if is_simulated_action_pressed(&"attack_light"):
 		return true
-	if Input.is_action_just_pressed("attack_light"):
+	var act := get_player_action(&"attack_light")
+	if Input.is_action_just_pressed(act):
 		return true
-	return has_buffered_action(&"attack_light")
+	return has_buffered_action(act)
 
 func is_attack_heavy_requested() -> bool:
 	if is_simulated_action_pressed(&"attack_heavy"):
 		return true
-	if Input.is_action_just_pressed("attack_heavy"):
+	var act := get_player_action(&"attack_heavy")
+	if Input.is_action_just_pressed(act):
 		return true
-	return has_buffered_action(&"attack_heavy")
+	return has_buffered_action(act)
 
 func is_parry_requested() -> bool:
 	if is_simulated_action_pressed(&"parry"):
 		return true
-	if Input.is_action_just_pressed("parry"):
+	var act := get_player_action(&"parry")
+	if Input.is_action_just_pressed(act):
 		return true
-	return has_buffered_action(&"parry")
+	return has_buffered_action(act)
 
 func is_skill_requested() -> bool:
 	if is_simulated_action_pressed(&"skill1"):
 		return true
-	if Input.is_action_just_pressed("skill1"):
+	var act := get_player_action(&"skill1")
+	if Input.is_action_just_pressed(act):
 		return true
-	return has_buffered_action(&"skill1")
+	return has_buffered_action(act)
 
 func is_skill2_requested() -> bool:
 	if is_simulated_action_pressed(&"skill2"):
 		return true
-	if Input.is_action_just_pressed("skill2"):
+	var act := get_player_action(&"skill2")
+	if Input.is_action_just_pressed(act):
 		return true
-	return has_buffered_action(&"skill2")
+	return has_buffered_action(act)
 
 func is_ultimate_requested() -> bool:
 	if is_simulated_action_pressed(&"ultimate"):
 		return true
-	if Input.is_action_just_pressed("ultimate"):
+	var act := get_player_action(&"ultimate")
+	if Input.is_action_just_pressed(act):
 		return true
-	return has_buffered_action(&"ultimate")
+	return has_buffered_action(act)
 
 func get_dash_speed() -> float:
 	return CombatConstants.DASH_SPEED
@@ -661,12 +679,17 @@ func try_consume_buffered_action_with_data(action_name: StringName) -> Dictionar
 	return {}
 
 func get_dash_vector() -> Vector2:
-	var h: float = simulated_horizontal_input if not is_zero_approx(simulated_horizontal_input) else Input.get_axis("move_left", "move_right")
-	if is_zero_approx(h):
+	var act_left := get_player_action(&"move_left")
+	var act_right := get_player_action(&"move_right")
+	var act_up := get_player_action(&"move_up")
+	var act_down := get_player_action(&"move_down")
+
+	var h: float = simulated_horizontal_input if not is_zero_approx(simulated_horizontal_input) else Input.get_axis(act_left, act_right)
+	if is_zero_approx(h) and player_index == 1:
 		h = Input.get_axis("ui_left", "ui_right")
 
-	var v: float = simulated_vertical_input if not is_zero_approx(simulated_vertical_input) else Input.get_axis("move_up", "move_down")
-	if is_zero_approx(v):
+	var v: float = simulated_vertical_input if not is_zero_approx(simulated_vertical_input) else Input.get_axis(act_up, act_down)
+	if is_zero_approx(v) and player_index == 1:
 		v = Input.get_axis("ui_up", "ui_down")
 
 	return resolve_dash_vector(Vector2(h, v), is_on_floor())
@@ -716,6 +739,20 @@ func _setup_input_fallbacks() -> void:
 	_bind_key("skill1", KEY_U)
 	_bind_key("skill2", KEY_I)
 	_bind_key("ultimate", KEY_O)
+
+func _setup_p2_input_fallbacks() -> void:
+	_bind_key("p2_move_left", KEY_LEFT)
+	_bind_key("p2_move_right", KEY_RIGHT)
+	_bind_key("p2_move_up", KEY_UP)
+	_bind_key("p2_move_down", KEY_DOWN)
+	_bind_key("p2_jump", KEY_KP_0)
+	_bind_key("p2_dash", KEY_KP_7)
+	_bind_key("p2_attack_light", KEY_KP_1)
+	_bind_key("p2_attack_heavy", KEY_KP_2)
+	_bind_key("p2_parry", KEY_KP_3)
+	_bind_key("p2_skill1", KEY_KP_4)
+	_bind_key("p2_skill2", KEY_KP_5)
+	_bind_key("p2_ultimate", KEY_KP_ENTER)
 
 func _bind_key(action: StringName, key: Key) -> void:
 	if not InputMap.has_action(action):

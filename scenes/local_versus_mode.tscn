@@ -1,0 +1,165 @@
+[gd_scene load_steps=17 format=3 uid="uid://localversus01zero"]
+
+[ext_resource type="Script" path="res://scripts/core/local_versus_manager.gd" id="1_mgr"]
+[ext_resource type="PackedScene" path="res://scenes/arena_skyscraper.tscn" id="2_arena"]
+[ext_resource type="Script" path="res://scripts/characters/apex_viper.gd" id="3_viper"]
+[ext_resource type="Script" path="res://scripts/characters/titan_bulwark.gd" id="4_bulwark"]
+[ext_resource type="Script" path="res://scripts/combat/fsm/state_machine.gd" id="5_fsm"]
+[ext_resource type="Script" path="res://scripts/combat/fsm/idle_state.gd" id="6_idle"]
+[ext_resource type="Script" path="res://scripts/combat/fsm/walk_state.gd" id="7_walk"]
+[ext_resource type="Script" path="res://scripts/combat/fsm/jump_state.gd" id="8_jump"]
+[ext_resource type="Script" path="res://scripts/combat/fsm/fall_state.gd" id="9_fall"]
+[ext_resource type="Script" path="res://scripts/combat/fsm/dash_state.gd" id="10_dash"]
+[ext_resource type="Script" path="res://scripts/combat/fsm/air_dash_state.gd" id="11_airdash"]
+[ext_resource type="Script" path="res://scripts/combat/fsm/attack_state.gd" id="12_attack"]
+[ext_resource type="Script" path="res://scripts/combat/fsm/hitstun_state.gd" id="13_hitstun"]
+[ext_resource type="Script" path="res://scripts/core/match_manager.gd" id="14_match"]
+[ext_resource type="PackedScene" path="res://scenes/combat_hud.tscn" id="15_hud"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mecha"]
+size = Vector2(24, 38)
+
+[node name="LocalVersusMode" type="Node2D"]
+script = ExtResource("1_mgr")
+
+[node name="ArenaSkyscraper" parent="." instance=ExtResource("2_arena")]
+
+[node name="Fighters" type="Node2D" parent="."]
+
+[node name="P1" type="CharacterBody2D" parent="Fighters"]
+position = Vector2(500, 288)
+collision_layer = 1
+collision_mask = 1
+script = ExtResource("3_viper")
+player_index = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Fighters/P1"]
+shape = SubResource("RectangleShape2D_mecha")
+
+[node name="MechaVisual" type="Node2D" parent="Fighters/P1"]
+
+[node name="Sprite" type="ColorRect" parent="Fighters/P1/MechaVisual"]
+offset_left = -12.0
+offset_top = -19.0
+offset_right = 12.0
+offset_bottom = 19.0
+color = Color(0.2, 0.9, 1, 1)
+
+[node name="StateMachine" type="Node" parent="Fighters/P1"]
+script = ExtResource("5_fsm")
+
+[node name="Idle" type="Node" parent="Fighters/P1/StateMachine"]
+script = ExtResource("6_idle")
+
+[node name="Walk" type="Node" parent="Fighters/P1/StateMachine"]
+script = ExtResource("7_walk")
+
+[node name="Jump" type="Node" parent="Fighters/P1/StateMachine"]
+script = ExtResource("8_jump")
+
+[node name="Fall" type="Node" parent="Fighters/P1/StateMachine"]
+script = ExtResource("9_fall")
+
+[node name="Dash" type="Node" parent="Fighters/P1/StateMachine"]
+script = ExtResource("10_dash")
+
+[node name="AirDash" type="Node" parent="Fighters/P1/StateMachine"]
+script = ExtResource("11_airdash")
+
+[node name="Attack" type="Node" parent="Fighters/P1/StateMachine"]
+script = ExtResource("12_attack")
+
+[node name="Hitstun" type="Node" parent="Fighters/P1/StateMachine"]
+script = ExtResource("13_hitstun")
+
+[node name="P2" type="CharacterBody2D" parent="Fighters"]
+position = Vector2(900, 288)
+collision_layer = 1
+collision_mask = 1
+script = ExtResource("4_bulwark")
+player_index = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Fighters/P2"]
+shape = SubResource("RectangleShape2D_mecha")
+
+[node name="MechaVisual" type="Node2D" parent="Fighters/P2"]
+
+[node name="Sprite" type="ColorRect" parent="Fighters/P2/MechaVisual"]
+offset_left = -14.0
+offset_top = -19.0
+offset_right = 14.0
+offset_bottom = 19.0
+color = Color(1, 0.45, 0.2, 1)
+
+[node name="StateMachine" type="Node" parent="Fighters/P2"]
+script = ExtResource("5_fsm")
+
+[node name="Idle" type="Node" parent="Fighters/P2/StateMachine"]
+script = ExtResource("6_idle")
+
+[node name="Walk" type="Node" parent="Fighters/P2/StateMachine"]
+script = ExtResource("7_walk")
+
+[node name="Jump" type="Node" parent="Fighters/P2/StateMachine"]
+script = ExtResource("8_jump")
+
+[node name="Fall" type="Node" parent="Fighters/P2/StateMachine"]
+script = ExtResource("9_fall")
+
+[node name="Dash" type="Node" parent="Fighters/P2/StateMachine"]
+script = ExtResource("10_dash")
+
+[node name="AirDash" type="Node" parent="Fighters/P2/StateMachine"]
+script = ExtResource("11_airdash")
+
+[node name="Attack" type="Node" parent="Fighters/P2/StateMachine"]
+script = ExtResource("12_attack")
+
+[node name="Hitstun" type="Node" parent="Fighters/P2/StateMachine"]
+script = ExtResource("13_hitstun")
+
+[node name="MatchManager" type="Node" parent="."]
+script = ExtResource("14_match")
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="CombatHUD" parent="UI" instance=ExtResource("15_hud")]
+
+[node name="ResultOverlay" type="ColorRect" parent="UI"]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.75)
+
+[node name="Center" type="CenterContainer" parent="UI/ResultOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="UI/ResultOverlay/Center"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="UI/ResultOverlay/Center/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "VICTORY!"
+horizontal_alignment = 1
+
+[node name="BtnRematch" type="Button" parent="UI/ResultOverlay/Center/VBox"]
+custom_minimum_size = Vector2(100, 24)
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "REMATCH"
+
+[node name="BtnExit" type="Button" parent="UI/ResultOverlay/Center/VBox"]
+custom_minimum_size = Vector2(100, 24)
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "MAIN MENU"
