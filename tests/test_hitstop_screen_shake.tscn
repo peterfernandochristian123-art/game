@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://testhitstop01"]
+
+[ext_resource type="Script" path="res://tests/test_hitstop_screen_shake.gd" id="1_test"]
+
+[node name="TestHitstopScreenShake" type="Node"]
+script = ExtResource("1_test")

@@ -1,6 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://arenaskyscraper01"]
+[gd_scene load_steps=7 format=3 uid="uid://arenaskyscraper01"]
 
 [ext_resource type="Script" path="res://scripts/arena/arena_skyscraper.gd" id="1_arena"]
+[ext_resource type="Script" path="res://scripts/visual/combat_camera.gd" id="2_cam"]
+[ext_resource type="Script" path="res://scripts/combat/components/hitstop_component.gd" id="3_hitstop"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_platform"]
 size = Vector2(1280, 24)
@@ -101,3 +103,7 @@ shape = SubResource("RectangleShape2D_right_sensor")
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(704, 240)
 zoom = Vector2(1, 1)
+script = ExtResource("2_cam")
+
+[node name="HitstopComponent" type="Node" parent="."]
+script = ExtResource("3_hitstop")
