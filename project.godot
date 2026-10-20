@@ -17,6 +17,10 @@ run/main_scene="res://scenes/main_menu.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 
+[audio]
+
+busses/default_bus_layout="res://default_bus_layout.tres"
+
 [autoload]
 
 EventBus="*res://scripts/core/event_bus.gd"
