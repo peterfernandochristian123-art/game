@@ -61,13 +61,21 @@ func has_super_armor() -> bool:
 	return super_armor_frames > 0
 
 signal ring_out_eliminated(mecha: Node2D)
+signal hp_changed(current: int, max_val: int)
+signal heat_changed(current: float, max_val: float)
+signal ultimate_changed(current: float, max_val: float)
+
 var is_eliminated: bool = false
+
+func set_hp(val: int) -> void:
+	current_hp = clampi(val, 0, max_hp)
+	hp_changed.emit(current_hp, max_hp)
 
 func eliminate_by_ring_out() -> void:
 	if is_eliminated:
 		return
 	is_eliminated = true
-	current_hp = 0
+	set_hp(0)
 	ring_out_eliminated.emit(self)
 	var bus = get_node_or_null("/root/EventBus")
 	if bus and bus.has_signal("round_ended"):
@@ -106,7 +114,7 @@ var heat_component: HeatComponentScript = null
 @onready var visual_root: Node2D = _find_visual_node()
 
 func _ready() -> void:
-	current_hp = max_hp
+	set_hp(max_hp)
 	_setup_combat_colliders()
 	_setup_heat_component()
 	_setup_fsm_states()
@@ -172,6 +180,7 @@ func _on_meltdown_triggered() -> void:
 
 func _on_heat_changed(current: float, _max_val: float) -> void:
 	heat_gauge = current
+	heat_changed.emit(current, _max_val)
 
 ## Pendinginan pasif: hanya saat state aktif Idle atau Walk (-0.2 heat per physics frame)
 func _update_heat_cooling() -> void:
@@ -301,7 +310,7 @@ func take_hit(attacker: Node2D, hit_data: Dictionary) -> void:
 			if base_dmg > 0 and block_dmg == 0:
 				block_dmg = 1
 
-		current_hp = max(0, current_hp - block_dmg)
+		set_hp(current_hp - block_dmg)
 
 		# Terapkan blockstun dan knockback teredam (60%)
 		var kb_val: float = hit_data.get("knockback", 120.0) * CombatConstants.BLOCK_KNOCKBACK_MULTIPLIER
@@ -359,7 +368,7 @@ func take_hit(attacker: Node2D, hit_data: Dictionary) -> void:
 	if state_machine and state_machine.current_state and state_machine.current_state.name == &"Meltdown":
 		dmg = int(round(float(dmg) * CombatConstants.MELTDOWN_DAMAGE_RECEIVED_MULTIPLIER))
 
-	current_hp = max(0, current_hp - dmg)
+	set_hp(current_hp - dmg)
 
 	# Super Armor: Full Super Armor (Story 3.3 Bulwark Riot Shield) & 1-Hit Startup Super Armor (Story 2.2 AC 2)
 	var absorbed_by_armor: bool = false
@@ -556,10 +565,12 @@ func grant_invulnerability(frames: int) -> void:
 
 func add_ultimate(amount: float) -> void:
 	current_ultimate = clampf(current_ultimate + amount, 0.0, max_ultimate)
+	ultimate_changed.emit(current_ultimate, max_ultimate)
 
 func drain_ultimate(amount: float) -> float:
 	var actual_drain: float = minf(current_ultimate, amount)
 	current_ultimate = maxf(0.0, current_ultimate - actual_drain)
+	ultimate_changed.emit(current_ultimate, max_ultimate)
 	return actual_drain
 
 
