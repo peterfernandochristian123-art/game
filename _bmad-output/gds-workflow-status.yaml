@@ -18,3 +18,4 @@ workflow_status:
   test-framework: pending
   test-design: pending
   sprint-planning: _bmad-output/implementation-artifacts/sprint-status.yaml
+  standalone-build: _bmad-output/implementation-artifacts/9-1-standalone-windows-release-package-and-presets.md
