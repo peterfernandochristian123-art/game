@@ -134,6 +134,10 @@ Menyediakan antarmuka pemilihan karakter (Character Select) arcade retro 32-bit 
 Menghadirkan panggung arena ke-2 berlatar reaktor bawah tanah industri tertutup dengan dinding pembatas fisik pantul (Wall Bounce), sistem bahaya semburan uap termal bertekanan tinggi (Steam Hazards), serta pemilihan panggung dinamis di antarmuka pra-pertandingan.
 **Requirements covered:** FR12, FR9, UX-DR5, NFR7
 
+### Epic 13: Playable 4th Mecha Roster - Phantom-9 "Kage" (Stance Switcher / Stealth Ninja Mecha)
+Mewujudkan petarung mecha ke-4 bertipe Stance Switcher ninja bertema bayangan dan katana ganda dengan mekanik pergantian kuda-kuda (Kenjutsu vs Shinobi), tebasan kilat Iaido, hujan shuriken, dan jurus pamungkas Tsukuyomi Shadow Blossom.
+**Requirements covered:** FR10, FR11, NFR7, UX-DR5
+
 ---
 
 ## Epic 1: Core Physics & Movement Engine
@@ -721,3 +725,29 @@ So that I can experience tactical corner pressure, wall-bounce combos, and envir
 **And** karakter yang terhempas keras ke dinding memicu reaksi pantulan *Wall-Bounce* dengan pembatasan 1x per rangkaian kombo (FR9),
 **And** panggung dilengkapi dua ventilasi uap geotermal reaktor (`scripts/hazards/steam_vent_hazard.gd`) yang mengalami siklus peringatan (Indikator Lampu Merah/Desis 3 detik) dan erupsi semburan uap (durasi 1.5 detik) yang meningkatkan Heat mecha sebesar +20% serta memberikan chip damage ringan jika tersentuh,
 **And** `MatchConfig` dan Character Select Screen mendukung seleksi arena (`&"skyscraper"` vs `&"reactor"`), dan mengalihkan transisi scene gameplay ke arena terpilih secara mulus.
+
+---
+
+## Epic 13: Playable 4th Mecha Roster - Phantom-9 "Kage" (Stance Switcher / Stealth Ninja Mecha)
+
+Mewujudkan petarung mecha ke-4 bertipe Stance Switcher ninja bertema bayangan dan katana ganda dengan mekanik pergantian kuda-kuda (Kenjutsu vs Shinobi), tebasan kilat Iaido, hujan shuriken, dan jurus pamungkas Tsukuyomi Shadow Blossom.
+
+### Story 13.1: Phantom-9 "Kage" Character Implementation & Stance Shift Mechanics
+
+As a player who enjoys agile dual-style hybrid fighters and mind-game mixups,
+I want to play as Phantom-9 Kage with dynamic Stance Switching between close-range Kenjutsu Katana and ranged Shinobi Shurikens,
+So that I can confuse opponents with evasive feints and fluidly adapt my combat range in mid-battle.
+
+**Acceptance Criteria:**
+
+**Given** karakter Phantom-9 Kage dipilih dengan Max HP 920, kecepatan jalan 320 px/s, dan dash 780 px/s (14 frame),
+**When** pemain mengeksekusi aksi unik Phantom-9:
+  - **Skill 1 (*Stance Shift & Shadow Feint*)**: Bertransisi seketika antara `&"kenjutsu"` (Katana Melee) dan `&"shinobi"` (Shuriken Ranged) dengan 12 frame evasive feint dan +15% Heat,
+  - **Normal String (Kenjutsu)**: 5L (Katana Quick Draw 4f startup, 60 damage) dan 5H (Spinning Overhead Cleave 8f startup, 90 damage),
+  - **Normal String (Shinobi)**: 5L (Kunai Poke 5f startup, 50 damage) dan 5H (Kunai Flurry 9f startup, 85 damage),
+  - **Skill 2 (Kenjutsu - *Iaido Crescent*)**: Tebasan lunge berkecepatan tinggi menembus garis depan (Startup 10f, damage 120, +25% Heat),
+  - **Skill 2 (Shinobi - *Shuriken Storm*)**: Melepaskan 3 shuriken bayangan menyebar (Startup 12f, damage 35x3, +20% Heat),
+  - **Ultimate (*Tsukuyomi Shadow Blossom*)**: Sekuens tebasan bayangan 5-hit sinematik ke seluruh penjuru layar (Startup 16f, damage 420, invulnerability startup frames),
+**Then** seluruh jurus berfungsi sesuai parameter Resource `.tres` dan kalkulasi damage scaling terpadu,
+**And** visual mecha pixel art mecha menampilkan siluet warna crimson red (#F22640) dengan chassis midnight black (#0F141A), syal ninja berpendar (#E61F38), dan afterimage dash jejak merah delima gelap.
+

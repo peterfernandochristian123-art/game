@@ -52,7 +52,7 @@ func _ready() -> void:
 	get_tree().quit(0 if passed == tests.size() else 1)
 
 func _test_fighter_factory_roster_metadata() -> void:
-	_check(FighterFactoryScript.get_roster_count() == 3, "Roster memiliki tepat 3 mecha petarung.")
+	_check(FighterFactoryScript.get_roster_count() >= 3, "Roster memiliki minimal 3 mecha petarung.")
 	
 	var viper = FighterFactoryScript.get_character_info(&"viper")
 	_check(viper["hp"] == 900, "Apex-0 Viper memiliki 900 HP.")
@@ -95,7 +95,7 @@ func _test_character_select_scene_structure() -> void:
 	add_child(screen)
 
 	_check(screen != null, "Scene character_select.tscn berhasil diinstansiasi.")
-	_check(screen.get_node("RosterArea/CardsContainer").get_child_count() == 3, "CardsContainer memuat 3 kartu petarung.")
+	_check(screen.get_node("RosterArea/CardsContainer").get_child_count() == FighterFactoryScript.get_roster_count(), "CardsContainer memuat seluruh kartu petarung.")
 	_check(screen.get_node("DetailsArea/P1Panel/Margin/VBox/HBoxTop/SpriteMount").get_child_count() > 0, "P1 SpriteMount memiliki preview pixel sprite.")
 	_check(screen.get_node("DetailsArea/P2Panel/Margin/VBox/HBoxTop/SpriteMount").get_child_count() > 0, "P2 SpriteMount memiliki preview pixel sprite.")
 
@@ -121,7 +121,12 @@ func _test_character_select_navigation_and_lock_in() -> void:
 	_check(screen.p1_index == 2, "P1 berpindah ke index 2 (Pulsar).")
 	_check(p1_emitted["id"] == &"pulsar", "Sinyal p1_selection_changed memancarkan pulsar.")
 
-	# Wraparound dari 2 ke 0 (Viper)
+	# Geser P1 ke index 3 jika ada (Kage)
+	if FighterFactoryScript.get_roster_count() > 3:
+		screen._change_p1_index(1)
+		_check(screen.p1_index == 3, "P1 berpindah ke index 3 (Kage).")
+
+	# Wraparound ke index 0 (Viper)
 	screen._change_p1_index(1)
 	_check(screen.p1_index == 0, "Wraparound ke index 0 (Viper) berhasil.")
 

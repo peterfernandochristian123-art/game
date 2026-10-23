@@ -54,6 +54,8 @@ func _detect_parent_mecha() -> void:
 			archetype = &"bulwark"
 		elif "Pulsar" in parent_mecha.name or "Ray" in parent_mecha.name:
 			archetype = &"pulsar"
+		elif "Kage" in parent_mecha.name or "Phantom" in parent_mecha.name:
+			archetype = &"kage"
 		else:
 			archetype = &"viper"
 		
@@ -84,6 +86,17 @@ func _apply_archetype_palette() -> void:
 		col_skin_shadow = Color(0.76, 0.58, 0.45)
 		col_hair = Color(0.08, 0.06, 0.14)
 		col_belt = Color(1.00, 0.85, 0.20) # Golden sash
+	elif archetype == &"kage":
+		col_chassis = Color(0.08, 0.08, 0.12) # Midnight Charcoal
+		col_armor = Color(0.95, 0.15, 0.25) # Crimson Red
+		col_highlight = Color(1.00, 0.40, 0.45) # Neon Rose
+		col_visor = Color(1.00, 0.20, 0.30) # Glowing Crimson
+		col_thruster = Color(0.85, 0.10, 0.20)
+		col_energy = Color(1.00, 0.20, 0.35)
+		col_skin = Color(0.94, 0.88, 0.82)
+		col_skin_shadow = Color(0.74, 0.65, 0.58)
+		col_hair = Color(0.06, 0.06, 0.08) # Jet midnight black
+		col_belt = Color(0.90, 0.12, 0.22) # Crimson flowing ninja scarf
 	else:
 		col_chassis = Color(0.10, 0.13, 0.20)
 		col_armor = Color(0.20, 0.88, 1.00)
@@ -141,6 +154,8 @@ func _draw() -> void:
 		_draw_bulwark_fighter()
 	elif archetype == &"pulsar":
 		_draw_pulsar_fighter()
+	elif archetype == &"kage":
+		_draw_kage_fighter()
 	else:
 		_draw_viper_fighter()
 
@@ -465,6 +480,98 @@ func _draw_pulsar_fighter() -> void:
 			var orb_pos = Vector2(cos(angle) * 11.0, sin(angle) * 7.0 - 4.0 + bob_y)
 			draw_circle(orb_pos, 2.0, col_energy)
 			draw_circle(orb_pos, 1.0, Color.WHITE)
+
+## =========================================================================
+## 4. PHANTOM-9 KAGE: SHADOW NINJA STANCE SWITCHER (Kenjutsu & Shinobi)
+## =========================================================================
+func _draw_kage_fighter() -> void:
+	var bob_y: float = 0.0
+	if current_state == &"Idle":
+		bob_y = sin(anim_tick * 0.16) * 1.5
+	elif current_state == &"Walk":
+		bob_y = abs(sin(anim_tick * 0.36)) * 1.8
+	elif current_state == &"Cliffhanger":
+		bob_y = 6.0
+
+	var head_center := Vector2(0, -14.0 + bob_y)
+	if current_state == &"Meltdown":
+		head_center.y += 3.0
+
+	# 1. Flowing Crimson Ninja Scarf (Berkibar di leher ninja)
+	var trail_offset = -6.0 if current_state == &"Walk" else -4.0
+	var wave_1 = sin((anim_tick + 12) * 0.22) * 3.5
+	var wave_2 = cos((anim_tick + 24) * 0.28) * 4.5
+	var scarf_pts = PackedVector2Array([
+		Vector2(-3, head_center.y + 3),
+		Vector2(trail_offset - 4, head_center.y + 5 + wave_1),
+		Vector2(trail_offset - 11, head_center.y + 7 + wave_2),
+		Vector2(trail_offset - 16, head_center.y + 9 + wave_1)
+	])
+	draw_polyline(scarf_pts, col_belt, 2.5)
+	draw_polyline(scarf_pts, col_highlight, 1.0)
+
+	# 2. Celana Shinobi Gelap & Crimson Shin Guards
+	if current_state == &"Walk":
+		var stride = sin(anim_tick * 0.36) * 5.0
+		_draw_fighter_leg(Vector2(-5 - stride, 5 + bob_y), Vector2(-6 - stride, 19 + bob_y), col_chassis, col_armor, 4.5)
+		_draw_fighter_leg(Vector2(4 + stride, 5 + bob_y), Vector2(5 + stride, 19 + bob_y), col_chassis, col_armor, 4.5)
+	else:
+		_draw_fighter_leg(Vector2(-5, 5 + bob_y), Vector2(-7, 19 + bob_y), col_chassis, col_armor, 4.5)
+		_draw_fighter_leg(Vector2(4, 5 + bob_y), Vector2(6, 19 + bob_y), col_chassis, col_armor, 4.5)
+
+	# 3. Torso Ninja Berotot & Armor Mesh Hitam-Merah
+	var chest_pts = PackedVector2Array([
+		Vector2(-7, -8 + bob_y),
+		Vector2(7, -8 + bob_y),
+		Vector2(5, 5 + bob_y),
+		Vector2(-5, 5 + bob_y)
+	])
+	draw_colored_polygon(chest_pts, col_chassis)
+
+	var inner_armor = PackedVector2Array([
+		Vector2(-4, -7 + bob_y),
+		Vector2(4, -7 + bob_y),
+		Vector2(2, 3 + bob_y),
+		Vector2(-2, 3 + bob_y)
+	])
+	draw_colored_polygon(inner_armor, col_armor)
+	draw_rect(Rect2(-6, 3 + bob_y, 12, 3), Color(0.12, 0.12, 0.16)) # Belt
+
+	# 4. Kepala, Cowl Ninja & Glowing Crimson Mask
+	draw_circle(head_center, 4.2, col_hair)
+	# Glowing Crimson Visor / Eye Slits
+	draw_line(Vector2(0, head_center.y - 1), Vector2(4, head_center.y - 1), col_visor, 1.5)
+	draw_circle(Vector2(3, head_center.y - 1), 1.0, Color.WHITE)
+
+	# 5. Katana (Kenjutsu) vs Shuriken (Shinobi)
+	var is_kenjutsu: bool = true
+	if parent_mecha and parent_mecha.get("current_stance"):
+		is_kenjutsu = (parent_mecha.current_stance == &"kenjutsu")
+
+	if current_state == &"Attack":
+		if is_kenjutsu:
+			# Slash Katana terhunus tajam
+			var blade_start = Vector2(5, -6 + bob_y)
+			var blade_tip = Vector2(22, -9 + bob_y)
+			_draw_fighter_arm(Vector2(4, -6 + bob_y), blade_start, col_skin, col_armor)
+			draw_line(blade_start, blade_tip, col_highlight, 2.5)
+			draw_line(blade_start, blade_tip, Color.WHITE, 1.2)
+		else:
+			# Lemparan Shuriken Bayangan
+			var hand_pos = Vector2(16, -4 + bob_y)
+			_draw_fighter_arm(Vector2(4, -6 + bob_y), hand_pos, col_skin, col_armor)
+			draw_circle(hand_pos, 3.5, col_energy)
+			draw_circle(hand_pos, 1.5, Color.WHITE)
+	else:
+		# Pose tangan sigap bela diri ninja
+		_draw_fighter_arm(Vector2(-5, -6 + bob_y), Vector2(-2, -3 + bob_y), col_skin, col_armor)
+		_draw_fighter_arm(Vector2(4, -6 + bob_y), Vector2(7, -4 + bob_y), col_skin, col_armor)
+		if is_kenjutsu:
+			# Katana terselip di punggung
+			draw_line(Vector2(-6, 4 + bob_y), Vector2(8, -16 + bob_y), col_highlight, 2.0)
+		else:
+			# Shuriken siap di tangan depan
+			draw_rect(Rect2(6, -6 + bob_y, 3, 3), col_energy)
 
 ## =========================================================================
 ## HELPER DRAWING FUNCTIONS (Smooth Anatomical Limbs)

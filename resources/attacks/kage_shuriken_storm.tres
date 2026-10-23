@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3 uid="uid://kageshurikenstorm01"]
+
+[ext_resource type="Script" path="res://scripts/combat/resources/attack_data.gd" id="1_atk"]
+
+[resource]
+script = ExtResource("1_atk")
+attack_name = &"Skill2"
+startup = 12
+active = 6
+recovery = 15
+damage = 105
+hitstun = 24
+blockstun = 16
+knockback = 240.0
+heat_cost = 20.0
+is_energy = true
+causes_ground_bounce = false
+causes_wall_bounce = false
+chain_level = 3

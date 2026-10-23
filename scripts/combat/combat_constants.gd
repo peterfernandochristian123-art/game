@@ -105,6 +105,19 @@ const PULSAR_DRONE_DURATION_FRAMES: int = 120
 const PULSAR_DRONE_HEAT_COST: float = 20.0
 const PULSAR_SUPERNOVA_DAMAGE: int = 380
 
+# Karakter Phantom-9 Kage Parameters (Story 13.1)
+const KAGE_MAX_HP: int = 920
+const KAGE_WALK_SPEED: float = 320.0
+const KAGE_DASH_SPEED: float = 780.0
+const KAGE_DASH_DURATION_FRAMES: int = 14
+const KAGE_STANCE_FEINT_FRAMES: int = 12
+const KAGE_STANCE_SHIFT_HEAT_COST: float = 15.0
+const KAGE_IAIDO_DAMAGE: int = 120
+const KAGE_IAIDO_HEAT_COST: float = 25.0
+const KAGE_SHURIKEN_STORM_DAMAGE: int = 105
+const KAGE_SHURIKEN_STORM_HEAT_COST: float = 20.0
+const KAGE_SHADOW_BLOSSOM_DAMAGE: int = 420
+
 # Toleransi Input (Buffer & Coyote Time)
 const INPUT_BUFFER_WINDOW_FRAMES: int = 5
 const COYOTE_TIME_FRAMES: int = 5

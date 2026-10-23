@@ -8,6 +8,7 @@ extends RefCounted
 const ApexViperScript = preload("res://scripts/characters/apex_viper.gd")
 const TitanBulwarkScript = preload("res://scripts/characters/titan_bulwark.gd")
 const RayPulsarScript = preload("res://scripts/characters/ray_pulsar.gd")
+const PhantomKageScript = preload("res://scripts/characters/phantom_kage.gd")
 
 const StateMachineScript = preload("res://scripts/combat/fsm/state_machine.gd")
 const IdleStateScript = preload("res://scripts/combat/fsm/idle_state.gd")
@@ -79,6 +80,26 @@ const ROSTER: Array[Dictionary] = [
 			"Skill 2: Disrupter Drone (120f Area Denial)",
 			"Ultimate: Supernova Horizon (360° Shockwave)"
 		]
+	},
+	{
+		"id": &"kage",
+		"name": "Phantom-9 \"Kage\"",
+		"archetype": "Stance Switcher / Shadow Shinobi",
+		"hp": 920,
+		"walk_speed": 320.0,
+		"dash_speed": 780.0,
+		"speed_grade": "S",
+		"defense_grade": "B",
+		"range_grade": "A",
+		"complexity": "Very High",
+		"theme_color": Color(0.95, 0.15, 0.25, 1.0), # Crimson Red
+		"description": "Shadow assassin mastering dual combat stances: close-quarters Kenjutsu Katana and ranged Shinobi Shurikens with evasive feints.",
+		"signature_moves": [
+			"5L / 5H: Katana Slash (Kenjutsu) / Kunai Poke (Shinobi)",
+			"Skill 1: Stance Shift & Shadow Feint (Dual Stance Swap)",
+			"Skill 2: Iaido Crescent (Kenjutsu) / Shuriken Storm (Shinobi)",
+			"Ultimate: Tsukuyomi Shadow Blossom (420 Dmg Full Screen)"
+		]
 	}
 ]
 
@@ -105,6 +126,9 @@ static func create_fighter(char_id: StringName, player_idx: int = 1) -> Characte
 		&"pulsar":
 			fighter = RayPulsarScript.new()
 			fighter.name = "Pulsar_P%d" % player_idx
+		&"kage":
+			fighter = PhantomKageScript.new()
+			fighter.name = "Kage_P%d" % player_idx
 		&"viper", _:
 			fighter = ApexViperScript.new()
 			fighter.name = "Viper_P%d" % player_idx

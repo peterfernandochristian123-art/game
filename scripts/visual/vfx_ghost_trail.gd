@@ -19,6 +19,8 @@ func _ready() -> void:
 		trail_color = Color(1.0, 0.6, 0.15, initial_alpha)
 	elif archetype == &"pulsar":
 		trail_color = Color(0.75, 0.25, 1.0, initial_alpha)
+	elif archetype == &"kage":
+		trail_color = Color(1.0, 0.15, 0.25, initial_alpha)
 	else:
 		trail_color = Color(0.2, 0.9, 1.0, initial_alpha)
 
@@ -33,6 +35,8 @@ func setup(pos: Vector2, facing: int, arch: StringName, custom_color: Color = Co
 		trail_color = Color(1.0, 0.6, 0.15, initial_alpha)
 	elif archetype == &"pulsar":
 		trail_color = Color(0.75, 0.25, 1.0, initial_alpha)
+	elif archetype == &"kage":
+		trail_color = Color(1.0, 0.15, 0.25, initial_alpha)
 	else:
 		trail_color = Color(0.2, 0.9, 1.0, initial_alpha)
 	queue_redraw()

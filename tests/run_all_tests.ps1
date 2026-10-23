@@ -47,7 +47,9 @@ $testScenes = @(
     # Epic 11: Character Select Screen & Roster Selection System
     "res://tests/test_character_select.tscn",
     # Epic 12: Underground Reactor Arena & Environmental Steam Hazards
-    "res://tests/test_underground_reactor.tscn"
+    "res://tests/test_underground_reactor.tscn",
+    # Epic 13: Playable 4th Mecha Roster - Phantom-9 Kage (Stance Switcher)
+    "res://tests/test_phantom_kage.tscn"
 )
 
 Write-Host "==========================================================" -ForegroundColor Cyan

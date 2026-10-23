@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3 uid="uid://kagestanceshift01"]
+
+[ext_resource type="Script" path="res://scripts/combat/resources/attack_data.gd" id="1_atk"]
+
+[resource]
+script = ExtResource("1_atk")
+attack_name = &"Skill1"
+startup = 2
+active = 10
+recovery = 2
+damage = 0
+hitstun = 0
+blockstun = 0
+knockback = 0.0
+heat_cost = 15.0
+is_energy = false
+causes_ground_bounce = false
+causes_wall_bounce = false
+chain_level = 3

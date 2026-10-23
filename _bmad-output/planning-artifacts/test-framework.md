@@ -72,7 +72,8 @@ tests/
 ├── test_mecha_combat_sfx.gd/.tscn     # Epic 8: Thruster dash, alarms, & impact audio pooling
 ├── test_ray_pulsar.gd/.tscn           # Epic 10: Ray-X Pulsar moveset & photon particles
 ├── test_character_select.gd/.tscn     # Epic 11: Character Select Screen & factory spawner
-└── test_underground_reactor.gd/.tscn  # Epic 12: Underground Reactor & steam vent hazards
+├── test_underground_reactor.gd/.tscn  # Epic 12: Underground Reactor & steam vent hazards
+└── test_phantom_kage.gd/.tscn         # Epic 13: Phantom-9 Kage Stance Switcher mechanics
 ```
 
 ---
