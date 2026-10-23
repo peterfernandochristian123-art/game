@@ -1,7 +1,7 @@
 class_name AudioManager
 extends Node
 
-## Pengelola Sistem Audio & Announcer 5-Bus Terpadu (Story 6.3 & Story 8.1)
+## Pengelola Sistem Audio & Announcer 5-Bus Terpadu (Story 6.3, Story 8.1 & Story 8.2)
 ## Mengatur bus Master, BGM, SFX, Announcer, MechaVoice serta pemutar SFX dan Cyberpunk Synthwave OST
 
 const AudioSynthesizerScript = preload("res://scripts/audio/audio_synthesizer.gd")
@@ -27,20 +27,27 @@ const REQUIRED_BUSSES: Array[StringName] = [
 
 static var instance: AudioManager = null
 
-# Audio Streams Sintetis SFX
+# Audio Streams Sintetis SFX Dasar (Story 6.3)
 var sfx_metal_clang: AudioStreamWAV = null
 var sfx_spark_parry: AudioStreamWAV = null
 var sfx_hydraulic_hiss: AudioStreamWAV = null
 var sfx_announcer_chime: AudioStreamWAV = null
 
-# Audio Streams Sintetis BGM
+# Audio Streams Sintetis SFX Mecha Combat Expansion (Story 8.2)
+var sfx_thruster_dash: AudioStreamWAV = null
+var sfx_overclock_alarm: AudioStreamWAV = null
+var sfx_meltdown_shutdown: AudioStreamWAV = null
+var sfx_heavy_impact: AudioStreamWAV = null
+var sfx_wall_bounce: AudioStreamWAV = null
+
+# Audio Streams Sintetis BGM (Story 8.1)
 var bgm_title: AudioStreamWAV = null
 var bgm_arena: AudioStreamWAV = null
 
 # Player Pool SFX & Announcer
 var _sfx_players: Array[AudioStreamPlayer] = []
 var _announcer_player: AudioStreamPlayer = null
-const SFX_POOL_SIZE: int = 6
+const SFX_POOL_SIZE: int = 8
 
 # Dual BGM Players for Seamless Crossfading
 var _bgm_player_a: AudioStreamPlayer = null
@@ -73,6 +80,10 @@ func _ready() -> void:
 			EventBus.round_ended.connect(_on_round_ended)
 		if EventBus.has_signal("cliffhanger_triggered"):
 			EventBus.cliffhanger_triggered.connect(_on_cliffhanger_triggered)
+		if EventBus.has_signal("state_changed"):
+			EventBus.state_changed.connect(_on_state_changed)
+		if EventBus.has_signal("overclock_triggered"):
+			EventBus.overclock_triggered.connect(_on_overclock_triggered)
 
 ## Memastikan kelima bus audio tersedia di AudioServer
 func ensure_audio_busses() -> void:
@@ -105,10 +116,18 @@ func get_bus_volume(bus_name: StringName) -> float:
 	return 1.0
 
 func _init_synthesized_sounds() -> void:
+	# SFX Inti (Story 6.3)
 	sfx_metal_clang = AudioSynthesizerScript.generate_metal_clang(340.0, 0.20)
 	sfx_spark_parry = AudioSynthesizerScript.generate_spark_parry(880.0, 0.32)
 	sfx_hydraulic_hiss = AudioSynthesizerScript.generate_hydraulic_hiss(0.18)
 	sfx_announcer_chime = AudioSynthesizerScript.generate_announcer_chime(0.35)
+
+	# SFX Mecha Combat Expansion (Story 8.2)
+	sfx_thruster_dash = AudioSynthesizerScript.generate_thruster_dash(0.22)
+	sfx_overclock_alarm = AudioSynthesizerScript.generate_overclock_alarm(0.18)
+	sfx_meltdown_shutdown = AudioSynthesizerScript.generate_meltdown_shutdown(0.45)
+	sfx_heavy_impact = AudioSynthesizerScript.generate_heavy_impact(0.28)
+	sfx_wall_bounce = AudioSynthesizerScript.generate_wall_bounce(0.25)
 
 func _ensure_bgm_streams() -> void:
 	if bgm_title == null:
@@ -234,11 +253,60 @@ func play_announcer(cue: String) -> void:
 		_announcer_player.play()
 	announcer_called.emit(cue)
 
-func _on_hit_confirmed(_attacker: Node2D, _victim: Node2D, _hit_data: Variant) -> void:
-	play_sfx(sfx_metal_clang, BUS_SFX)
+# Helper SFX Mecha Langsung (Story 8.2)
+func play_thruster_dash() -> void:
+	play_sfx(sfx_thruster_dash, BUS_SFX)
+
+func play_overclock_alarm() -> void:
+	play_sfx(sfx_overclock_alarm, BUS_SFX)
+
+func play_meltdown_shutdown() -> void:
+	play_sfx(sfx_meltdown_shutdown, BUS_SFX)
+
+func play_heavy_impact() -> void:
+	play_sfx(sfx_heavy_impact, BUS_SFX)
+
+func play_wall_bounce() -> void:
+	play_sfx(sfx_wall_bounce, BUS_SFX)
+
+func _on_hit_confirmed(_attacker: Node2D, _victim: Node2D, hit_data: Variant) -> void:
+	var dmg: float = 0.0
+	var is_wall_bounce: bool = false
+	var is_ground_bounce: bool = false
+
+	if hit_data != null:
+		if hit_data is Dictionary:
+			dmg = float(hit_data.get("damage", 0.0))
+			is_wall_bounce = bool(hit_data.get("wall_bounce", false))
+			is_ground_bounce = bool(hit_data.get("ground_bounce", false))
+		elif hit_data is Resource:
+			if "damage" in hit_data:
+				dmg = float(hit_data.damage)
+			if "wall_bounce" in hit_data:
+				is_wall_bounce = bool(hit_data.wall_bounce)
+			if "ground_bounce" in hit_data:
+				is_ground_bounce = bool(hit_data.ground_bounce)
+
+	if is_wall_bounce:
+		play_wall_bounce()
+	elif dmg >= 120.0 or is_ground_bounce:
+		play_heavy_impact()
+	else:
+		play_sfx(sfx_metal_clang, BUS_SFX)
 
 func _on_parry_triggered(_defender: Node2D, _attacker: Node2D) -> void:
 	play_sfx(sfx_spark_parry, BUS_SFX)
+
+func _on_state_changed(_character: Node2D, _prev_state: StringName, new_state: StringName) -> void:
+	if new_state == &"Dash" or new_state == &"AirDash":
+		play_thruster_dash()
+	elif new_state == &"Meltdown":
+		play_meltdown_shutdown()
+		play_announcer("CRITICAL MELTDOWN!")
+
+func _on_overclock_triggered(_character: Node2D, is_active: bool) -> void:
+	if is_active:
+		play_overclock_alarm()
 
 func _on_round_ended(_winner_id: int, reason: StringName) -> void:
 	var cue: String = "K.O.!" if reason == &"ko" else "RING OUT!"

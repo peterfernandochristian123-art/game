@@ -250,7 +250,13 @@ func _setup_heat_component() -> void:
 		heat_component.heat_changed.connect(_on_heat_changed)
 	if not heat_component.meltdown_triggered.is_connected(_on_meltdown_triggered):
 		heat_component.meltdown_triggered.connect(_on_meltdown_triggered)
+	if not heat_component.overclock_state_changed.is_connected(_on_overclock_state_changed):
+		heat_component.overclock_state_changed.connect(_on_overclock_state_changed)
 	heat_gauge = heat_component.current_heat
+
+func _on_overclock_state_changed(is_active: bool) -> void:
+	if is_instance_valid(EventBus):
+		EventBus.overclock_triggered.emit(self, is_active)
 
 func _on_meltdown_triggered() -> void:
 	if state_machine:

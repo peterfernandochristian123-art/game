@@ -40,7 +40,8 @@ $testScenes = @(
     "res://tests/test_pixel_sprites_visual.tscn",
     "res://tests/test_ghost_trail_and_stage_vfx.tscn",
     # Epic 8: Cyberpunk OST & Mecha Combat Audio Immersion
-    "res://tests/test_synthwave_ost.tscn"
+    "res://tests/test_synthwave_ost.tscn",
+    "res://tests/test_mecha_combat_sfx.tscn"
 )
 
 Write-Host "==========================================================" -ForegroundColor Cyan
