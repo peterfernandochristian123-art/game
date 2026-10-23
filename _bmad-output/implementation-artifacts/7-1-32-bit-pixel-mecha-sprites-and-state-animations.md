@@ -4,7 +4,7 @@ baseline_commit: d6d2a7e
 
 # Story 7.1: 32-Bit Pixel Mecha Sprites, State Visuals & Architecture Hardening
 
-Status: review
+Status: done
 
 ## Story
 
