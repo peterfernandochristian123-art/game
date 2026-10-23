@@ -17,6 +17,8 @@ func _ready() -> void:
 	scale.x = absf(scale.x) * (1 if facing_direction >= 0 else -1)
 	if archetype == &"bulwark":
 		trail_color = Color(1.0, 0.6, 0.15, initial_alpha)
+	elif archetype == &"pulsar":
+		trail_color = Color(0.75, 0.25, 1.0, initial_alpha)
 	else:
 		trail_color = Color(0.2, 0.9, 1.0, initial_alpha)
 
@@ -29,6 +31,8 @@ func setup(pos: Vector2, facing: int, arch: StringName, custom_color: Color = Co
 		trail_color = custom_color
 	elif archetype == &"bulwark":
 		trail_color = Color(1.0, 0.6, 0.15, initial_alpha)
+	elif archetype == &"pulsar":
+		trail_color = Color(0.75, 0.25, 1.0, initial_alpha)
 	else:
 		trail_color = Color(0.2, 0.9, 1.0, initial_alpha)
 	queue_redraw()

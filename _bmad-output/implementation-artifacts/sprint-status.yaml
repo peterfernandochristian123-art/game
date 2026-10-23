@@ -98,3 +98,7 @@ development_status:
   9-1-standalone-windows-release-package-and-presets: done
   epic-9-retrospective: optional
 
+  epic-10: done
+  10-1-ray-x-pulsar-zoner-character-implementation: done
+  epic-10-retrospective: optional
+

@@ -94,6 +94,17 @@ const BULWARK_SIEGE_CANNON_DAMAGE: int = 450
 const BULWARK_PILEDRIVER_HEAT_COST: float = 35.0
 const BULWARK_RIOT_SHIELD_HEAT_COST: float = 15.0
 
+# Karakter Ray-X Pulsar Parameters (Story 10.1)
+const PULSAR_MAX_HP: int = 950
+const PULSAR_WALK_SPEED: float = 300.0
+const PULSAR_DASH_SPEED: float = 720.0
+const PULSAR_DASH_DURATION_FRAMES: int = 14
+const PULSAR_RAILGUN_DAMAGE: int = 110
+const PULSAR_RAILGUN_HEAT_COST: float = 25.0
+const PULSAR_DRONE_DURATION_FRAMES: int = 120
+const PULSAR_DRONE_HEAT_COST: float = 20.0
+const PULSAR_SUPERNOVA_DAMAGE: int = 380
+
 # Toleransi Input (Buffer & Coyote Time)
 const INPUT_BUFFER_WINDOW_FRAMES: int = 5
 const COYOTE_TIME_FRAMES: int = 5

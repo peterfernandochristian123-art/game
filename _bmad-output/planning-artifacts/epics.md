@@ -122,6 +122,10 @@ Menghadirkan pengalaman audio arcade 90-an yang imersif dan bertenaga penuh mela
 Menyiapkan profil ekspor Godot 4, konfigurasi preset Windows Desktop, pengemasan paket game biner terenkapsulasi (`FightingToZero.exe` & `FightingToZero.pck`), serta verifikasi rilis standalone siap distribusi.
 **Requirements covered:** NFR3, NFR5, NFR6
 
+### Epic 10: Playable 3rd Mecha Roster - Ray-X "Pulsar" (Zoner / Beam & Drone Disrupter)
+Mewujudkan petarung mecha ke-3 berorientasi penyerangan jarak jauh (Zoner / Trapper) dengan senjata laser foton, drone melayang penutup area, dan gelombang kejut Supernova Horizon 360°.
+**Requirements covered:** FR10, FR11, NFR7, UX-DR5
+
 ---
 
 ## Epic 1: Core Physics & Movement Engine
@@ -644,6 +648,30 @@ So that anyone can easily install and play the full game on PC.
 **Then** berkas biner `.pck` tergenerasi sempurna dengan seluruh resource, scene, skrip, dan shader terkompilasi,
 **And** paket binary mandiri `builds/windows/FightingToZero.exe` dapat dieksekusi secara instan dan memuat `FightingToZero.pck` dengan performa terkunci 60 FPS,
 **And** disediakan script peluncur batch `run_standalone_build.bat` di root direktori untuk kemudahan testing.
+
+---
+
+## Epic 10: Playable 3rd Mecha Roster - Ray-X "Pulsar" (Zoner / Beam & Drone Disrupter)
+
+Mewujudkan petarung mecha ke-3 berorientasi penyerangan jarak jauh (Zoner / Trapper) dengan senjata laser foton, drone melayang penutup area, dan gelombang kejut Supernova Horizon 360°.
+
+### Story 10.1: Ray-X "Pulsar" Zoner Character Implementation
+
+As a player who prefers long-range zoning, spatial traps, and beam artillery,
+I want to play as Ray-X Pulsar with photon railguns, floating disrupter drone pods, and the 360-degree Supernova shockwave,
+So that I can control arena space, deny aggressive rushes, and control the edge from a safe distance.
+
+**Acceptance Criteria:**
+
+**Given** karakter Ray-X Pulsar dipilih dengan Max HP 950, kecepatan jalan 300 px/s, dan dash 720 px/s (14 frame),
+**When** pemain mengeksekusi jurus khas Pulsar:
+  - Normal String: 2-hit Plasma Pulse (Light Plasma Burst 5f startup, Long-reach Beam Lance 10f),
+  - Skill 1 (*Photon Railgun*): Tembakan laser partikel linear cepat menembus proyektil biasa (Startup 12f, damage 110, +25% Heat),
+  - Skill 2 (*Disrupter Drone Pod*): Melepaskan drone tempur melayang yang mengunci posisi spasial di platform (+20% Heat),
+  - Ultimate (*Supernova Horizon*): Gelombang kejut partikel foton 360 derajat di sekeliling Pulsar (Startup 18f, damage 380, invulnerable startup frame),
+**Then** seluruh jurus berfungsi sesuai parameter Resource `.tres` dan kalkulasi damage scaling terpadu,
+**And** visual mecha pixel art mecha menampilkan siluet warna violet neon (#A64DFF) dengan visor kuning foton (#FFE633) dan thruster plasma ungu.
+
 
 
 

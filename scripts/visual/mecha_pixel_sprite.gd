@@ -44,6 +44,8 @@ func _detect_parent_mecha() -> void:
 			archetype = parent_mecha.get_archetype()
 		elif "Bulwark" in parent_mecha.name or "Titan" in parent_mecha.name:
 			archetype = &"bulwark"
+		elif "Pulsar" in parent_mecha.name or "Ray" in parent_mecha.name:
+			archetype = &"pulsar"
 		else:
 			archetype = &"viper"
 		
@@ -60,6 +62,13 @@ func _apply_archetype_palette() -> void:
 		col_visor = Color(1.00, 0.25, 0.20) # Sensor mata merah ruby
 		col_thruster = Color(1.00, 0.40, 0.05)
 		col_energy = Color(1.00, 0.60, 0.15)
+	elif archetype == &"pulsar":
+		col_chassis = Color(0.12, 0.08, 0.20) # Deep Obsidian Violet
+		col_armor = Color(0.65, 0.25, 0.95)   # Neon Violet
+		col_highlight = Color(0.85, 0.50, 1.00) # Bright Lavender
+		col_visor = Color(1.00, 0.90, 0.15)   # Golden Amber / Yellow Visor
+		col_thruster = Color(0.80, 0.30, 1.00) # Purple Plasma Jets
+		col_energy = Color(1.00, 0.85, 0.20)   # Golden Photon Particle
 	else:
 		col_chassis = Color(0.10, 0.13, 0.20)
 		col_armor = Color(0.20, 0.88, 1.00)
