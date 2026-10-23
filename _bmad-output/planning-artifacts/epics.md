@@ -676,8 +676,23 @@ So that I can control arena space, deny aggressive rushes, and control the edge 
 **Then** seluruh jurus berfungsi sesuai parameter Resource `.tres` dan kalkulasi damage scaling terpadu,
 **And** visual mecha pixel art mecha menampilkan siluet warna violet neon (#A64DFF) dengan visor kuning foton (#FFE633) dan thruster plasma ungu.
 
+---
 
+## Epic 11: Character Select Screen & Roster Selection System
 
+Menyediakan antarmuka pemilihan karakter (Character Select) arcade retro 32-bit dengan preview sprite bergerak dinamis, inspeksi move list & statistik, konfigurasi pemain (P1 vs AI / Local 2P), dan factory spawner otomatis.
 
+### Story 11.1: Character Select Screen & Roster Selection System
 
+As a player starting a duel in Versus AI or Local 2P mode,
+I want to select my preferred mecha from the 3-fighter roster (Apex-0 Viper, Titan-V Bulwark, Ray-X Pulsar), inspect their stats, and see live animated pixel sprite previews,
+So that I can customize each combat match with contrasting combat playstyles before entering the arena.
 
+**Acceptance Criteria:**
+
+**Given** pemain memilih mode Versus AI atau Local 2-Player dari Main Menu,
+**When** scene `scenes/character_select.tscn` dimuat,
+**Then** sistem menampilkan 3 kartu roster mecha (Apex-0 Viper, Titan-V Bulwark, Ray-X Pulsar) dengan estetika cyberpunk 32-bit resolusi 640x360,
+**And** navigasi kursor (WASD/Gamepad) berpindah antar karakter secara mulus dan menampilkan preview sprite bergerak (*live animated pixel preview*) dari `MechaPixelSprite`,
+**And** panel samping menampilkan statistik lengkap (HP, Kecepatan Jalan, Kecepatan Dash, Rating Speed/Defense/Range, dan deskripsi jurus khas),
+**And** saat P1 dan P2 (atau P1 dan AI) mengunci pilihan (Lock-In), `MatchConfig` menyimpan konfigurasi pertandingan dan secara otomatis menginstansiasi mecha terpilih di arena via `FighterFactory`.
