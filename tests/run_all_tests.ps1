@@ -37,7 +37,8 @@ $testScenes = @(
     "res://tests/test_audio_system.tscn",
     "res://tests/test_performance_stress.tscn",
     # Epic 7: 32-Bit Pixel Character Sprites & Animation Integration
-    "res://tests/test_pixel_sprites_visual.tscn"
+    "res://tests/test_pixel_sprites_visual.tscn",
+    "res://tests/test_ghost_trail_and_stage_vfx.tscn"
 )
 
 Write-Host "==========================================================" -ForegroundColor Cyan

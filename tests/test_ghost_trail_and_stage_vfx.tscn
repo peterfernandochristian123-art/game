@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://testghosttrail01"]
+
+[ext_resource type="Script" path="res://tests/test_ghost_trail_and_stage_vfx.gd" id="1_test"]
+
+[node name="TestGhostTrailAndStageVFX" type="Node"]
+script = ExtResource("1_test")

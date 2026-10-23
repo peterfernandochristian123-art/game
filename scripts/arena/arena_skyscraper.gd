@@ -2,6 +2,7 @@ class_name ArenaSkyscraper
 extends Node2D
 
 const CombatConstants = preload("res://scripts/combat/combat_constants.gd")
+const CyberCityBackgroundScript = preload("res://scripts/arena/cyber_city_background.gd")
 
 ## Arena Pencakar Langit: Zero-G Skyscraper Platform (Story 4.1)
 ## Panggung terbuka selebar 1280 piksel melayang tinggi di atas New Babel-01 tanpa dinding pengaman
@@ -22,7 +23,15 @@ var registered_fighters: Array[Node2D] = []
 
 func _ready() -> void:
 	_setup_boundaries_and_sensors()
+	_setup_cyber_city_background()
 	_find_fighters_in_tree()
+
+func _setup_cyber_city_background() -> void:
+	var bg = get_node_or_null("Background")
+	if bg and not bg.has_node("CyberCityLayer"):
+		var layer = CyberCityBackgroundScript.new()
+		layer.name = "CyberCityLayer"
+		bg.add_child(layer)
 
 func register_fighter(fighter: Node2D) -> void:
 	if fighter and fighter not in registered_fighters:

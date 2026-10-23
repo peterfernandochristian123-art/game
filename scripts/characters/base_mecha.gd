@@ -10,6 +10,8 @@ const BlockstunState = preload("res://scripts/combat/fsm/blockstun_state.gd")
 const CliffhangerState = preload("res://scripts/combat/fsm/cliffhanger_state.gd")
 const AttackData = preload("res://scripts/combat/resources/attack_data.gd")
 const MechaPixelSpriteScript = preload("res://scripts/visual/mecha_pixel_sprite.gd")
+const DashTrailComponentScript = preload("res://scripts/visual/dash_trail_component.gd")
+const VFXCoreRuptureScript = preload("res://scripts/visual/vfx_core_rupture.gd")
 
 ## Base Controller untuk Mecha Tempur dalam Fighting to Zero
 ## Mengintegrasikan Hierarchical State Machine (Mecha HSM), Physics 60 FPS, dan Orientasi Visual
@@ -144,6 +146,7 @@ func _ready() -> void:
 	_setup_input_fallbacks()
 	_setup_p2_input_fallbacks()
 	_setup_steam_vent()
+	_setup_dash_trail()
 	
 	# Set default layer dan mask: Layer 1 (World)
 	collision_layer = 1
@@ -153,6 +156,26 @@ func _ready() -> void:
 		print("[STATE][%s] BaseMecha siap. Kecepatan jalan: %.1f px/s, Lompat: %.1f px/s." % [
 			name, walk_speed, jump_velocity
 		])
+
+func _setup_dash_trail() -> void:
+	if not has_node("DashTrailComponent"):
+		var dt := DashTrailComponentScript.new()
+		dt.name = "DashTrailComponent"
+		add_child(dt)
+		dt.bind_mecha(self)
+	else:
+		var dt = get_node("DashTrailComponent")
+		if dt.has_method("bind_mecha"):
+			dt.bind_mecha(self)
+
+func trigger_core_rupture() -> void:
+	var rupture := VFXCoreRuptureScript.new()
+	var spawn_parent: Node = get_parent()
+	if not spawn_parent:
+		spawn_parent = get_tree().current_scene if get_tree() else null
+	if spawn_parent:
+		spawn_parent.add_child(rupture)
+		rupture.trigger_at(global_position)
 
 func _setup_visual_node() -> void:
 	if not visual_root:
@@ -434,6 +457,8 @@ func take_hit(attacker: Node2D, hit_data: Dictionary) -> void:
 
 	set_hp(current_hp - dmg)
 	trigger_hit_flash(4)
+	if current_hp <= 0 and not is_eliminated:
+		trigger_core_rupture()
 
 	# Super Armor: Full Super Armor (Story 3.3 Bulwark Riot Shield) & 1-Hit Startup Super Armor (Story 2.2 AC 2)
 	var absorbed_by_armor: bool = false

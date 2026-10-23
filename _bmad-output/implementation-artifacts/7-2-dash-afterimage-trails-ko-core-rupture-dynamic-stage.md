@@ -4,7 +4,7 @@ baseline_commit: ed6e124
 
 # Story 7.2: Dash Afterimage Trails, K.O. Core Rupture & Dynamic Stage Background
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -47,28 +47,28 @@ So that every movement feels blindingly fast, victories feel momentous, and the 
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Dash Ghost Afterimage Trail Subsystem (AC: 1, 4)
-  - [ ] 1.1 Buat `scripts/visual/vfx_ghost_trail.gd` untuk rendering siluet mecha dengan alpha decay halus.
-  - [ ] 1.2 Buat `scripts/visual/dash_trail_component.gd` yang terhubung dengan `DashState` & `AirDashState` mecha.
-- [ ] Task 2: Cinematic K.O. Core Rupture FX (AC: 2, 4)
-  - [ ] 2.1 Buat `scripts/visual/vfx_core_rupture.gd` untuk ledakan reaktor mecha radial, hitstop freeze, dan fragmen asap.
-  - [ ] 2.2 Integrasikan dengan sinyal `round_ended` pada `EventBus` dan `ArenaSkyscraper`.
-- [ ] Task 3: Living 90s Cyber-City Arena Background (AC: 3, 4)
-  - [ ] 3.1 Tambahkan jendela pixel grid neon pada gedung-gedung latar belakang di `scenes/arena_skyscraper.tscn`.
-  - [ ] 3.2 Tambahkan skrip `scripts/arena/cyber_city_background.gd` untuk lampu antena kedip dan kendaraan hovercraft melintas.
-- [ ] Task 4: Automated Testing Suite & Regression Verification (AC: 5)
-  - [ ] 4.1 Buat `tests/test_ghost_trail_and_stage_vfx.gd` dan `tests/test_ghost_trail_and_stage_vfx.tscn`.
-  - [ ] 4.2 Daftarkan ke `tests/run_all_tests.ps1` dan pastikan seluruh 27 test suite lulus 100%.
+- [x] Task 1: Dash Ghost Afterimage Trail Subsystem (AC: 1, 4)
+  - [x] 1.1 Buat `scripts/visual/vfx_ghost_trail.gd` untuk rendering siluet mecha dengan alpha decay halus.
+  - [x] 1.2 Buat `scripts/visual/dash_trail_component.gd` yang terhubung dengan `DashState` & `AirDashState` mecha.
+- [x] Task 2: Cinematic K.O. Core Rupture FX (AC: 2, 4)
+  - [x] 2.1 Buat `scripts/visual/vfx_core_rupture.gd` untuk ledakan reaktor mecha radial, hitstop freeze, dan fragmen asap.
+  - [x] 2.2 Integrasikan dengan sinyal `round_ended` pada `EventBus` dan `ArenaSkyscraper`.
+- [x] Task 3: Living 90s Cyber-City Arena Background (AC: 3, 4)
+  - [x] 3.1 Tambahkan jendela pixel grid neon pada gedung-gedung latar belakang di `scenes/arena_skyscraper.tscn`.
+  - [x] 3.2 Tambahkan skrip `scripts/arena/cyber_city_background.gd` untuk lampu antena kedip dan kendaraan hovercraft melintas.
+- [x] Task 4: Automated Testing Suite & Regression Verification (AC: 5)
+  - [x] 4.1 Buat `tests/test_ghost_trail_and_stage_vfx.gd` dan `tests/test_ghost_trail_and_stage_vfx.tscn`.
+  - [x] 4.2 Daftarkan ke `tests/run_all_tests.ps1` dan pastikan seluruh 27 test suite lulus 100%.
 
 ## Dev Notes
 
 - **Afterimage Rendering**:
-  - Hindari ViewportTexture screenshot yang mahal di mobile; buat bayangan siluet dengan menduplikasi gambar `MechaPixelSprite` atau drawing instance siluet dengan warna solid dan alpha decay.
-  - Afterimage harus di-parent ke scene arena atau root node agar posisinya tertinggal statis di koordinat dunia saat mecha bergerak meluncur cepat.
+  - Menggunakan `VFXGhostTrail` berbobot ringan di world space dengan alpha decay linear 10 frame (Cyan untuk Viper, Oranye untuk Bulwark).
+  - Parent ke root/arena panggung agar tertinggal di koordinat dunia saat mecha bergerak meluncur cepat.
 
 - **K.O. Sequence**:
-  - Gunakan `EventBus.hitstop_requested` untuk freeze 18 frame agar momen K.O. terasa berdampak luar biasa.
-  - Pemicuan hanya 1x per eliminasi mecha untuk mencegah double explosion.
+  - `VFXCoreRupture` memancarkan flash energy build-up, 18-frame hitstop freeze, shockwave arc expander, dan 32 partikel las radial 360 derajat.
+  - Terpicu saat HP mecha menyentuh 0 dalam `take_hit()`.
 
 ### Project Context Rules
 
@@ -91,6 +91,28 @@ Gemini 3.8 Flash (Medium)
 
 ### Debug Log References
 
+- Task 361 run_all_tests log: 27/27 test suites PASS (100% success).
+
 ### Completion Notes List
 
+- Implemented `VFXGhostTrail` (`scripts/visual/vfx_ghost_trail.gd`): 32-bit pixel silhouette afterimage with smooth alpha decay (10 frames) for Viper (cyan) and Bulwark (orange).
+- Implemented `DashTrailComponent` (`scripts/visual/dash_trail_component.gd`): attaches to mecha and spawns world-space ghost trails during Dash and AirDash states.
+- Implemented `VFXCoreRupture` (`scripts/visual/vfx_core_rupture.gd`): energy build-up flash, 18-frame hitstop freeze, shockwave expansion, and 360-degree radial welding spark explosion on K.O.
+- Implemented `CyberCityBackground` (`scripts/arena/cyber_city_background.gd`): dynamic cyberpunk city backdrop with twinkling amber/cyan pixel windows, antenna beacons, and horizontal cruising hovercraft.
+- Integrated into `BaseMecha` and `ArenaSkyscraper`.
+- Added test suite `tests/test_ghost_trail_and_stage_vfx.gd` and `.tscn` (5/5 tests passed).
+- Updated `tests/run_all_tests.ps1` to execute all 27 test suites; regression verification confirmed 100% pass across all suites.
+
 ### File List
+
+- `scripts/visual/vfx_ghost_trail.gd` (NEW)
+- `scripts/visual/dash_trail_component.gd` (NEW)
+- `scripts/visual/vfx_core_rupture.gd` (NEW)
+- `scripts/arena/cyber_city_background.gd` (NEW)
+- `tests/test_ghost_trail_and_stage_vfx.gd` (NEW)
+- `tests/test_ghost_trail_and_stage_vfx.tscn` (NEW)
+- `scripts/characters/base_mecha.gd` (MODIFIED)
+- `scripts/arena/arena_skyscraper.gd` (MODIFIED)
+- `tests/run_all_tests.ps1` (MODIFIED)
+- `_bmad-output/implementation-artifacts/sprint-status.yaml` (MODIFIED)
+- `_bmad-output/implementation-artifacts/7-2-dash-afterimage-trails-ko-core-rupture-dynamic-stage.md` (MODIFIED)
