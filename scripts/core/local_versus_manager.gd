@@ -24,6 +24,7 @@ func _ready() -> void:
 	if not p1 or not p2:
 		return
 
+	_apply_arena_selection()
 	_apply_roster_selection()
 
 	# 1. Konfigurasi Player Index
@@ -110,4 +111,17 @@ func _apply_roster_selection() -> void:
 		p2 = FighterFactoryScript.create_fighter(MatchConfigScript.p2_character, 2)
 		p2.global_position = pos
 		fighters_node.add_child(p2)
+
+func _apply_arena_selection() -> void:
+	if MatchConfigScript.selected_arena == &"reactor":
+		var current_arena = get_node_or_null("ArenaSkyscraper")
+		if current_arena:
+			var reactor_scene = load("res://scenes/arena_underground_reactor.tscn")
+			if reactor_scene:
+				var new_arena = reactor_scene.instantiate()
+				var idx = current_arena.get_index()
+				current_arena.name = "ArenaSkyscraper_Old"
+				current_arena.queue_free()
+				add_child(new_arena)
+				move_child(new_arena, idx)
 

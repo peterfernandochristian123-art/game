@@ -1,3 +1,3 @@
 @echo off
 echo Launching Fighting to Zero Standalone Windows Release...
-start "" "%~dp0builds\windows\FightingToZero.exe"
+start "" "%~dp0builds\windows\FightingToZero.exe" --main-pack "%~dp0builds\windows\FightingToZero.pck"

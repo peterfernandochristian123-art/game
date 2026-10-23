@@ -45,7 +45,9 @@ $testScenes = @(
     # Epic 10: Playable 3rd Mecha Roster - Ray-X Pulsar
     "res://tests/test_ray_pulsar.tscn",
     # Epic 11: Character Select Screen & Roster Selection System
-    "res://tests/test_character_select.tscn"
+    "res://tests/test_character_select.tscn",
+    # Epic 12: Underground Reactor Arena & Environmental Steam Hazards
+    "res://tests/test_underground_reactor.tscn"
 )
 
 Write-Host "==========================================================" -ForegroundColor Cyan

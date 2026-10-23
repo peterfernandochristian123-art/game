@@ -130,6 +130,10 @@ Mewujudkan petarung mecha ke-3 berorientasi penyerangan jarak jauh (Zoner / Trap
 Menyediakan antarmuka pemilihan karakter (Character Select) arcade retro 32-bit dengan preview sprite bergerak dinamis, inspeksi move list & statistik, konfigurasi pemain (P1 vs AI / Local 2P), dan factory spawner otomatis.
 **Requirements covered:** FR10, FR11, FR16, FR18, UX-DR3
 
+### Epic 12: Underground Reactor Arena & Environmental Steam Hazards
+Menghadirkan panggung arena ke-2 berlatar reaktor bawah tanah industri tertutup dengan dinding pembatas fisik pantul (Wall Bounce), sistem bahaya semburan uap termal bertekanan tinggi (Steam Hazards), serta pemilihan panggung dinamis di antarmuka pra-pertandingan.
+**Requirements covered:** FR12, FR9, UX-DR5, NFR7
+
 ---
 
 ## Epic 1: Core Physics & Movement Engine
@@ -696,3 +700,24 @@ So that I can customize each combat match with contrasting combat playstyles bef
 **And** navigasi kursor (WASD/Gamepad) berpindah antar karakter secara mulus dan menampilkan preview sprite bergerak (*live animated pixel preview*) dari `MechaPixelSprite`,
 **And** panel samping menampilkan statistik lengkap (HP, Kecepatan Jalan, Kecepatan Dash, Rating Speed/Defense/Range, dan deskripsi jurus khas),
 **And** saat P1 dan P2 (atau P1 dan AI) mengunci pilihan (Lock-In), `MatchConfig` menyimpan konfigurasi pertandingan dan secara otomatis menginstansiasi mecha terpilih di arena via `FighterFactory`.
+
+---
+
+## Epic 12: Underground Reactor Arena & Environmental Steam Hazards
+
+Menghadirkan panggung arena ke-2 berlatar reaktor bawah tanah industri tertutup dengan dinding pembatas fisik pantul (Wall Bounce), sistem bahaya semburan uap termal bertekanan tinggi (Steam Hazards), serta pemilihan panggung dinamis di antarmuka pra-pertandingan.
+
+### Story 12.1: Underground Reactor Stage with Boundary Walls & Steam Hazards
+
+As a player competing in Versus AI, Local 2P, or Training mode,
+I want to battle in the Underground Reactor stage featuring enclosed boundary walls that bounce knocked-back fighters and active steam vents that periodically erupt with heat hazards,
+So that I can experience tactical corner pressure, wall-bounce combos, and environmental risk management distinct from the open skyscraper arena.
+
+**Acceptance Criteria:**
+
+**Given** scene arena `scenes/arena_underground_reactor.tscn` dimuat,
+**When** pertarungan berlangsung di dalam reaktor,
+**Then** arena dibatasi oleh dinding fisik baja tertutup di batas kiri (X = 64) dan batas kanan (X = 1344) pada Layer 1 World Collision (tanpa open cliff/cliffhanger),
+**And** karakter yang terhempas keras ke dinding memicu reaksi pantulan *Wall-Bounce* dengan pembatasan 1x per rangkaian kombo (FR9),
+**And** panggung dilengkapi dua ventilasi uap geotermal reaktor (`scripts/hazards/steam_vent_hazard.gd`) yang mengalami siklus peringatan (Indikator Lampu Merah/Desis 3 detik) dan erupsi semburan uap (durasi 1.5 detik) yang meningkatkan Heat mecha sebesar +20% serta memberikan chip damage ringan jika tersentuh,
+**And** `MatchConfig` dan Character Select Screen mendukung seleksi arena (`&"skyscraper"` vs `&"reactor"`), dan mengalihkan transisi scene gameplay ke arena terpilih secara mulus.

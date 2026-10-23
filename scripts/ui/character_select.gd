@@ -25,6 +25,7 @@ var is_transitioning: bool = false
 
 @onready var title_label: Label = $TopBar/TitleLabel
 @onready var mode_label: Label = $TopBar/ModeLabel
+@onready var stage_label: Label = $TopBar/StageLabel
 
 # Roster Cards Container
 @onready var cards_container: HBoxContainer = $RosterArea/CardsContainer
@@ -56,6 +57,7 @@ func _ready() -> void:
 	_build_roster_cards()
 	_update_p1_display()
 	_update_p2_display()
+	_update_stage_ui()
 	_fade_in()
 
 func _setup_audio() -> void:
@@ -185,6 +187,10 @@ func _unhandled_input(event: InputEvent) -> void:
 			elif event.keycode == KEY_L or event.keycode == KEY_RIGHT:
 				_change_p2_index(1)
 
+	# Ganti Arena: Tab / T
+	if event is InputEventKey and event.pressed and (event.keycode == KEY_TAB or event.keycode == KEY_T):
+		toggle_stage()
+
 	# Konfirmasi: Space / Enter
 	if event.is_action_pressed("ui_accept") or (event is InputEventKey and event.pressed and event.keycode == KEY_ENTER):
 		_confirm_selection()
@@ -192,6 +198,24 @@ func _unhandled_input(event: InputEvent) -> void:
 	# Batal / Kembali: Esc
 	if event.is_action_pressed("ui_cancel") or (event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE):
 		_cancel_or_return()
+
+func toggle_stage() -> void:
+	if MatchConfigScript.selected_arena == &"skyscraper":
+		MatchConfigScript.set_arena(&"reactor")
+	else:
+		MatchConfigScript.set_arena(&"skyscraper")
+	MenuAudio.play_nav_beep(self)
+	_update_stage_ui()
+
+func _update_stage_ui() -> void:
+	if not stage_label:
+		return
+	if MatchConfigScript.selected_arena == &"reactor":
+		stage_label.text = "[TAB] ARENA: UNDERGROUND REACTOR (HAZARD ACTIVE)"
+		stage_label.modulate = Color(1.0, 0.45, 0.1, 1.0)
+	else:
+		stage_label.text = "[TAB] ARENA: ZERO-G SKYSCRAPER (OPEN CLIFF)"
+		stage_label.modulate = Color(0.2, 0.9, 1.0, 1.0)
 
 func _change_p1_index(delta: int) -> void:
 	var total = FighterFactoryScript.get_roster_count()

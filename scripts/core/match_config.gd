@@ -9,12 +9,24 @@ static var p1_character: StringName = &"viper"
 static var p2_character: StringName = &"bulwark"
 static var game_mode: StringName = &"versus_ai"
 static var ai_difficulty: int = 1 # 0: Novice, 1: Veteran, 2: Ace
+static var selected_arena: StringName = &"skyscraper" # &"skyscraper" | &"reactor"
 
 static func reset_defaults() -> void:
 	p1_character = &"viper"
 	p2_character = &"bulwark"
 	game_mode = &"versus_ai"
 	ai_difficulty = 1
+	selected_arena = &"skyscraper"
+
+static func set_arena(arena_id: StringName) -> void:
+	selected_arena = arena_id
+
+static func get_arena_scene() -> String:
+	match selected_arena:
+		&"reactor":
+			return "res://scenes/arena_underground_reactor.tscn"
+		_:
+			return "res://scenes/arena_skyscraper.tscn"
 
 static func set_p1(char_id: StringName) -> void:
 	p1_character = char_id

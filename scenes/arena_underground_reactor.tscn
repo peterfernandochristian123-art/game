@@ -1,0 +1,181 @@
+[gd_scene load_steps=12 format=3 uid="uid://arenareactor01zero"]
+
+[ext_resource type="Script" path="res://scripts/arena/arena_underground_reactor.gd" id="1_reactor"]
+[ext_resource type="Script" path="res://scripts/visual/combat_camera.gd" id="2_cam"]
+[ext_resource type="Script" path="res://scripts/combat/components/hitstop_component.gd" id="3_hitstop"]
+[ext_resource type="Script" path="res://scripts/visual/vfx_manager.gd" id="4_vfx"]
+[ext_resource type="Script" path="res://scripts/audio/audio_manager.gd" id="5_audio"]
+[ext_resource type="Script" path="res://scripts/hazards/steam_vent_hazard.gd" id="6_hazard"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platform"]
+size = Vector2(1280, 24)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_left_wall"]
+size = Vector2(24, 340)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_right_wall"]
+size = Vector2(24, 340)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_steam_vent"]
+size = Vector2(32, 70)
+
+[node name="ArenaUndergroundReactor" type="Node2D"]
+script = ExtResource("1_reactor")
+
+[node name="Background" type="ColorRect" parent="."]
+offset_right = 1408.0
+offset_bottom = 480.0
+color = Color(0.06, 0.05, 0.08, 1)
+
+[node name="ReactorGlowFog" type="ColorRect" parent="Background"]
+offset_top = 220.0
+offset_right = 1408.0
+offset_bottom = 480.0
+color = Color(0.2, 0.08, 0.04, 0.5)
+
+[node name="ConduitPipe1" type="ColorRect" parent="Background"]
+offset_left = 180.0
+offset_right = 210.0
+offset_bottom = 480.0
+color = Color(0.12, 0.1, 0.14, 1)
+
+[node name="ConduitPipe1Glow" type="ColorRect" parent="Background"]
+offset_left = 192.0
+offset_right = 198.0
+offset_bottom = 480.0
+color = Color(0.9, 0.35, 0.05, 0.7)
+
+[node name="ConduitPipe2" type="ColorRect" parent="Background"]
+offset_left = 1198.0
+offset_right = 1228.0
+offset_bottom = 480.0
+color = Color(0.12, 0.1, 0.14, 1)
+
+[node name="ConduitPipe2Glow" type="ColorRect" parent="Background"]
+offset_left = 1210.0
+offset_right = 1216.0
+offset_bottom = 480.0
+color = Color(0.9, 0.35, 0.05, 0.7)
+
+[node name="ReactorCoreStructure" type="ColorRect" parent="Background"]
+offset_left = 654.0
+offset_top = 20.0
+offset_right = 754.0
+offset_bottom = 480.0
+color = Color(0.1, 0.09, 0.12, 1)
+
+[node name="CorePlasmaLine" type="ColorRect" parent="Background/ReactorCoreStructure"]
+offset_left = 44.0
+offset_right = 56.0
+offset_bottom = 460.0
+color = Color(1, 0.45, 0.1, 0.85)
+
+[node name="Platform" type="StaticBody2D" parent="."]
+position = Vector2(704, 300)
+collision_layer = 1
+collision_mask = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platform"]
+shape = SubResource("RectangleShape2D_platform")
+
+[node name="PlatformVisual" type="ColorRect" parent="Platform"]
+offset_left = -640.0
+offset_top = -12.0
+offset_right = 640.0
+offset_bottom = 12.0
+color = Color(0.18, 0.16, 0.2, 1)
+
+[node name="HazardStripeLeft" type="ColorRect" parent="Platform"]
+offset_left = -640.0
+offset_top = -12.0
+offset_right = -624.0
+offset_bottom = 12.0
+color = Color(1, 0.45, 0.1, 1)
+
+[node name="HazardStripeRight" type="ColorRect" parent="Platform"]
+offset_left = 624.0
+offset_top = -12.0
+offset_right = 640.0
+offset_bottom = 12.0
+color = Color(1, 0.45, 0.1, 1)
+
+[node name="CenterGrate" type="ColorRect" parent="Platform"]
+offset_left = -20.0
+offset_top = -12.0
+offset_right = 20.0
+offset_bottom = 12.0
+color = Color(0.12, 0.1, 0.14, 1)
+
+[node name="LeftWall" type="StaticBody2D" parent="."]
+position = Vector2(52, 150)
+collision_layer = 1
+collision_mask = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LeftWall"]
+shape = SubResource("RectangleShape2D_left_wall")
+
+[node name="WallVisual" type="ColorRect" parent="LeftWall"]
+offset_left = -12.0
+offset_top = -170.0
+offset_right = 12.0
+offset_bottom = 170.0
+color = Color(0.22, 0.2, 0.25, 1)
+
+[node name="HazardBorder" type="ColorRect" parent="LeftWall"]
+offset_left = 8.0
+offset_top = -170.0
+offset_right = 12.0
+offset_bottom = 170.0
+color = Color(1, 0.4, 0.05, 1)
+
+[node name="RightWall" type="StaticBody2D" parent="."]
+position = Vector2(1356, 150)
+collision_layer = 1
+collision_mask = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RightWall"]
+shape = SubResource("RectangleShape2D_right_wall")
+
+[node name="WallVisual" type="ColorRect" parent="RightWall"]
+offset_left = -12.0
+offset_top = -170.0
+offset_right = 12.0
+offset_bottom = 170.0
+color = Color(0.22, 0.2, 0.25, 1)
+
+[node name="HazardBorder" type="ColorRect" parent="RightWall"]
+offset_left = -12.0
+offset_top = -170.0
+offset_right = -8.0
+offset_bottom = 170.0
+color = Color(1, 0.4, 0.05, 1)
+
+[node name="VentLeft" type="Area2D" parent="."]
+position = Vector2(420, 288)
+script = ExtResource("6_hazard")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="VentLeft"]
+position = Vector2(0, -35)
+shape = SubResource("RectangleShape2D_steam_vent")
+
+[node name="VentRight" type="Area2D" parent="."]
+position = Vector2(988, 288)
+script = ExtResource("6_hazard")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="VentRight"]
+position = Vector2(0, -35)
+shape = SubResource("RectangleShape2D_steam_vent")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(704, 240)
+zoom = Vector2(1, 1)
+script = ExtResource("2_cam")
+
+[node name="HitstopComponent" type="Node" parent="."]
+script = ExtResource("3_hitstop")
+
+[node name="VFXManager" type="Node2D" parent="."]
+script = ExtResource("4_vfx")
+
+[node name="AudioManager" type="Node" parent="."]
+script = ExtResource("5_audio")
