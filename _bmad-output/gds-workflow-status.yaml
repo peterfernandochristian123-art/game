@@ -7,15 +7,15 @@ created_at: '2026-10-16'
 workflow_status:
   brainstorm-game: _bmad-output/brainstorming-session-2026-10-16.md
   game-brief: _bmad-output/planning-artifacts/briefs/brief-game-2026-10-16/brief.md
-  domain-research: pending
+  domain-research: _bmad-output/planning-artifacts/domain-research.md
   gdd: _bmad-output/planning-artifacts/gdds/gdd-game-2026-10-16/gdd.md
-  narrative: pending
-  game-ux: pending
-  game-prd: pending
+  narrative: _bmad-output/planning-artifacts/narrative.md
+  game-ux: _bmad-output/planning-artifacts/game-ux.md
+  game-prd: _bmad-output/planning-artifacts/game-prd.md
   game-architecture: _bmad-output/game-architecture.md
   create-epics-and-stories: _bmad-output/planning-artifacts/epics.md
   check-implementation-readiness: _bmad-output/planning-artifacts/implementation-readiness-report-2026-10-17.md
-  test-framework: pending
-  test-design: pending
+  test-framework: _bmad-output/planning-artifacts/test-framework.md
+  test-design: _bmad-output/planning-artifacts/test-design.md
   sprint-planning: _bmad-output/implementation-artifacts/sprint-status.yaml
   standalone-build: _bmad-output/implementation-artifacts/9-1-standalone-windows-release-package-and-presets.md
