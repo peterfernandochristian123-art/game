@@ -2,6 +2,7 @@
 .godot/
 .godot_bin/
 *.translation
+*.uid
 
 # Mono/C# cache
 .mono/
@@ -17,7 +18,7 @@ Thumbs.db
 *.txt
 test_*results.txt
 test_*_results.txt
-godot_run.log
+builds/
 .vscode/*
 !.vscode/tasks.json
 !.vscode/settings.json

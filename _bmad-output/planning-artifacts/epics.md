@@ -118,6 +118,10 @@ Menggantikan placeholder visual kotak primitif dengan sprite mecha pixel art ber
 Menghadirkan pengalaman audio arcade 90-an yang imersif dan bertenaga penuh melalui dynamic synthwave background music engine (Title BGM & Skyscraper Battle BGM), ekspansi sound effects aksi mecha autentik (thruster dash, heat warning siren, meltdown shutdown, varied impact sounds), serta voice announcer arcade terpadu.
 **Requirements covered:** UX-DR6, NFR5, NFR6
 
+### Epic 9: Standalone Build & Export Pipeline
+Menyiapkan profil ekspor Godot 4, konfigurasi preset Windows Desktop, pengemasan paket game biner terenkapsulasi (`FightingToZero.exe` & `FightingToZero.pck`), serta verifikasi rilis standalone siap distribusi.
+**Requirements covered:** NFR3, NFR5, NFR6
+
 ---
 
 ## Epic 1: Core Physics & Movement Engine
@@ -620,6 +624,27 @@ So that I receive clear, visceral audio cues for every combat state and action.
 **When** serangan mendarat pada lawan,
 **Then** efek suara impact bervariasi secara dinamis (Light Hit vs Heavy Impact vs Wall/Ledge Bounce),
 **And** seluruh SFX diproses melalui pooling suara tanpa kebocoran memori pada loop 60 FPS deterministik.
+
+---
+
+## Epic 9: Standalone Build & Export Pipeline
+
+Menyiapkan profil ekspor Godot 4, konfigurasi preset Windows Desktop, pengemasan paket game biner terenkapsulasi (`FightingToZero.exe` & `FightingToZero.pck`), serta verifikasi rilis standalone siap distribusi.
+
+### Story 9.1: Standalone Windows Release Package & Presets
+
+As a player or distributor,
+I want a standalone Windows executable (`FightingToZero.exe`) and package (`FightingToZero.pck`) that runs independently without opening the Godot Editor,
+So that anyone can easily install and play the full game on PC.
+
+**Acceptance Criteria:**
+
+**Given** proyek Godot 4 telah terkonfigurasi dengan `export_presets.cfg`,
+**When** proses ekspor dijalankan melalui Godot CLI (`--export-pack "Windows Desktop" builds/windows/FightingToZero.pck`),
+**Then** berkas biner `.pck` tergenerasi sempurna dengan seluruh resource, scene, skrip, dan shader terkompilasi,
+**And** paket binary mandiri `builds/windows/FightingToZero.exe` dapat dieksekusi secara instan dan memuat `FightingToZero.pck` dengan performa terkunci 60 FPS,
+**And** disediakan script peluncur batch `run_standalone_build.bat` di root direktori untuk kemudahan testing.
+
 
 
 
