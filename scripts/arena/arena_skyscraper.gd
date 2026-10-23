@@ -24,7 +24,13 @@ var registered_fighters: Array[Node2D] = []
 func _ready() -> void:
 	_setup_boundaries_and_sensors()
 	_setup_cyber_city_background()
+	_setup_audio()
 	_find_fighters_in_tree()
+
+func _setup_audio() -> void:
+	var audio_mgr := get_node_or_null("AudioManager")
+	if audio_mgr and audio_mgr.has_method("play_bgm"):
+		audio_mgr.play_bgm(&"arena")
 
 func _setup_cyber_city_background() -> void:
 	var bg = get_node_or_null("Background")

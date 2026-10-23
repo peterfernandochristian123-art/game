@@ -2,6 +2,7 @@ class_name MainMenu
 extends Control
 
 const MenuAudio = preload("res://scripts/ui/menu_audio.gd")
+const AudioManagerScript = preload("res://scripts/audio/audio_manager.gd")
 
 ## Pengendali Navigasi Main Menu (Story 5.1)
 ## Menyediakan antarmuka 32-bit retro arcade dengan dukungan Gamepad, Keyboard, dan Layar Sentuh
@@ -36,15 +37,26 @@ const COLOR_SUBTEXT := Color(0.4, 0.6, 0.7, 0.9)
 var current_focus_index: int = 0
 var is_transitioning: bool = false
 var button_nodes: Array[Button] = []
+var _audio_manager: Node = null
 
 @onready var menu_container: VBoxContainer = $MenuContainer/OptionsList
 @onready var subtext_label: Label = $MenuContainer/SubtextLabel
 @onready var fade_rect: ColorRect = $FadeOverlay
 
 func _ready() -> void:
+	_setup_audio()
 	_setup_buttons()
 	_update_visual_focus(0, false)
 	_fade_in_menu()
+
+func _setup_audio() -> void:
+	if AudioManagerScript.instance != null:
+		_audio_manager = AudioManagerScript.instance
+	else:
+		_audio_manager = AudioManagerScript.new()
+		add_child(_audio_manager)
+	if _audio_manager and _audio_manager.has_method("play_bgm"):
+		_audio_manager.play_bgm(&"title")
 
 func _setup_buttons() -> void:
 	button_nodes.clear()

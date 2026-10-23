@@ -114,6 +114,10 @@ Menyempurnakan kenikmatan benturan baja (*game feel*) melalui sistem hitstop lok
 Menggantikan placeholder visual kotak primitif dengan sprite mecha pixel art beresolusi 32-bit yang kaya detail dan sistem visual state animation dinamis (Idle, Walk, Jump, Dash, Attack, Hitstun, Cliffhanger), siluet mecha khas untuk Apex-0 Viper dan Titan-V Bulwark, serta resolusi technical debt arsitektur.
 **Requirements covered:** NFR7, UX-DR5, FR10, FR11
 
+### Epic 8: Cyberpunk OST & Mecha Combat Audio Immersion
+Menghadirkan pengalaman audio arcade 90-an yang imersif dan bertenaga penuh melalui dynamic synthwave background music engine (Title BGM & Skyscraper Battle BGM), ekspansi sound effects aksi mecha autentik (thruster dash, heat warning siren, meltdown shutdown, varied impact sounds), serta voice announcer arcade terpadu.
+**Requirements covered:** UX-DR6, NFR5, NFR6
+
 ---
 
 ## Epic 1: Core Physics & Movement Engine
@@ -577,6 +581,46 @@ So that every movement feels blindingly fast, victories feel momentous, and the 
 **When** mecha tereliminasi oleh K.O. (HP 0),
 **Then** sistem memicu sekuens dramatis *Core Rupture*: partikel percikan las bertegangan tinggi, flash layar lokal, dan efek fragmentasi ledakan reaktor mecha dengan freeze 18 frame sebelum sekuens kemenangan ronde,
 **And** latar belakang `arena_skyscraper.tscn` diperkaya dengan elemen cyber-city 90-an dinamis: jendela gedung bertingkat yang berpendar lembut, lampu kabut kota New Babel-01, dan kendaraan hovercraft melintas sesekali di kejauhan secara deterministik 60 FPS tanpa beban memori berlebih.
+
+---
+
+## Epic 8: Cyberpunk OST & Mecha Combat Audio Immersion
+
+Menghadirkan pengalaman audio arcade 90-an yang imersif dan bertenaga penuh melalui dynamic synthwave background music engine (Title BGM & Skyscraper Battle BGM), ekspansi sound effects aksi mecha autentik (thruster dash, heat warning siren, meltdown shutdown, varied impact sounds), serta voice announcer arcade terpadu.
+
+### Story 8.1: Cyberpunk Synthwave OST System (Menu & Arena BGM)
+
+As a player navigating menus or engaging in intense mecha combat,
+I want dynamic, looped 90s cyberpunk synthwave background music playing through the BGM audio bus with smooth transitions,
+So that every battle feels energetic, stylish, and retro-arcade authentic.
+
+**Acceptance Criteria:**
+
+**Given** AudioManager mengelola bus `BGM` di AudioServer,
+**When** pemain berada di Main Menu atau memasuki arena Skyscraper,
+**Then** AudioManager memutar BGM bertema arcade synthwave 90-an yang di-loop mulus (Title Theme: tempo santai 105 BPM; Arena Theme: tempo energetik 128 BPM),
+**And** transisi musik dari Menu ke Arena berlangsung dengan crossfade halus tanpa audio popping atau glitch,
+**And** volume BGM dapat diatur dan di-mute secara independen dari menu Settings dan tersimpan di `user://settings.cfg`.
+
+---
+
+### Story 8.2: Authentic Mecha Combat SFX Expansion & Dynamic Sound Feedback
+
+As a player performing dashes, managing heat, or landing hits,
+I want distinct mechanical sound effects for thruster dashes, heat alarms, meltdown shutoff, and heavy impact varieties,
+So that I receive clear, visceral audio cues for every combat state and action.
+
+**Acceptance Criteria:**
+
+**Given** pertempuran mecha sedang berlangsung di arena,
+**When** mecha mengeksekusi Vector Dash darat/udara,
+**Then** AudioManager memutar efek suara desisan jet thruster mecha bertekanan tinggi di bus `SFX`,
+**When** panas reaktor mencapai zona Overclock (80–99%) atau Emergency Meltdown (100%),
+**Then** sistem membunyikan sinyal peringatan termal (Overclock pulsing alarm) atau sirine mati daya darurat (Meltdown shutdown power-down),
+**When** serangan mendarat pada lawan,
+**Then** efek suara impact bervariasi secara dinamis (Light Hit vs Heavy Impact vs Wall/Ledge Bounce),
+**And** seluruh SFX diproses melalui pooling suara tanpa kebocoran memori pada loop 60 FPS deterministik.
+
 
 
 
