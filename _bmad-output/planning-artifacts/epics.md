@@ -561,4 +561,22 @@ So that the combat feels authentic, visually punchy, readable, and true to the 9
 **And** dimensi bounding box kolisi (24x38 px) dan semua layer Area2D tetap terjaga tanpa mengubah parameter hitbox/hurtbox yang sudah seimbang,
 **And** menyelesaikan technical debt yang tertunda: unifikasi `CombatConstants.MAX_HEAT` dan aturan `.gitignore` untuk hasil tes otomatis.
 
+---
+
+### Story 7.2: Dash Afterimage Trails, K.O. Core Rupture & Dynamic Stage Background
+
+As a player executing high-speed maneuvers or landing a decisive final blow,
+I want dynamic dash silhouette after-image trails, a cinematic K.O. core rupture explosion, and a living 90s cyber-city background with glowing neon windows and passing hover vehicles,
+So that every movement feels blindingly fast, victories feel momentous, and the zero-g skyscraper battlefield feels immersive.
+
+**Acceptance Criteria:**
+
+**Given** pertempuran mecha berlangsung di arena `arena_skyscraper.tscn`,
+**When** mecha mengeksekusi *Vector Dash* darat atau *Air Dash*,
+**Then** sistem `DashGhostTrail` menghasilkan jejak siluet bayangan bergradasi warna neon khas (cyan untuk Viper, oranye untuk Bulwark) yang memudar selama 8–12 frame,
+**When** mecha tereliminasi oleh K.O. (HP 0),
+**Then** sistem memicu sekuens dramatis *Core Rupture*: partikel percikan las bertegangan tinggi, flash layar lokal, dan efek fragmentasi ledakan reaktor mecha dengan freeze 18 frame sebelum sekuens kemenangan ronde,
+**And** latar belakang `arena_skyscraper.tscn` diperkaya dengan elemen cyber-city 90-an dinamis: jendela gedung bertingkat yang berpendar lembut, lampu kabut kota New Babel-01, dan kendaraan hovercraft melintas sesekali di kejauhan secara deterministik 60 FPS tanpa beban memori berlebih.
+
+
 
