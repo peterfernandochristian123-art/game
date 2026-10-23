@@ -6,6 +6,8 @@ extends Node2D
 ## MatchRules, CombatHUD, Dual-Input Touch Overlay, dan Pengatur Tingkat Kesulitan.
 
 const AIControllerScript = preload("res://scripts/ai/ai_controller.gd")
+const MatchConfigScript = preload("res://scripts/core/match_config.gd")
+const FighterFactoryScript = preload("res://scripts/characters/fighter_factory.gd")
 
 @onready var p1: Node2D = $Fighters/P1
 @onready var p2: Node2D = $Fighters/P2
@@ -30,6 +32,8 @@ const AIControllerScript = preload("res://scripts/ai/ai_controller.gd")
 func _ready() -> void:
 	if not p1 or not p2:
 		return
+
+	_apply_roster_selection()
 
 	# 1. Setup AI Controller
 	if ai_controller and ai_controller.has_method("setup"):
@@ -124,3 +128,27 @@ func _return_to_main_menu() -> void:
 	var tree = get_tree()
 	if tree:
 		tree.change_scene_to_file("res://scenes/main_menu.tscn")
+
+func _apply_roster_selection() -> void:
+	var fighters_node = get_node_or_null("Fighters")
+	if not fighters_node:
+		return
+
+	# Cek apakah P1 perlu diganti sesuai MatchConfig
+	if p1 and p1.has_method("get_archetype") and p1.get_archetype() != MatchConfigScript.p1_character:
+		var pos = p1.global_position
+		fighters_node.remove_child(p1)
+		p1.queue_free()
+		p1 = FighterFactoryScript.create_fighter(MatchConfigScript.p1_character, 1)
+		p1.global_position = pos
+		fighters_node.add_child(p1)
+
+	# Cek apakah P2 perlu diganti sesuai MatchConfig
+	if p2 and p2.has_method("get_archetype") and p2.get_archetype() != MatchConfigScript.p2_character:
+		var pos = p2.global_position
+		fighters_node.remove_child(p2)
+		p2.queue_free()
+		p2 = FighterFactoryScript.create_fighter(MatchConfigScript.p2_character, 2)
+		p2.global_position = pos
+		fighters_node.add_child(p2)
+

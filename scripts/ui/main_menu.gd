@@ -3,6 +3,7 @@ extends Control
 
 const MenuAudio = preload("res://scripts/ui/menu_audio.gd")
 const AudioManagerScript = preload("res://scripts/audio/audio_manager.gd")
+const MatchConfigScript = preload("res://scripts/core/match_config.gd")
 
 ## Pengendali Navigasi Main Menu (Story 5.1)
 ## Menyediakan antarmuka 32-bit retro arcade dengan dukungan Gamepad, Keyboard, dan Layar Sentuh
@@ -20,9 +21,9 @@ enum MenuItem {
 }
 
 const MENU_DATA: Array[Dictionary] = [
-	{"id": &"versus_ai", "label": "VERSUS AI", "scene": "res://scenes/versus_ai_mode.tscn", "subtext": "SOLO DUEL VS AI (NOVICE / VETERAN / ACE)"},
+	{"id": &"versus_ai", "label": "VERSUS AI", "scene": "res://scenes/character_select.tscn", "subtext": "SOLO DUEL VS AI (NOVICE / VETERAN / ACE)"},
 	{"id": &"training", "label": "TRAINING MODE", "scene": "res://scenes/training_mode.tscn", "subtext": "PRACTICE LAB & FRAME DATA INSPECTOR"},
-	{"id": &"local_2p", "label": "LOCAL 2P VERSUS", "scene": "res://scenes/local_versus_mode.tscn", "subtext": "2-PLAYER BATTLE ON A SINGLE SCREEN"},
+	{"id": &"local_2p", "label": "LOCAL 2P VERSUS", "scene": "res://scenes/character_select.tscn", "subtext": "2-PLAYER BATTLE ON A SINGLE SCREEN"},
 	{"id": &"settings", "label": "SETTINGS", "scene": "", "subtext": "AUDIO BUSSES, CONTROLS & DISPLAY"},
 	{"id": &"exit", "label": "EXIT", "scene": "", "subtext": "SHUTDOWN SYSTEM & EXIT GAME"}
 ]
@@ -173,6 +174,7 @@ func _select_item(index: int) -> void:
 	tw.tween_callback(func(): _execute_selection_flow(item_id, item["scene"]))
 
 func _execute_selection_flow(item_id: StringName, target_scene_path: String) -> void:
+	MatchConfigScript.set_mode(item_id)
 	if item_id == &"exit":
 		_fade_out_and_execute(func(): get_tree().quit())
 	elif item_id == &"settings":

@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://testcharacterselect01zero"]
+
+[ext_resource type="Script" path="res://tests/test_character_select.gd" id="1_testcharselect"]
+
+[node name="TestCharacterSelect" type="Node"]
+script = ExtResource("1_testcharselect")

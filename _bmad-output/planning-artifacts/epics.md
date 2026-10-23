@@ -126,6 +126,10 @@ Menyiapkan profil ekspor Godot 4, konfigurasi preset Windows Desktop, pengemasan
 Mewujudkan petarung mecha ke-3 berorientasi penyerangan jarak jauh (Zoner / Trapper) dengan senjata laser foton, drone melayang penutup area, dan gelombang kejut Supernova Horizon 360°.
 **Requirements covered:** FR10, FR11, NFR7, UX-DR5
 
+### Epic 11: Character Select Screen & Roster Selection System
+Menyediakan antarmuka pemilihan karakter (Character Select) arcade retro 32-bit dengan preview sprite bergerak dinamis, inspeksi move list & statistik, konfigurasi pemain (P1 vs AI / Local 2P), dan factory spawner otomatis.
+**Requirements covered:** FR10, FR11, FR16, FR18, UX-DR3
+
 ---
 
 ## Epic 1: Core Physics & Movement Engine
