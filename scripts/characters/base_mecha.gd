@@ -9,6 +9,7 @@ const ParryState = preload("res://scripts/combat/fsm/parry_state.gd")
 const BlockstunState = preload("res://scripts/combat/fsm/blockstun_state.gd")
 const CliffhangerState = preload("res://scripts/combat/fsm/cliffhanger_state.gd")
 const AttackData = preload("res://scripts/combat/resources/attack_data.gd")
+const MechaPixelSpriteScript = preload("res://scripts/visual/mecha_pixel_sprite.gd")
 
 ## Base Controller untuk Mecha Tempur dalam Fighting to Zero
 ## Mengintegrasikan Hierarchical State Machine (Mecha HSM), Physics 60 FPS, dan Orientasi Visual
@@ -22,7 +23,7 @@ const AttackData = preload("res://scripts/combat/resources/attack_data.gd")
 
 @export_group("Combat Stats")
 @export var max_hp: int = 1000
-@export var max_heat: float = 100.0
+@export var max_heat: float = CombatConstants.MAX_HEAT
 @export var passive_damage_reduction: float = 0.0
 
 @export_group("Ultimate Stats")
@@ -124,7 +125,7 @@ var hitbox: Area2D = null
 var heat_component: HeatComponentScript = null
 var steam_vent: CPUParticles2D = null
 
-@onready var state_machine: StateMachine = $StateMachine
+@onready var state_machine: StateMachine = get_node_or_null("StateMachine") as StateMachine
 @onready var visual_root: Node2D = _find_visual_node()
 
 func _setup_steam_vent() -> void:
@@ -137,6 +138,7 @@ func _setup_steam_vent() -> void:
 func _ready() -> void:
 	set_hp(max_hp)
 	_setup_combat_colliders()
+	_setup_visual_node()
 	_setup_heat_component()
 	_setup_fsm_states()
 	_setup_input_fallbacks()
@@ -151,6 +153,36 @@ func _ready() -> void:
 		print("[STATE][%s] BaseMecha siap. Kecepatan jalan: %.1f px/s, Lompat: %.1f px/s." % [
 			name, walk_speed, jump_velocity
 		])
+
+func _setup_visual_node() -> void:
+	if not visual_root:
+		visual_root = _find_visual_node()
+	if not visual_root:
+		var vis := Node2D.new()
+		vis.name = "MechaVisual"
+		add_child(vis)
+		visual_root = vis
+
+	var existing_spr = visual_root.get_node_or_null("Sprite")
+	if not existing_spr or existing_spr is ColorRect:
+		if existing_spr and existing_spr is ColorRect:
+			visual_root.remove_child(existing_spr)
+			existing_spr.queue_free()
+		var pixel_spr := MechaPixelSpriteScript.new()
+		pixel_spr.name = "Sprite"
+		pixel_spr.archetype = get_archetype()
+		visual_root.add_child(pixel_spr)
+
+func get_archetype() -> StringName:
+	if "Titan" in name or "Bulwark" in name:
+		return &"bulwark"
+	return &"viper"
+
+func trigger_hit_flash(frames: int = 4) -> void:
+	if visual_root and visual_root.has_node("Sprite"):
+		var spr = visual_root.get_node("Sprite")
+		if spr.has_method("trigger_hit_flash"):
+			spr.trigger_hit_flash(frames)
 
 func _setup_fsm_states() -> void:
 	if not state_machine:
@@ -220,6 +252,15 @@ func add_heat(amount: float) -> void:
 		heat_component.add_heat(amount)
 
 func _setup_combat_colliders() -> void:
+	# Root Body CollisionShape2D (Layer 1 World)
+	if not has_node("CollisionShape2D"):
+		var col := CollisionShape2D.new()
+		col.name = "CollisionShape2D"
+		var rect := RectangleShape2D.new()
+		rect.size = Vector2(24, 38)
+		col.shape = rect
+		add_child(col)
+
 	# Hurtbox (Layer 2)
 	if has_node("Hurtbox"):
 		hurtbox = get_node("Hurtbox") as Area2D
@@ -392,6 +433,7 @@ func take_hit(attacker: Node2D, hit_data: Dictionary) -> void:
 		dmg = int(round(float(dmg) * CombatConstants.MELTDOWN_DAMAGE_RECEIVED_MULTIPLIER))
 
 	set_hp(current_hp - dmg)
+	trigger_hit_flash(4)
 
 	# Super Armor: Full Super Armor (Story 3.3 Bulwark Riot Shield) & 1-Hit Startup Super Armor (Story 2.2 AC 2)
 	var absorbed_by_armor: bool = false

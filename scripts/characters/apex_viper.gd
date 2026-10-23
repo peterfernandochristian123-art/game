@@ -126,3 +126,6 @@ func _update_hud() -> void:
 	if heat_label and is_cryogenic_active():
 		var sec_left: float = float(cryogenic_frames_left) / 60.0
 		heat_label.text = "HEAT: 0%% [ABSOLUTE ZERO! %.1fs]" % sec_left
+
+func get_archetype() -> StringName:
+	return &"viper"

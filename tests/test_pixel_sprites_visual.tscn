@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://testpixelspritesvisual01"]
+
+[ext_resource type="Script" path="res://tests/test_pixel_sprites_visual.gd" id="1_test"]
+
+[node name="TestPixelSpritesVisual" type="Node"]
+script = ExtResource("1_test")

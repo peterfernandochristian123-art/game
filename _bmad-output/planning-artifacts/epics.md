@@ -110,6 +110,10 @@ Menyediakan pengalaman bermain utuh yang ramah pemain di PC dan Mobile melalui a
 Menyempurnakan kenikmatan benturan baja (*game feel*) melalui sistem hitstop lokal, guncangan layar (*screen shake*), partikel las percikan api, announcer retro 90-an, konfigurasi bus audio, dan optimasi performa 60 FPS terkunci.
 **Requirements covered:** NFR1, NFR2, NFR3, NFR4, NFR5, NFR6, NFR7, UX-DR5, UX-DR6
 
+### Epic 7: 32-Bit Pixel Character Sprites & Animation Integration
+Menggantikan placeholder visual kotak primitif dengan sprite mecha pixel art beresolusi 32-bit yang kaya detail dan sistem visual state animation dinamis (Idle, Walk, Jump, Dash, Attack, Hitstun, Cliffhanger), siluet mecha khas untuk Apex-0 Viper dan Titan-V Bulwark, serta resolusi technical debt arsitektur.
+**Requirements covered:** NFR7, UX-DR5, FR10, FR11
+
 ---
 
 ## Epic 1: Core Physics & Movement Engine
@@ -533,4 +537,28 @@ So that gameplay is fluid, tournament-ready, and never stutters.
 **Then** frame rate rata-rata terkunci pada 60 FPS stabil dengan frame drop < 0.5%,
 **And** konsumsi RAM tidak melebihi batas 600 MB RAM,
 **And** sistem mempertahankan 0 crash sepanjang pengujian dan lulus eksekusi test headless `godot --headless --script test/run_tests.gd`.
+
+---
+
+## Epic 7: 32-Bit Pixel Character Sprites & Animation Integration
+
+Menggantikan placeholder visual kotak primitif dengan sprite mecha pixel art beresolusi 32-bit yang kaya detail dan sistem visual state animation dinamis (Idle, Walk, Jump, Dash, Attack, Hitstun, Cliffhanger), siluet mecha khas untuk Apex-0 Viper dan Titan-V Bulwark, serta resolusi technical debt arsitektur.
+
+### Story 7.1: 32-Bit Pixel Mecha Sprites, State Visuals & Architecture Hardening
+
+As a player,
+I want distinct, highly recognizable 32-bit pixel art mecha visuals and fluid state animations for Apex-0 Viper and Titan-V Bulwark instead of placeholder colored blocks,
+So that the combat feels authentic, visually punchy, readable, and true to the 90s arcade aesthetic.
+
+**Acceptance Criteria:**
+
+**Given** karakter Apex-0 Viper dan Titan-V Bulwark aktif di arena pertarungan,
+**When** karakter bertransisi antar status FSM (Idle, Walk, Jump, Fall, Dash, Attack, Hitstun, Cliffhanger, Meltdown),
+**Then** node visual karakter menampilkan sprite mecha pixel art beresolusi 32-bit dengan siluet khas:
+  - Apex-0 Viper: Desain ramping aerodinamis warna cyan-neon dengan rapier beam dan thruster biru,
+  - Titan-V Bulwark: Desain bodi baja berat warna oranye-industrial dengan piston hidrolik dan shoulder armor tebal,
+**And** animasi mikro (bobbing idle, flame thruster saat dash/jump, flash hitstun, dan pose satu tangan cliffhanger) terikat mulus dengan siklus frame FSM,
+**And** dimensi bounding box kolisi (24x38 px) dan semua layer Area2D tetap terjaga tanpa mengubah parameter hitbox/hurtbox yang sudah seimbang,
+**And** menyelesaikan technical debt yang tertunda: unifikasi `CombatConstants.MAX_HEAT` dan aturan `.gitignore` untuk hasil tes otomatis.
+
 

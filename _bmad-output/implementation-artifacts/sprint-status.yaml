@@ -34,7 +34,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-10-17 15:31
-last_updated: 2026-10-20 16:30
+last_updated: 2026-10-23 15:16
 project: game
 project_key: NOKEY
 tracking_system: file-system
@@ -83,3 +83,8 @@ development_status:
   6-3-arcade-announcer-sound-effects-audio-server-bus-setup: done
   6-4-performance-profiling-memory-audit-60-fps-lock: done
   epic-6-retrospective: optional
+
+  epic-7: in-progress
+  7-1-32-bit-pixel-mecha-sprites-and-state-animations: review
+  epic-7-retrospective: optional
+

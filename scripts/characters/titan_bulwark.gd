@@ -92,3 +92,6 @@ func _update_hud() -> void:
 	var status_label := get_node_or_null("../UI/HUD/StatusLabel") as Label
 	if status_label and has_super_armor():
 		status_label.text += " [RIOT SHIELD SUPER ARMOR!]"
+
+func get_archetype() -> StringName:
+	return &"bulwark"
