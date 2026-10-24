@@ -1,8 +1,9 @@
 # Master Test Runner for Fighting to Zero
 # Runs all 25 automated test suites across Epic 1 through Epic 6 headless
 
-$godotPath = "C:\Users\game\.godot_bin\Godot_v4.7.2-stable_win64_console.exe"
-$projectPath = "c:\Users\game"
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$projectPath = (Resolve-Path "$scriptDir\..").Path
+$godotPath = Join-Path $projectPath ".godot_bin\Godot_v4.7.2-stable_win64_console.exe"
 
 $testScenes = @(
     # Epic 1: Core Physics & Combat Mechanics
@@ -49,7 +50,9 @@ $testScenes = @(
     # Epic 12: Underground Reactor Arena & Environmental Steam Hazards
     "res://tests/test_underground_reactor.tscn",
     # Epic 13: Playable 4th Mecha Roster - Phantom-9 Kage (Stance Switcher)
-    "res://tests/test_phantom_kage.tscn"
+    "res://tests/test_phantom_kage.tscn",
+    # Epic 14: Settings Modal, In-Match Pause System & Battle Records Persistence
+    "res://tests/test_settings_and_records.tscn"
 )
 
 Write-Host "==========================================================" -ForegroundColor Cyan
@@ -89,6 +92,6 @@ if ($failed -gt 0) {
     }
     exit 1
 } else {
-    Write-Host "SEMUA 25 TEST SUITES DARI EPIC 1 - 6 BERHASIL 100%!" -ForegroundColor Green
+    Write-Host ("SEMUA {0} TEST SUITES DARI EPIC 1 - 14 BERHASIL 100%!" -f $testScenes.Count) -ForegroundColor Green
     exit 0
 }

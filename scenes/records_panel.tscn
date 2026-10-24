@@ -1,0 +1,164 @@
+[gd_scene load_steps=2 format=3 uid="uid://recordspanel01zero"]
+
+[ext_resource type="Script" path="res://scripts/ui/records_panel.gd" id="1_rec"]
+
+[node name="RecordsPanel" type="Control"]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_rec")
+
+[node name="DimOverlay" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.03, 0.06, 0.85)
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="CenterContainer"]
+custom_minimum_size = Vector2(380, 270)
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="CenterContainer/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 12
+
+[node name="VBox" type="VBoxContainer" parent="CenterContainer/Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Title" type="Label" parent="CenterContainer/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.85, 0.2, 1)
+theme_override_font_sizes/font_size = 14
+text = "// PILOT BATTLE RECORDS //"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="CenterContainer/Panel/Margin/VBox"]
+layout_mode = 2
+
+[node name="Grid" type="GridContainer" parent="CenterContainer/Panel/Margin/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 8
+columns = 2
+
+[node name="MatchesKey" type="Label" parent="CenterContainer/Panel/Margin/VBox/Grid"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "TOTAL MATCHES:"
+
+[node name="MatchesVal" type="Label" parent="CenterContainer/Panel/Margin/VBox/Grid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 11
+text = "0"
+horizontal_alignment = 2
+
+[node name="WinLossKey" type="Label" parent="CenterContainer/Panel/Margin/VBox/Grid"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "RECORD (W / L):"
+
+[node name="WinLossVal" type="Label" parent="CenterContainer/Panel/Margin/VBox/Grid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 1, 0.4, 1)
+theme_override_font_sizes/font_size = 11
+text = "0 W / 0 L"
+horizontal_alignment = 2
+
+[node name="WinRateKey" type="Label" parent="CenterContainer/Panel/Margin/VBox/Grid"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "WIN RATE:"
+
+[node name="WinRateVal" type="Label" parent="CenterContainer/Panel/Margin/VBox/Grid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+theme_override_font_sizes/font_size = 11
+text = "0.0%"
+horizontal_alignment = 2
+
+[node name="ParryKey" type="Label" parent="CenterContainer/Panel/Margin/VBox/Grid"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "SPARK PARRIES:"
+
+[node name="ParryVal" type="Label" parent="CenterContainer/Panel/Margin/VBox/Grid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 11
+text = "0"
+horizontal_alignment = 2
+
+[node name="RingOutKey" type="Label" parent="CenterContainer/Panel/Margin/VBox/Grid"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "RING-OUT K.O.:"
+
+[node name="RingOutVal" type="Label" parent="CenterContainer/Panel/Margin/VBox/Grid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.4, 0.3, 1)
+theme_override_font_sizes/font_size = 11
+text = "0"
+horizontal_alignment = 2
+
+[node name="MeltdownKey" type="Label" parent="CenterContainer/Panel/Margin/VBox/Grid"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "HEAT MELTDOWNS:"
+
+[node name="MeltdownVal" type="Label" parent="CenterContainer/Panel/Margin/VBox/Grid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.3, 1, 1)
+theme_override_font_sizes/font_size = 11
+text = "0"
+horizontal_alignment = 2
+
+[node name="FavCharKey" type="Label" parent="CenterContainer/Panel/Margin/VBox/Grid"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "FAVORITE MECHA:"
+
+[node name="FavCharVal" type="Label" parent="CenterContainer/Panel/Margin/VBox/Grid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 11
+text = "VIPER"
+horizontal_alignment = 2
+
+[node name="ButtonsHBox" type="HBoxContainer" parent="CenterContainer/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="BtnReset" type="Button" parent="CenterContainer/Panel/Margin/VBox/ButtonsHBox"]
+custom_minimum_size = Vector2(120, 24)
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "RESET STATS"
+
+[node name="BtnClose" type="Button" parent="CenterContainer/Panel/Margin/VBox/ButtonsHBox"]
+custom_minimum_size = Vector2(120, 24)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 10
+text = "CLOSE"

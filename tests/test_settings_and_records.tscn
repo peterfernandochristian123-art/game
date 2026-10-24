@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://testepic14settingszero"]
+
+[ext_resource type="Script" path="res://tests/test_settings_and_records.gd" id="1_test"]
+
+[node name="TestSettingsAndRecords" type="Node"]
+script = ExtResource("1_test")

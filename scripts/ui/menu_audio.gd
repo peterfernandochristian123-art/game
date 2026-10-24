@@ -59,3 +59,7 @@ static func play_cancel_buzz(parent: Node) -> AudioStreamPlayer:
 	# Nada turun (320 Hz -> 160 Hz, 80ms) untuk pembatalan / kembali
 	var stream := create_tone_stream(320.0, 0.08, 0.2, false, 160.0)
 	return play_sound(parent, stream)
+
+static func play_cancel_chime(parent: Node) -> AudioStreamPlayer:
+	return play_cancel_buzz(parent)
+

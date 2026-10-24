@@ -178,7 +178,6 @@ func _execute_selection_flow(item_id: StringName, target_scene_path: String) -> 
 	if item_id == &"exit":
 		_fade_out_and_execute(func(): get_tree().quit())
 	elif item_id == &"settings":
-		# Settings placeholder or modal
 		_open_settings_panel()
 	elif target_scene_path != "":
 		_fade_out_and_execute(func():
@@ -193,12 +192,25 @@ func _execute_selection_flow(item_id: StringName, target_scene_path: String) -> 
 		is_transitioning = false
 		can_navigate = true
 
+var _settings_panel: Control = null
+
 func _open_settings_panel() -> void:
-	# Buka popup/info sederhana untuk setting dan pulihkan navigasi
-	if subtext_label:
-		subtext_label.text = "SETTINGS: AUDIO MASTER 100% | RESOLUTION 640x360 | (ESC TO RETURN)"
+	if not _settings_panel:
+		var scene: PackedScene = load("res://scenes/settings_panel.tscn")
+		if scene:
+			_settings_panel = scene.instantiate() as Control
+			add_child(_settings_panel)
+			if _settings_panel.has_signal("closed"):
+				_settings_panel.closed.connect(_on_settings_panel_closed)
+	if _settings_panel and _settings_panel.has_method("open"):
+		_settings_panel.open()
+	elif _settings_panel:
+		_settings_panel.show()
+
+func _on_settings_panel_closed() -> void:
 	is_transitioning = false
 	can_navigate = true
+	_update_visual_focus(current_focus_index, false)
 
 func _fade_in_menu() -> void:
 	if not fade_rect:

@@ -8,6 +8,8 @@ extends Node2D
 
 const MatchConfigScript = preload("res://scripts/core/match_config.gd")
 const FighterFactoryScript = preload("res://scripts/characters/fighter_factory.gd")
+const RecordsManagerScript = preload("res://scripts/core/records_manager.gd")
+const PauseMenuScene = preload("res://scenes/pause_menu.tscn")
 
 @onready var p1: Node2D = $Fighters/P1
 @onready var p2: Node2D = $Fighters/P2
@@ -57,6 +59,14 @@ func _ready() -> void:
 	if btn_exit:
 		btn_exit.pressed.connect(_return_to_main_menu)
 
+	# 5. Setup In-Match Pause Menu
+	var pause_menu = PauseMenuScene.instantiate()
+	pause_menu.name = "PauseMenu"
+	var ui_node = get_node_or_null("UI")
+	if ui_node:
+		ui_node.add_child(pause_menu)
+		pause_menu.rematch_requested.connect(_on_rematch_pressed)
+
 func _on_round_started(round_num: int) -> void:
 	if hud and hud.round_label:
 		hud.round_label.text = "ROUND %d" % round_num
@@ -79,6 +89,11 @@ func _on_match_ended(winner_player_id: int) -> void:
 	else:
 		result_title.text = "VICTORY!\nPLAYER 2 WINS"
 		result_title.modulate = Color(1.0, 0.45, 0.2)
+
+	# Catat statistik karir
+	var p1_char: StringName = p1.get_archetype() if p1 and p1.has_method("get_archetype") else &"viper"
+	var p2_char: StringName = p2.get_archetype() if p2 and p2.has_method("get_archetype") else &"bulwark"
+	RecordsManager.get_instance().record_match(winner_player_id == 1, p1_char, p2_char)
 
 func _on_rematch_pressed() -> void:
 	if result_overlay:

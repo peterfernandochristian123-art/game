@@ -138,6 +138,10 @@ Menghadirkan panggung arena ke-2 berlatar reaktor bawah tanah industri tertutup 
 Mewujudkan petarung mecha ke-4 bertipe Stance Switcher ninja bertema bayangan dan katana ganda dengan mekanik pergantian kuda-kuda (Kenjutsu vs Shinobi), tebasan kilat Iaido, hujan shuriken, dan jurus pamungkas Tsukuyomi Shadow Blossom.
 **Requirements covered:** FR10, FR11, NFR7, UX-DR5
 
+### Epic 14: Settings Modal, In-Match Pause System & Battle Records Persistence
+Menyediakan antarmuka konfigurasi audio/display interaktif dengan penyimpanan persistent (user://settings.cfg), sistem jeda pertarungan in-match (Pause Menu), serta pelacakan rekor statistik karir pemain (user://records.cfg).
+**Requirements covered:** NFR8, UX-DR3, GDD 6.1
+
 ---
 
 ## Epic 1: Core Physics & Movement Engine
@@ -750,4 +754,58 @@ So that I can confuse opponents with evasive feints and fluidly adapt my combat 
   - **Ultimate (*Tsukuyomi Shadow Blossom*)**: Sekuens tebasan bayangan 5-hit sinematik ke seluruh penjuru layar (Startup 16f, damage 420, invulnerability startup frames),
 **Then** seluruh jurus berfungsi sesuai parameter Resource `.tres` dan kalkulasi damage scaling terpadu,
 **And** visual mecha pixel art mecha menampilkan siluet warna crimson red (#F22640) dengan chassis midnight black (#0F141A), syal ninja berpendar (#E61F38), dan afterimage dash jejak merah delima gelap.
+
+---
+
+## Epic 14: Settings Modal, In-Match Pause System & Battle Records Persistence
+
+Menyediakan antarmuka konfigurasi audio/display interaktif dengan penyimpanan persistent (`user://settings.cfg`), sistem jeda pertarungan in-match (Pause Menu), serta pelacakan rekor statistik karir pemain (`user://records.cfg`).
+
+### Story 14.1: Interactive Settings Modal & Audio/Video Configuration
+
+As a player on PC or handheld device,
+I want an interactive Settings panel with audio volume sliders (Master, BGM, SFX, Announcer) and display toggles (Fullscreen, Screen Shake) that persist to disk,
+So that I can customize my audiovisual experience to suit my audio equipment and display preferences.
+
+**Acceptance Criteria:**
+
+**Given** pemain memilih opsi "SETTINGS" dari Main Menu atau Pause Menu,
+**When** modal `scenes/settings_panel.tscn` dibuka,
+**Then** sistem menyinkronkan slider volume Master, BGM Synthwave, SFX Combat, dan Announcer 90s sesuai nilai di `SettingsManager`,
+**And** penggeseran slider seketika memperbarui desibel bus pada `AudioServer` (dengan linear to dB mapping),
+**And** toggle Fullscreen mengubah mode window via `DisplayServer`, dan toggle Screen Shake menyimpan preferensi visual ke `user://settings.cfg`,
+**And** tombol "RESET DEFAULT" mengembalikan semua parameter ke nilai baku dan tombol "APPLY & CLOSE" menyimpan perubahan ke disk.
+
+---
+
+### Story 14.2: In-Match Combat Pause Menu
+
+As a player in a Versus AI or Local 2P duel,
+I want to pause the active battle at any moment using Escape or Controller Start,
+So that I can take a break, adjust volume settings, restart the match, or return to the menu without force-quitting the application.
+
+**Acceptance Criteria:**
+
+**Given** pertempuran sedang aktif berlangsung di panggung arena,
+**When** pemain menekan tombol `ui_cancel` (Escape) atau Gamepad Start,
+**Then** pohon scene permainan dijeda seketika (`get_tree().paused = true`) dengan backdrop gelap dan panel `scenes/pause_menu.tscn` muncul,
+**And** menu menyediakan opsi navigasi terpadu: "RESUME COMBAT", "SETTINGS", "RESTART MATCH", "CHARACTER SELECT", dan "EXIT TO MENU",
+**And** menekan tombol Resume atau Escape kembali memulihkan simulasi fisika permainan secara mulus tanpa desinkronisasi.
+
+---
+
+### Story 14.3: Battle Records & Player Career Statistics
+
+As a competitive player,
+I want my battle statistics (Total Matches, Wins, Losses, Win Rate %, Spark Parries, Ring-Outs, Meltdowns, Favorite Mecha) to be recorded and viewable,
+So that I can monitor my combat mastery and track my competitive progression over time.
+
+**Acceptance Criteria:**
+
+**Given** pertarungan berakhir dengan evaluasi K.O., Ring-Out, atau Time-Out,
+**When** sinyal `match_ended` dipancarkan oleh `MatchManager`,
+**Then** `RecordsManager` memperbarui statistik karir di `user://records.cfg` (Total Matches +1, Wins/Losses, Ring-Outs, Parries, Meltdowns, dan Mecha usage count),
+**And** pemain dapat mengakses modal `scenes/records_panel.tscn` via tombol "PILOT RECORDS" di Settings Menu,
+**And** panel rekor menampilkan ringkasan performa secara akurat serta menyediakan tombol "RESET STATS" untuk menghapus rekor karir jika diinginkan.
+
 
