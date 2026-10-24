@@ -1,10 +1,11 @@
 class_name VFXManager
 extends Node2D
 
-## Pengelola Sistem Partikel & Efek Visual Pertarungan (Story 6.2 & Skill VFX Update)
-## Mendengarkan sinyal kontak & aktivasi skill dari EventBus dan memunculkan percikan las,
-## tebasan energi neon, kristal es kriogenik, perisai heksagonal, laser partikel,
-## hantaman seismik, badai shuriken, kabut ninja, dan ledakan supernova 32-bit.
+## Pengelola Sistem Partikel & Efek Visual Pertarungan (Enhanced Mecha Combat VFX Engine)
+## Mendengarkan sinyal kontak tempur & aktivasi skill dari EventBus.
+## Menghadirkan hitspark bintang geometris (✦) bergaya anime fighting game,
+## guard spark matriks heksagonal (honeycomb barrier), puing lempeng baja mecha (cyber debris),
+## tebasan energi neon, kristal es kriogenik, laser partikel, dan singularitas kosmik.
 
 const VFXSparksScene = preload("res://scenes/vfx/vfx_welding_sparks.tscn")
 const VFXSlashScene = preload("res://scenes/vfx/vfx_energy_slash.tscn")
@@ -17,6 +18,9 @@ const VFXSupernovaScript = preload("res://scripts/visual/vfx_supernova.gd")
 const VFXShadowSmokeScript = preload("res://scripts/visual/vfx_shadow_smoke.gd")
 const VFXShurikenStormScript = preload("res://scripts/visual/vfx_shuriken_storm.gd")
 const VFXCinematicSlashScript = preload("res://scripts/visual/vfx_cinematic_slash.gd")
+const VFXHitSparkScript = preload("res://scripts/visual/vfx_hitspark.gd")
+const VFXGuardSparkScript = preload("res://scripts/visual/vfx_guard_spark.gd")
+const VFXCyberDebrisScript = preload("res://scripts/visual/vfx_cyber_debris.gd")
 
 @export var enabled: bool = true
 
@@ -125,35 +129,67 @@ func _on_hit_confirmed(attacker: Node2D, victim: Node2D, hit_data: Variant) -> v
 	elif hit_data != null and hit_data.has_method("to_dict"):
 		data_dict = hit_data.to_dict()
 
-	var is_blocked: bool = data_dict.get("is_blocked", false)
+	var is_blocked: bool = data_dict.get("is_blocked", false) or data_dict.get("blocked", false)
 	var is_energy: bool = data_dict.get("is_energy", false)
 	var atk_name: String = str(data_dict.get("name", "5L"))
 	var facing: int = int(dir_to_victim)
 
-	# 1. Munculkan percikan api las logam umum
+	# Tentukan warna aksen visual mecha penyerang
+	var char_col := Color(0.2, 0.95, 1.0) # Default Cyan (Apex-0 Viper)
+	var atk_owner: String = attacker.name.to_lower()
+	if atk_owner.contains("bulwark") or atk_owner.contains("p2"):
+		char_col = Color(1.0, 0.55, 0.15) # Amber/Crimson (Titan-V Bulwark)
+	elif atk_owner.contains("pulsar"):
+		char_col = Color(0.75, 0.25, 1.0) # Plasma Violet (Ray-X Pulsar)
+	elif atk_owner.contains("kage") or atk_owner.contains("unit_zero") or atk_owner.contains("boss"):
+		char_col = Color(1.0, 0.15, 0.25) # Ninja Crimson (Phantom-9 Kage / Unit-0)
+
+	# 1. Jika Serangan DITANGKIS / BLOCKED:
+	if is_blocked:
+		# Munculkan riak guard spark matriks heksagonal pelindung
+		spawn_guard_spark(contact_pos, -facing, Color(0.2, 0.85, 1.0))
+		spawn_sparks(contact_pos, spark_angle, false)
+		return
+
+	# 2. Jika Serangan MASUK BERSIH / HIT CONFIRMED:
+	# Evaluasi intensitas pukulan: 0 = Light, 1 = Medium, 2 = Heavy, 3 = Counter
+	var hit_level := 0
+	var is_counter: bool = data_dict.get("counter", false) or data_dict.get("is_counter", false)
+	var dmg: float = float(data_dict.get("damage", 40.0))
+
+	if is_counter or dmg >= 140.0:
+		hit_level = 3
+	elif atk_name.contains("H") or atk_name.contains("6H") or atk_name.contains("2H") or atk_name.contains("Skill") or atk_name.contains("Ultimate") or dmg >= 80.0:
+		hit_level = 2
+	elif atk_name.contains("M") or atk_name.contains("2M") or dmg >= 55.0:
+		hit_level = 1
+	else:
+		hit_level = 0
+
+	# Munculkan Hitspark Bintang Geometris Fighting Game (✦)
+	spawn_hitspark(contact_pos, hit_level, char_col, Vector2(facing, 0.0))
+
+	# Munculkan serpihan lempeng baja mecha (Cyber Debris) jika pukulan medium/heavy
+	if hit_level >= 1:
+		var shard_count := 6 if hit_level == 1 else (10 if hit_level == 2 else 14)
+		spawn_cyber_debris(contact_pos, Vector2(-facing * 0.8, -0.6), shard_count, char_col)
+
+	# Percikan api las logam tradisional
 	spawn_sparks(contact_pos, spark_angle, false)
 
-	# 2. Deteksi efek khusus skill saat kontak berhasil
-	if not is_blocked:
-		if atk_name.contains("Blink") or (atk_name.contains("Skill") and attacker.name.to_lower().contains("viper")):
-			spawn_cryo_freeze(contact_pos, 44.0, Color(0.2, 0.95, 1.0))
-		elif atk_name.contains("Piledriver") or (atk_name.contains("Skill") and attacker.name.to_lower().contains("bulwark")):
-			spawn_seismic_impact(victim.global_position, facing, Color(1.0, 0.55, 0.15), 80.0)
-		elif atk_name.contains("Railgun") or atk_name.contains("Supernova"):
-			spawn_supernova(contact_pos, 80.0, Color(0.8, 0.25, 1.0), 0.3)
-		elif atk_name.contains("Iaido") or atk_name.contains("Blossom"):
-			spawn_cinematic_slash(contact_pos, 2, Color(1.0, 0.15, 0.25), 0.3, 160.0)
+	# 3. Deteksi efek khusus skill saat kontak berhasil
+	if atk_name.contains("Blink") or (atk_name.contains("Skill") and atk_owner.contains("viper")):
+		spawn_cryo_freeze(contact_pos, 44.0, Color(0.2, 0.95, 1.0))
+	elif atk_name.contains("Piledriver") or (atk_name.contains("Skill") and atk_owner.contains("bulwark")):
+		spawn_seismic_impact(victim.global_position, facing, Color(1.0, 0.55, 0.15), 80.0)
+	elif atk_name.contains("Railgun") or atk_name.contains("Supernova"):
+		spawn_supernova(contact_pos, 80.0, Color(0.8, 0.25, 1.0), 0.3)
+	elif atk_name.contains("Iaido") or atk_name.contains("Blossom"):
+		spawn_cinematic_slash(contact_pos, 2, Color(1.0, 0.15, 0.25), 0.3, 160.0)
 
-	# 3. Jika serangan tajam / slash atau energi, munculkan busur tebasan
-	if not is_blocked and (is_energy or atk_name.contains("L") or atk_name.contains("H") or atk_name.contains("Skill")):
-		var slash_col := Color(0.2, 0.95, 1.0) # Default Cyan (Apex Viper)
-		if attacker.name.to_lower().contains("bulwark") or attacker.name.to_lower().contains("p2"):
-			slash_col = Color(1.0, 0.45, 0.15) # Amber/Crimson (Titan Bulwark)
-		elif attacker.name.to_lower().contains("pulsar"):
-			slash_col = Color(0.75, 0.25, 1.0) # Violet (Ray-X Pulsar)
-		elif attacker.name.to_lower().contains("kage") or attacker.name.to_lower().contains("unit_zero") or attacker.name.to_lower().contains("boss"):
-			slash_col = Color(1.0, 0.15, 0.25) # Crimson (Phantom Kage / Boss)
-		spawn_slash(contact_pos, facing, slash_col)
+	# 4. Busur tebasan energi bergradasi
+	if is_energy or atk_name.contains("L") or atk_name.contains("M") or atk_name.contains("H") or atk_name.contains("Skill"):
+		spawn_slash(contact_pos, facing, char_col)
 
 func _on_parry_triggered(defender: Node2D, attacker: Node2D) -> void:
 	if not enabled or not is_instance_valid(defender) or not is_instance_valid(attacker):
@@ -162,8 +198,28 @@ func _on_parry_triggered(defender: Node2D, attacker: Node2D) -> void:
 	var contact_pos: Vector2 = (defender.global_position + attacker.global_position) / 2.0
 	contact_pos.y -= 10.0
 
-	# Pijaran las emas besar pada Spark Parry
+	# Pemicuan Spark Parry: Hitspark Emas Level 3, Guard Spark Emas, dan Lontaran Las Penuh
+	spawn_hitspark(contact_pos, 3, Color(1.0, 0.85, 0.2), Vector2(0, -1.0))
+	spawn_guard_spark(contact_pos, 1, Color(1.0, 0.85, 0.2))
 	spawn_sparks(contact_pos, 0.0, true)
+
+func spawn_hitspark(pos: Vector2, level: int = 1, custom_color: Color = Color.TRANSPARENT, dir: Vector2 = Vector2.RIGHT) -> Node2D:
+	var spark = VFXHitSparkScript.new()
+	add_child(spark)
+	spark.trigger_hitspark(pos, level, custom_color, dir)
+	return spark
+
+func spawn_guard_spark(pos: Vector2, facing: int = 1, custom_color: Color = Color.TRANSPARENT) -> Node2D:
+	var guard = VFXGuardSparkScript.new()
+	add_child(guard)
+	guard.trigger_guard(pos, facing, custom_color)
+	return guard
+
+func spawn_cyber_debris(pos: Vector2, blast_dir: Vector2 = Vector2.UP, count: int = 6, custom_color: Color = Color.TRANSPARENT) -> Node2D:
+	var debris = VFXCyberDebrisScript.new()
+	add_child(debris)
+	debris.trigger_debris(pos, blast_dir, count, custom_color)
+	return debris
 
 func spawn_sparks(pos: Vector2, dir_degrees: float = 0.0, parry_boost: bool = false) -> Node2D:
 	var sparks = VFXSparksScene.instantiate()

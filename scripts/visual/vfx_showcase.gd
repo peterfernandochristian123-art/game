@@ -1,8 +1,8 @@
 class_name VFXShowcase
 extends Node2D
 
-## Interactive Skill Visual Effects Showcase Lab
-## Memungkinkan peninjauan langsung setiap efek visual skill dari seluruh mecha roster
+## Interactive Skill & Combat Visual Effects Showcase Lab
+## Memungkinkan peninjauan langsung setiap efek visual skill dan tumbukan tempur (hitspark, guard, puing baja)
 
 const VFXManagerScript = preload("res://scripts/visual/vfx_manager.gd")
 const MechaPixelSpriteScript = preload("res://scripts/visual/mecha_pixel_sprite.gd")
@@ -17,29 +17,36 @@ var current_time_scale: float = 1.0
 
 const SKILLS: Array[Dictionary] = [
 	# Apex-0 Viper
-	{"key": KEY_1, "name": "Blink Slash", "mecha": "Apex-0 Viper", "skill": &"BlinkSlash", "color": Color(0.2, 0.95, 1.0), "desc": "Teleportasi berkecepatan tinggi & ledakan kristal es heksagonal."},
-	{"key": KEY_2, "name": "Deflection Matrix", "mecha": "Apex-0 Viper", "skill": &"DeflectionMatrix", "color": Color(0.2, 0.95, 1.0), "desc": "Perisai energi heksagonal berdenyut dengan bracket sudut defleksi."},
-	{"key": KEY_3, "name": "Absolute Zero", "mecha": "Apex-0 Viper", "skill": &"AbsoluteZeroProtocol", "color": Color(0.3, 0.98, 1.0), "desc": "Nova kriogenik radius 130px membekukan mecha core ke 0% Heat."},
+	{"key": KEY_1, "name": "Blink Slash", "mecha": "Apex-0 Viper", "skill": &"BlinkSlash", "color": Color(0.2, 0.95, 1.0), "desc": "Sayatan laser berkecepatan tinggi, garis sonik supersonik & fraktal kristal es."},
+	{"key": KEY_2, "name": "Deflection Matrix", "mecha": "Apex-0 Viper", "skill": &"DeflectionMatrix", "color": Color(0.2, 0.95, 1.0), "desc": "Perisai energi heksagonal berdenyut dengan bracket sudut defleksi & kisi sarang lebah."},
+	{"key": KEY_3, "name": "Absolute Zero", "mecha": "Apex-0 Viper", "skill": &"AbsoluteZeroProtocol", "color": Color(0.3, 0.98, 1.0), "desc": "Domain pembekuan gletser sub-zero dengan jarum kristal es & kabut dingin."},
 
 	# Titan-V Bulwark
-	{"key": KEY_4, "name": "Hydraulic Piledriver", "mecha": "Titan-V Bulwark", "skill": &"HydraulicPiledriver", "color": Color(1.0, 0.55, 0.15), "desc": "Hantaman seismik lantai, retakan tanah bercahaya & puing bebatuan."},
-	{"key": KEY_5, "name": "Riot Shield", "mecha": "Titan-V Bulwark", "skill": &"RiotShield", "color": Color(1.0, 0.65, 0.2), "desc": "Perisai baja berat heksagonal amber pelindung Full Super Armor."},
-	{"key": KEY_6, "name": "Orbital Siege Cannon", "mecha": "Titan-V Bulwark", "skill": &"OrbitalSiegeCannon", "color": Color(1.0, 0.6, 0.15), "desc": "Meriam partikel orbital vertikal dari langit dengan cincin resonansi."},
+	{"key": KEY_4, "name": "Hydraulic Piledriver", "mecha": "Titan-V Bulwark", "skill": &"HydraulicPiledriver", "color": Color(1.0, 0.55, 0.15), "desc": "Hantaman piston seismik, retakan lantai bercahaya magma & lempeng puing terlontar."},
+	{"key": KEY_5, "name": "Riot Shield", "mecha": "Titan-V Bulwark", "skill": &"RiotShield", "color": Color(1.0, 0.65, 0.2), "desc": "Perisai baja berat heksagonal amber pelindung Full Super Armor & peredam kejut."},
+	{"key": KEY_6, "name": "Orbital Siege Cannon", "mecha": "Titan-V Bulwark", "skill": &"OrbitalSiegeCannon", "color": Color(1.0, 0.6, 0.15), "desc": "Meriam partikel orbital vertikal dengan berkas laser berinti putih & cincin foton berpilin."},
 
 	# Ray-X Pulsar
-	{"key": KEY_7, "name": "Photon Railgun", "mecha": "Ray-X Pulsar", "skill": &"PhotonRailgun", "color": Color(0.75, 0.25, 1.0), "desc": "Laser foton horizontal menembus ruang dengan cincin riak cahaya."},
-	{"key": KEY_8, "name": "Disrupter Drone", "mecha": "Ray-X Pulsar", "skill": &"DisrupterDrone", "color": Color(0.7, 0.3, 1.0), "desc": "Unit drone foton melayang dengan gyro rings berputar & pulsa radar."},
-	{"key": KEY_9, "name": "Supernova Horizon", "mecha": "Ray-X Pulsar", "skill": &"SupernovaHorizon", "color": Color(0.8, 0.25, 1.0), "desc": "Ledakan 360 derajat korona surya ungu-magenta & suar radiasi kosmik."},
+	{"key": KEY_7, "name": "Photon Railgun", "mecha": "Ray-X Pulsar", "skill": &"PhotonRailgun", "color": Color(0.75, 0.25, 1.0), "desc": "Akselerator partikel foton horizontal dengan cincin resonansi & kilatan busur listrik."},
+	{"key": KEY_8, "name": "Disrupter Drone", "mecha": "Ray-X Pulsar", "skill": &"DisrupterDrone", "color": Color(0.7, 0.3, 1.0), "desc": "Drone foton melayang dengan gyro rings berputar, pulsa radar & busur EMP."},
+	{"key": KEY_9, "name": "Supernova Horizon", "mecha": "Ray-X Pulsar", "skill": &"SupernovaHorizon", "color": Color(0.8, 0.25, 1.0), "desc": "Singularitas kosmik dengan piringan akresi spiral, cincin lensa gravitasi & jet relativistik kutub."},
 
 	# Phantom-9 Kage
-	{"key": KEY_Q, "name": "Stance Shift & Feint", "mecha": "Phantom-9 Kage", "skill": &"StanceShift", "color": Color(0.95, 0.15, 0.25), "desc": "Kepulan ledakan asap ninja crimson-hitam & siluet ilusi bayangan."},
-	{"key": KEY_W, "name": "Iaido Crescent", "mecha": "Phantom-9 Kage", "skill": &"IaidoCrescent", "color": Color(1.0, 0.15, 0.25), "desc": "Tebasan sabit diagonal berkecepatan tinggi dengan garis kecepatan manga."},
-	{"key": KEY_E, "name": "Shuriken Storm", "mecha": "Phantom-9 Kage", "skill": &"ShurikenStorm", "color": Color(1.0, 0.2, 0.3), "desc": "3 shuriken foton 4-point berkipas berputar cepat dengan jejak neon."},
-	{"key": KEY_R, "name": "Shadow Blossom", "mecha": "Phantom-9 Kage", "skill": &"ShadowBlossom", "color": Color(1.0, 0.1, 0.25), "desc": "Rangkaian 5 sayatan pedang bersilangan layar penuh bercahaya crimson tajam."},
+	{"key": KEY_Q, "name": "Stance Shift & Feint", "mecha": "Phantom-9 Kage", "skill": &"StanceShift", "color": Color(0.95, 0.15, 0.25), "desc": "Kepulan siluet ilusi ninja bayangan nanite crimson-hitam & desintegrasi kabut."},
+	{"key": KEY_W, "name": "Iaido Crescent", "mecha": "Phantom-9 Kage", "skill": &"IaidoCrescent", "color": Color(1.0, 0.15, 0.25), "desc": "Tebasan sabit katana manga berkecepatan tinggi, sayatan spasial & garis kecepatan."},
+	{"key": KEY_E, "name": "Shuriken Storm", "mecha": "Phantom-9 Kage", "skill": &"ShurikenStorm", "color": Color(1.0, 0.2, 0.3), "desc": "3 shuriken foton 4-titik berkipas berputar cepat dengan jejak pita neon."},
+	{"key": KEY_R, "name": "Shadow Blossom", "mecha": "Phantom-9 Kage", "skill": &"ShadowBlossom", "color": Color(1.0, 0.1, 0.25), "desc": "5 sayatan pedang bersilangan layar penuh dengan silau intan & kilatan akhir."},
 
 	# Final Boss Unit-0
-	{"key": KEY_T, "name": "Cataclysm Slash", "mecha": "Boss Unit-0", "skill": &"CataclysmSlash", "color": Color(1.2, 0.1, 0.3), "desc": "Tebasan sayatan kehampaan merah darah terkorupsi partikel glitch."},
-	{"key": KEY_Y, "name": "Zero Overload", "mecha": "Boss Unit-0", "skill": &"ZeroOverload", "color": Color(1.1, 0.1, 0.3), "desc": "Ledakan kehampaan proto-core Overclock 220px dengan distorsi merah pekat."}
+	{"key": KEY_T, "name": "Cataclysm Slash", "mecha": "Boss Unit-0", "skill": &"CataclysmSlash", "color": Color(1.2, 0.1, 0.3), "desc": "Tebasan kehampaan merah darah terkorupsi distorsi spasial & glitch."},
+	{"key": KEY_Y, "name": "Zero Overload", "mecha": "Boss Unit-0", "skill": &"ZeroOverload", "color": Color(1.1, 0.1, 0.3), "desc": "Overload proto-core kehampaan dengan radiasi kosmik pekat & gelombang kejut realitas."},
+
+	# Combat Hit Feedback (Non-Explosion Fighting Game VFX)
+	{"key": KEY_Z, "name": "Hitspark Light (5L)", "mecha": "Combat VFX", "skill": &"HitsparkLight", "color": Color(0.3, 0.95, 1.0), "desc": "✦ Bintang tumbukan tajam 4-titik dengan pop cepat & kilau foton."},
+	{"key": KEY_X, "name": "Hitspark Heavy (5H)", "mecha": "Combat VFX", "skill": &"HitsparkHeavy", "color": Color(1.0, 0.45, 0.1), "desc": "✦✧ Bintang tumbukan ganda 8-titik, cincin syok intan & garis arah tumbukan."},
+	{"key": KEY_C, "name": "Counter Hit Burst (CH)", "mecha": "Combat VFX", "skill": &"CounterHit", "color": Color(1.0, 0.15, 0.3), "desc": "✦✧ Tumbukan dahsyat crimson-emas, bintang ganda menyilaukan & gelombang impak komik."},
+	{"key": KEY_V, "name": "Guard Spark (Block)", "mecha": "Combat VFX", "skill": &"GuardSpark", "color": Color(0.25, 0.85, 1.0), "desc": "Perisai sarang lebah heksagonal holografis & percikan pantulan kinetik 45°."},
+	{"key": KEY_B, "name": "Cyber Armor Debris", "mecha": "Combat VFX", "skill": &"CyberDebris", "color": Color(0.9, 0.9, 1.0), "desc": "Puing lempeng baja mecha terhempas dengan gravitasi & bara foton berpijar."}
 ]
 
 func _ready() -> void:
@@ -59,15 +66,15 @@ func _setup_background() -> void:
 	# Lantai panggung
 	var floor_rect := ColorRect.new()
 	floor_rect.color = Color(0.12, 0.15, 0.22, 1.0)
-	floor_rect.position = Vector2(0, 520)
-	floor_rect.size = Vector2(1280, 200)
+	floor_rect.position = Vector2(0, 500)
+	floor_rect.size = Vector2(1280, 220)
 	floor_rect.z_index = -90
 	add_child(floor_rect)
 
 	# Garis pembatas lantai neon
 	var floor_line := ColorRect.new()
 	floor_line.color = Color(0.2, 0.8, 1.0, 0.8)
-	floor_line.position = Vector2(0, 518)
+	floor_line.position = Vector2(0, 498)
 	floor_line.size = Vector2(1280, 2)
 	floor_line.z_index = -85
 	add_child(floor_line)
@@ -76,7 +83,7 @@ func _setup_dummies() -> void:
 	# Caster Dummy (Mecha Biru/Kiri)
 	caster_dummy = Node2D.new()
 	caster_dummy.name = "P1_Viper"
-	caster_dummy.position = Vector2(540, 480)
+	caster_dummy.position = Vector2(540, 460)
 	add_child(caster_dummy)
 
 	var spr1 = MechaPixelSpriteScript.new()
@@ -86,7 +93,7 @@ func _setup_dummies() -> void:
 	# Target Dummy (Mecha Oranye/Kanan)
 	target_dummy = Node2D.new()
 	target_dummy.name = "P2_Titan"
-	target_dummy.position = Vector2(740, 480)
+	target_dummy.position = Vector2(740, 460)
 	add_child(target_dummy)
 
 	var spr2 = MechaPixelSpriteScript.new()
@@ -104,14 +111,14 @@ func _setup_ui() -> void:
 
 	# Header Title
 	var title := Label.new()
-	title.text = "⚡ FIGHTING TO ZERO - MECHA SKILL VFX SHOWCASE LAB ⚡"
+	title.text = "⚡ FIGHTING TO ZERO - MECHA COMBAT & SKILL VFX LAB ⚡"
 	title.position = Vector2(20, 15)
 	title.add_theme_font_size_override("font_size", 20)
 	title.modulate = Color(0.2, 0.95, 1.0)
 	canvas.add_child(title)
 
 	var subtitle := Label.new()
-	subtitle.text = "Klik tombol di bawah atau tekan tombol keyboard [1-9, Q, W, E, R, T, Y] untuk memicu efek!"
+	subtitle.text = "Klik tombol di bawah atau tekan keyboard [1-9, Q, W, E, R, T, Y, Z, X, C, V, B] untuk memicu efek!"
 	subtitle.position = Vector2(20, 42)
 	subtitle.add_theme_font_size_override("font_size", 13)
 	subtitle.modulate = Color(0.7, 0.8, 0.9)
@@ -119,7 +126,7 @@ func _setup_ui() -> void:
 
 	# Info Description Box
 	info_label = Label.new()
-	info_label.text = "Pilih salah satu skill untuk melihat animasi efek visual 32-bit dan penjelasannya."
+	info_label.text = "Pilih salah satu efek untuk melihat animasi visual bertema mecha anime dan penjelasannya."
 	info_label.position = Vector2(20, 68)
 	info_label.add_theme_font_size_override("font_size", 14)
 	info_label.modulate = Color(1.0, 0.9, 0.3)
@@ -141,23 +148,23 @@ func _setup_ui() -> void:
 	back_btn.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/main_menu.tscn"))
 	canvas.add_child(back_btn)
 
-	# Scroll Container untuk Tombol-tombol Skill di Bagian Bawah
+	# Scroll Container untuk Tombol-tombol di Bagian Bawah
 	var scroll := ScrollContainer.new()
-	scroll.position = Vector2(20, 545)
-	scroll.size = Vector2(1240, 160)
+	scroll.position = Vector2(20, 520)
+	scroll.size = Vector2(1240, 185)
 	canvas.add_child(scroll)
 
 	var grid := GridContainer.new()
 	grid.columns = 3
-	grid.add_theme_constant_override("h_separation", 12)
-	grid.add_theme_constant_override("v_separation", 8)
+	grid.add_theme_constant_override("h_separation", 10)
+	grid.add_theme_constant_override("v_separation", 6)
 	scroll.add_child(grid)
 
 	for data in SKILLS:
 		var btn := Button.new()
 		var key_str := OS.get_keycode_string(data["key"])
 		btn.text = "[%s] %s (%s)" % [key_str, data["name"], data["mecha"]]
-		btn.custom_minimum_size = Vector2(390, 36)
+		btn.custom_minimum_size = Vector2(390, 32)
 		btn.modulate = data["color"]
 		var s_data = data
 		btn.pressed.connect(func(): _trigger_skill(s_data))
@@ -183,10 +190,30 @@ func _trigger_skill(data: Dictionary) -> void:
 	var m_name: String = data["mecha"]
 	var pos: Vector2 = caster_dummy.global_position
 	var facing: int = 1
+	var target_pos: Vector2 = target_dummy.global_position if is_instance_valid(target_dummy) else pos
 
 	if info_label:
 		info_label.text = "⚡ %s - %s: %s" % [m_name, data["name"], data["desc"]]
 		info_label.modulate = data["color"]
+
+	# Tangani efek pertarungan non-skill langsung
+	if s_name == &"HitsparkLight":
+		vfx_manager.spawn_hitspark(target_pos, 0, data["color"], Vector2.RIGHT)
+		return
+	elif s_name == &"HitsparkHeavy":
+		vfx_manager.spawn_hitspark(target_pos, 2, data["color"], Vector2.RIGHT)
+		vfx_manager.spawn_cyber_debris(target_pos, Vector2(-1, -0.6), 8, data["color"])
+		return
+	elif s_name == &"CounterHit":
+		vfx_manager.spawn_hitspark(target_pos, 3, data["color"], Vector2.RIGHT)
+		vfx_manager.spawn_cyber_debris(target_pos, Vector2(-1, -0.6), 12, data["color"])
+		return
+	elif s_name == &"GuardSpark":
+		vfx_manager.spawn_guard_spark(target_pos, -1, data["color"])
+		return
+	elif s_name == &"CyberDebris":
+		vfx_manager.spawn_cyber_debris(target_pos, Vector2.UP, 10, data["color"])
+		return
 
 	# 1. Panggil sinyal aktivasi skill global ke VFXManager
 	EventBus.skill_cast.emit(caster_dummy, s_name, pos, facing)

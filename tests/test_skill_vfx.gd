@@ -10,6 +10,9 @@ const VFXSupernovaScript = preload("res://scripts/visual/vfx_supernova.gd")
 const VFXShadowSmokeScript = preload("res://scripts/visual/vfx_shadow_smoke.gd")
 const VFXShurikenStormScript = preload("res://scripts/visual/vfx_shuriken_storm.gd")
 const VFXCinematicSlashScript = preload("res://scripts/visual/vfx_cinematic_slash.gd")
+const VFXHitSparkScript = preload("res://scripts/visual/vfx_hitspark.gd")
+const VFXGuardSparkScript = preload("res://scripts/visual/vfx_guard_spark.gd")
+const VFXCyberDebrisScript = preload("res://scripts/visual/vfx_cyber_debris.gd")
 const ApexViperScript = preload("res://scripts/characters/apex_viper.gd")
 const TitanBulwarkScript = preload("res://scripts/characters/titan_bulwark.gd")
 
@@ -32,8 +35,9 @@ func _check(cond: bool, msg: String) -> void:
 func _ready() -> void:
 	var out_path: String = ProjectSettings.globalize_path("res://test_skill_vfx_results.txt")
 	log_file = FileAccess.open(out_path, FileAccess.WRITE)
+
 	_log("==================================================")
-	_log("[TEST RUNNER] Memulai pengujian Efek Visual Skill Berbeda-beda...")
+	_log("[TEST RUNNER] Memulai pengujian Efek Visual Skill & Combat Hitspark Berbeda-beda...")
 	_log("==================================================")
 
 	var tests: Array[Callable] = [
@@ -147,6 +151,30 @@ func _test_individual_vfx_nodes() -> void:
 	_check(c_slash._active == true, "VFXCinematicSlash aktif dengan tebasan bersilangan.")
 	c_slash.queue_free()
 
+	# 10. VFXHitSpark
+	var hitspark = VFXHitSparkScript.new()
+	add_child(hitspark)
+	hitspark.trigger_hitspark(Vector2(500, 300), 2, Color.YELLOW, Vector2.RIGHT)
+	hitspark._process(0.016)
+	_check(hitspark._active == true, "VFXHitSpark aktif dengan bintang geometris.")
+	hitspark.queue_free()
+
+	# 11. VFXGuardSpark
+	var guard = VFXGuardSparkScript.new()
+	add_child(guard)
+	guard.trigger_guard(Vector2(600, 300), -1, Color.CYAN)
+	guard._process(0.016)
+	_check(guard._active == true, "VFXGuardSpark aktif dengan matriks heksagonal pertahanan.")
+	guard.queue_free()
+
+	# 12. VFXCyberDebris
+	var debris = VFXCyberDebrisScript.new()
+	add_child(debris)
+	debris.trigger_debris(Vector2(700, 300), Vector2.UP, 8, Color.WHITE)
+	debris._process(0.016)
+	_check(debris._active == true, "VFXCyberDebris aktif dengan lempeng serpihan baja mecha.")
+	debris.queue_free()
+
 func _test_vfx_manager_spawn_methods() -> void:
 	var mgr: Node2D = VFXManagerScript.new()
 	add_child(mgr)
@@ -161,9 +189,12 @@ func _test_vfx_manager_spawn_methods() -> void:
 	var n7 = mgr.spawn_shadow_smoke(Vector2(700, 700))
 	var n8 = mgr.spawn_shuriken_storm(Vector2(800, 800))
 	var n9 = mgr.spawn_cinematic_slash(Vector2(900, 900))
+	var n10 = mgr.spawn_hitspark(Vector2(100, 200))
+	var n11 = mgr.spawn_guard_spark(Vector2(200, 300))
+	var n12 = mgr.spawn_cyber_debris(Vector2(300, 400))
 
-	_check(mgr.get_child_count() == before + 9, "VFXManager berhasil memunculkan 9 jenis node efek visual spesifik.")
-	_check(n1 != null and n2 != null and n3 != null and n4 != null and n5 != null and n6 != null and n7 != null and n8 != null and n9 != null, "Semua node VFX hasil instansiasi tidak null.")
+	_check(mgr.get_child_count() == before + 12, "VFXManager berhasil memunculkan 12 jenis node efek visual spesifik.")
+	_check(n1 != null and n2 != null and n3 != null and n4 != null and n5 != null and n6 != null and n7 != null and n8 != null and n9 != null and n10 != null and n11 != null and n12 != null, "Semua node VFX hasil instansiasi tidak null.")
 
 	mgr.queue_free()
 
@@ -172,29 +203,15 @@ func _test_vfx_manager_skill_cast_handling() -> void:
 	add_child(mgr)
 
 	var caster := Node2D.new()
-	caster.name = "P1_Viper"
+	caster.name = "TestMecha"
 	add_child(caster)
 
-	var initial := mgr.get_child_count()
-
-	# Uji sinyal skill cast untuk berbagai mecha
 	var skills_to_test: Array[StringName] = [
-		&"BlinkSlash",
-		&"DeflectionMatrix",
-		&"AbsoluteZeroProtocol",
-		&"HydraulicPiledriver",
-		&"RiotShield",
-		&"OrbitalSiegeCannon",
-		&"PhotonRailgun",
-		&"DisrupterDrone",
-		&"SupernovaHorizon",
-		&"StanceShift",
-		&"IaidoCrescent",
-		&"ShurikenStorm",
-		&"ShadowBlossom",
-		&"CataclysmSlash",
-		&"ShadowShockwave",
-		&"ZeroOverload"
+		&"BlinkSlash", &"DeflectionMatrix", &"AbsoluteZeroProtocol",
+		&"HydraulicPiledriver", &"RiotShield", &"OrbitalSiegeCannon",
+		&"PhotonRailgun", &"DisrupterDrone", &"SupernovaHorizon",
+		&"StanceShift", &"IaidoCrescent", &"ShurikenStorm", &"ShadowBlossom",
+		&"CataclysmSlash", &"ShadowShockwave", &"ZeroOverload"
 	]
 
 	for s in skills_to_test:
@@ -219,13 +236,20 @@ func _test_vfx_manager_hit_impact_effects() -> void:
 	add_child(p1)
 	add_child(p2)
 
+	# 1. Hit Clean BlinkSlash
 	var before := mgr.get_child_count()
 	mgr._on_hit_confirmed(p1, p2, {"name": "BlinkSlash", "damage": 80})
 	_check(mgr.get_child_count() > before, "Hit confirmed BlinkSlash memicu efek kontak kriogenik & tebasan.")
 
+	# 2. Hit Clean HydraulicPiledriver
 	var before_bulwark := mgr.get_child_count()
 	mgr._on_hit_confirmed(p2, p1, {"name": "HydraulicPiledriver", "damage": 220})
 	_check(mgr.get_child_count() > before_bulwark, "Hit confirmed HydraulicPiledriver memicu efek retakan seismik.")
+
+	# 3. Blocked Hit
+	var before_block := mgr.get_child_count()
+	mgr._on_hit_confirmed(p1, p2, {"name": "5L", "damage": 40, "blocked": true})
+	_check(mgr.get_child_count() > before_block, "Blocked hit confirmed memicu efek guard spark heksagonal.")
 
 	p1.queue_free()
 	p2.queue_free()
