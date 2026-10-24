@@ -9,7 +9,8 @@ static var p1_character: StringName = &"viper"
 static var p2_character: StringName = &"bulwark"
 static var game_mode: StringName = &"versus_ai"
 static var ai_difficulty: int = 1 # 0: Novice, 1: Veteran, 2: Ace
-static var selected_arena: StringName = &"skyscraper" # &"skyscraper" | &"reactor"
+static var selected_arena: StringName = &"skyscraper" # &"skyscraper" | &"reactor" | &"orbital" | &"highway"
+const AVAILABLE_ARENAS: Array[StringName] = [&"skyscraper", &"reactor", &"orbital", &"highway"]
 
 static func reset_defaults() -> void:
 	p1_character = &"viper"
@@ -21,10 +22,22 @@ static func reset_defaults() -> void:
 static func set_arena(arena_id: StringName) -> void:
 	selected_arena = arena_id
 
+static func cycle_next_arena() -> StringName:
+	var idx = AVAILABLE_ARENAS.find(selected_arena)
+	if idx == -1:
+		selected_arena = &"skyscraper"
+	else:
+		selected_arena = AVAILABLE_ARENAS[(idx + 1) % AVAILABLE_ARENAS.size()]
+	return selected_arena
+
 static func get_arena_scene() -> String:
 	match selected_arena:
 		&"reactor":
 			return "res://scenes/arena_underground_reactor.tscn"
+		&"orbital":
+			return "res://scenes/arena_orbital_station.tscn"
+		&"highway":
+			return "res://scenes/arena_cyber_highway.tscn"
 		_:
 			return "res://scenes/arena_skyscraper.tscn"
 

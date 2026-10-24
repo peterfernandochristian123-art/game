@@ -213,22 +213,26 @@ func _unhandled_input(event: InputEvent) -> void:
 		_cancel_or_return()
 
 func toggle_stage() -> void:
-	if MatchConfigScript.selected_arena == &"skyscraper":
-		MatchConfigScript.set_arena(&"reactor")
-	else:
-		MatchConfigScript.set_arena(&"skyscraper")
+	MatchConfigScript.cycle_next_arena()
 	MenuAudio.play_nav_beep(self)
 	_update_stage_ui()
 
 func _update_stage_ui() -> void:
 	if not stage_label:
 		return
-	if MatchConfigScript.selected_arena == &"reactor":
-		stage_label.text = "[TAB] ARENA: UNDERGROUND REACTOR (HAZARD ACTIVE)"
-		stage_label.modulate = Color(1.0, 0.45, 0.1, 1.0)
-	else:
-		stage_label.text = "[TAB] ARENA: ZERO-G SKYSCRAPER (OPEN CLIFF)"
-		stage_label.modulate = Color(0.2, 0.9, 1.0, 1.0)
+	match MatchConfigScript.selected_arena:
+		&"reactor":
+			stage_label.text = "[TAB] ARENA: UNDERGROUND REACTOR (HAZARD ACTIVE)"
+			stage_label.modulate = Color(1.0, 0.45, 0.1, 1.0)
+		&"orbital":
+			stage_label.text = "[TAB] ARENA: ORBITAL SPACE STATION (SOLAR ARRAY)"
+			stage_label.modulate = Color(0.3, 0.9, 1.0, 1.0)
+		&"highway":
+			stage_label.text = "[TAB] ARENA: NEO-SHIBUYA HIGHWAY (RAINY OVERPASS)"
+			stage_label.modulate = Color(1.0, 0.25, 0.65, 1.0)
+		_:
+			stage_label.text = "[TAB] ARENA: ZERO-G SKYSCRAPER (OPEN CLIFF)"
+			stage_label.modulate = Color(0.2, 0.9, 1.0, 1.0)
 
 func _change_p1_index(delta: int) -> void:
 	var total = FighterFactoryScript.get_roster_count()

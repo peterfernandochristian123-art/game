@@ -142,8 +142,9 @@ func _test_character_select_stage_toggle() -> void:
 	if cs.stage_label:
 		_check(cs.stage_label.text.contains("REACTOR"), "Stage label harus menampilkan status UNDERGROUND REACTOR")
 
-	# Toggle balik
-	cs.toggle_stage()
-	_check(MatchConfigScript.selected_arena == &"skyscraper", "Setelah toggle kedua, arena harus kembali ke skyscraper")
+	# Toggle balik / cycle ke skyscraper
+	while MatchConfigScript.selected_arena != &"skyscraper":
+		cs.toggle_stage()
+	_check(MatchConfigScript.selected_arena == &"skyscraper", "Setelah cycle lengkap, arena harus kembali ke skyscraper")
 
 	cs.queue_free()

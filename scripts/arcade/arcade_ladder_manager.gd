@@ -99,24 +99,24 @@ func _build_stages_pipeline() -> void:
 			"stage_num": 2,
 			"opponent": available_rivals[1] if available_rivals.size() > 1 else &"pulsar",
 			"difficulty": AIControllerScript.Difficulty.VETERAN,
-			"arena": &"reactor",
-			"title": "STAGE 2 / 4 - REACTOR TRIAL",
-			"subtext": "OPPONENT: VETERAN CLASS DUELIST"
+			"arena": &"highway",
+			"title": "STAGE 2 / 4 - NEO-SHIBUYA OVERPASS",
+			"subtext": "OPPONENT: VETERAN HIGHWAY ENFORCER"
 		},
 		{
 			"stage_num": 3,
 			"opponent": available_rivals[2] if available_rivals.size() > 2 else &"kage",
 			"difficulty": AIControllerScript.Difficulty.ACE,
-			"arena": &"skyscraper",
-			"title": "STAGE 3 / 4 - SUMMIT SHOWDOWN",
+			"arena": &"reactor",
+			"title": "STAGE 3 / 4 - REACTOR TRIAL",
 			"subtext": "OPPONENT: ACE CLASS CHAMPION"
 		},
 		{
 			"stage_num": 4,
 			"opponent": &"unit_zero",
 			"difficulty": AIControllerScript.Difficulty.NIGHTMARE,
-			"arena": &"reactor",
-			"title": "STAGE 4 / 4 - FINAL ENCOUNTER",
+			"arena": &"orbital",
+			"title": "STAGE 4 / 4 - ORBITAL HORIZON",
 			"subtext": "BOSS: UNBOUND OVERCLOCK PROTO-CORE"
 		}
 	]
@@ -181,23 +181,30 @@ func _setup_fighters(opp_id: StringName) -> void:
 	fighters_node.add_child(p2)
 
 func _apply_arena(arena_id: StringName) -> void:
-	var current_skyscraper = get_node_or_null("ArenaSkyscraper")
-	var current_reactor = get_node_or_null("ArenaUndergroundReactor")
+	var existing_arena: Node = null
+	for child in get_children():
+		if child.name.begins_with("Arena"):
+			existing_arena = child
+			break
 
-	if arena_id == &"reactor" and current_skyscraper:
-		var scene = load("res://scenes/arena_underground_reactor.tscn")
+	var scene_path: String = "res://scenes/arena_skyscraper.tscn"
+	match arena_id:
+		&"reactor":
+			scene_path = "res://scenes/arena_underground_reactor.tscn"
+		&"orbital":
+			scene_path = "res://scenes/arena_orbital_station.tscn"
+		&"highway":
+			scene_path = "res://scenes/arena_cyber_highway.tscn"
+		_:
+			scene_path = "res://scenes/arena_skyscraper.tscn"
+
+	if existing_arena and not existing_arena.name.to_lower().contains(String(arena_id)):
+		var scene = load(scene_path)
 		if scene:
 			var new_arena = scene.instantiate()
-			var idx = current_skyscraper.get_index()
-			current_skyscraper.queue_free()
-			add_child(new_arena)
-			move_child(new_arena, idx)
-	elif arena_id == &"skyscraper" and current_reactor:
-		var scene = load("res://scenes/arena_skyscraper.tscn")
-		if scene:
-			var new_arena = scene.instantiate()
-			var idx = current_reactor.get_index()
-			current_reactor.queue_free()
+			var idx = existing_arena.get_index()
+			existing_arena.name = "Arena_Old"
+			existing_arena.queue_free()
 			add_child(new_arena)
 			move_child(new_arena, idx)
 

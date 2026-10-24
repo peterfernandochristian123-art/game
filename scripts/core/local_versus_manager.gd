@@ -128,12 +128,13 @@ func _apply_roster_selection() -> void:
 		fighters_node.add_child(p2)
 
 func _apply_arena_selection() -> void:
-	if MatchConfigScript.selected_arena == &"reactor":
+	if MatchConfigScript.selected_arena != &"skyscraper":
 		var current_arena = get_node_or_null("ArenaSkyscraper")
 		if current_arena:
-			var reactor_scene = load("res://scenes/arena_underground_reactor.tscn")
-			if reactor_scene:
-				var new_arena = reactor_scene.instantiate()
+			var scene_path: String = MatchConfigScript.get_arena_scene()
+			var arena_scene = load(scene_path)
+			if arena_scene:
+				var new_arena = arena_scene.instantiate()
 				var idx = current_arena.get_index()
 				current_arena.name = "ArenaSkyscraper_Old"
 				current_arena.queue_free()

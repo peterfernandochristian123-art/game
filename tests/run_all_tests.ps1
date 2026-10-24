@@ -56,7 +56,9 @@ $testScenes = @(
     # Epic 15: Arcade Ladder & Boss Gauntlet Mode
     "res://tests/test_arcade_ladder.tscn",
     # Skill VFX Diversity & Visual Impact Polish
-    "res://tests/test_skill_vfx.tscn"
+    "res://tests/test_skill_vfx.tscn",
+    # New Arenas: Orbital Station & Cyber Highway
+    "res://tests/test_new_arenas.tscn"
 )
 
 Write-Host "==========================================================" -ForegroundColor Cyan
