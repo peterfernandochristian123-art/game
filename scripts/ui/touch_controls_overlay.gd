@@ -17,12 +17,12 @@ enum InputMode {
 }
 
 const ACTION_BUTTONS := [
-	{"name": "BtnNormal", "action": &"attack_light", "label": "ATK", "color": Color(0.2, 0.9, 1.0, 0.85)},
-	{"name": "BtnDash", "action": &"dash", "label": "DASH", "color": Color(0.3, 1.0, 0.5, 0.85)},
-	{"name": "BtnSkill1", "action": &"skill1", "label": "SKILL 1", "color": Color(1.0, 0.8, 0.2, 0.85)},
-	{"name": "BtnSkill2", "action": &"skill2", "label": "SKILL 2", "color": Color(1.0, 0.5, 0.2, 0.85)},
-	{"name": "BtnParry", "action": &"parry", "label": "PARRY", "color": Color(0.9, 0.3, 1.0, 0.85)},
-	{"name": "BtnUltimate", "action": &"ultimate", "label": "ULTI", "color": Color(1.0, 0.2, 0.35, 0.85)}
+	{"name": "BtnNormal", "action": &"attack_light", "label": "ATK [J/Z]", "color": Color(0.2, 0.9, 1.0, 0.85)},
+	{"name": "BtnDash", "action": &"dash", "label": "DASH [X]", "color": Color(0.3, 1.0, 0.5, 0.85)},
+	{"name": "BtnSkill1", "action": &"skill1", "label": "SKILL 1 [U]", "color": Color(1.0, 0.8, 0.2, 0.85)},
+	{"name": "BtnSkill2", "action": &"skill2", "label": "SKILL 2 [I]", "color": Color(1.0, 0.5, 0.2, 0.85)},
+	{"name": "BtnParry", "action": &"parry", "label": "PARRY [L]", "color": Color(0.9, 0.3, 1.0, 0.85)},
+	{"name": "BtnUltimate", "action": &"ultimate", "label": "ULTI [O]", "color": Color(1.0, 0.2, 0.35, 0.85)}
 ]
 
 @export var auto_hide_on_controller: bool = true

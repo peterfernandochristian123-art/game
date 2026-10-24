@@ -30,6 +30,7 @@ func _ready() -> void:
 		_test_ultimate_gauge_updates,
 		_test_timer_and_round_wins_sync,
 		_test_fighter_binding_with_signals,
+		_test_skill_command_dock_key_hints
 	]
 	var passed: int = 0
 	for t in tests:
@@ -182,3 +183,25 @@ func _test_fighter_binding_with_signals() -> void:
 	hud.queue_free()
 	mock_p1.queue_free()
 	mock_p2.queue_free()
+
+func _test_skill_command_dock_key_hints() -> void:
+	var hud := _instantiate_hud()
+	_check(hud.skill_dock != null, "Skill Command Dock tersedia di CombatHUD.")
+	_check(hud.skill1_badge != null and hud.skill1_badge.text.contains("U"), "Skill 1 memiliki badge tombol [U].")
+	_check(hud.skill2_badge != null and hud.skill2_badge.text.contains("I"), "Skill 2 memiliki badge tombol [I].")
+	_check(hud.ultimate_badge != null and hud.ultimate_badge.text.contains("O"), "Ultimate memiliki badge tombol [O].")
+
+	var mock_p1 := MockFighter.new()
+	mock_p1.name = "P1_Viper_DockTest"
+	mock_p1.set("archetype", &"viper")
+	add_child(mock_p1)
+	hud.bind_fighters(mock_p1, null)
+	_check(hud.skill1_name_label.text.contains("BLINK SLASH"), "Nama skill 1 Viper terpasang ke dock.")
+	_check(hud.skill2_name_label.text.contains("DEFLECTION MATRIX"), "Nama skill 2 Viper terpasang ke dock.")
+
+	# Update ultimate to 100%
+	hud.update_p1_ultimate(100.0, 100.0)
+	_check(hud.ultimate_name_label.text.contains("READY"), "Ultimate card menampilkan status READY saat 100%.")
+
+	hud.queue_free()
+	mock_p1.queue_free()

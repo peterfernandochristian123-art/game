@@ -1,9 +1,10 @@
 class_name CombatHUD
 extends Control
 
-## Pengendali HUD Pertarungan Retro 32-Bit (Story 5.3)
+## Pengendali HUD Pertarungan Retro 32-Bit (Story 5.3 & Skill Command Dock Update)
 ## Menampilkan HP Bar simetris real-time, Heat Gauge dinamis (Nominal/Overclock/Meltdown),
-## Ultimate Meter, Round Countdown Timer 90s, dan Indikator Ronde Menang
+## Ultimate Meter, Round Countdown Timer 90s, Indikator Ronde Menang,
+## serta Dock Perintah Skill interaktif dengan petunjuk tombol [U, I, O, J, K, L, X] real-time.
 
 const COLOR_HP_HEALTHY := Color(0.2, 0.95, 0.4, 1.0) # Hijau neon
 const COLOR_HP_WARN := Color(1.0, 0.85, 0.2, 1.0)    # Kuning
@@ -42,6 +43,17 @@ const COLOR_ULTIMATE_MAX := Color(0.3, 1.0, 0.9, 1.0)       # Cyan Flash
 @onready var timer_label: Label = $TopBar/CenterPanel/TimerLabel
 @onready var round_label: Label = $TopBar/CenterPanel/RoundLabel
 
+# Skill & Command Keybind Dock Nodes
+var skill_dock: PanelContainer = null
+var skill1_badge: Label = null
+var skill1_name_label: Label = null
+var skill2_badge: Label = null
+var skill2_name_label: Label = null
+var ultimate_badge: Label = null
+var ultimate_name_label: Label = null
+var ultimate_card: Control = null
+var current_p1_ult_name: String = "ABSOLUTE ZERO"
+
 var p1_fighter: Node2D = null
 var p2_fighter: Node2D = null
 var match_manager: Node = null
@@ -50,6 +62,213 @@ var is_sudden_death: bool = false
 func _ready() -> void:
 	update_round_wins(0, 0)
 	update_timer(90.0)
+	_setup_skill_command_dock()
+
+func _setup_skill_command_dock() -> void:
+	if skill_dock != null:
+		return
+
+	skill_dock = PanelContainer.new()
+	skill_dock.name = "SkillCommandDock"
+	skill_dock.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	skill_dock.layout_mode = 1
+	skill_dock.anchors_preset = Control.PRESET_BOTTOM_WIDE
+	skill_dock.anchor_left = 0.5
+	skill_dock.anchor_right = 0.5
+	skill_dock.anchor_top = 1.0
+	skill_dock.anchor_bottom = 1.0
+	skill_dock.offset_left = -312.0
+	skill_dock.offset_right = 312.0
+	skill_dock.offset_top = -32.0
+	skill_dock.offset_bottom = -4.0
+	skill_dock.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	skill_dock.grow_vertical = Control.GROW_DIRECTION_BEGIN
+
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.04, 0.06, 0.1, 0.9)
+	style.border_color = Color(0.2, 0.7, 0.95, 0.6)
+	style.border_width_left = 1
+	style.border_width_top = 1
+	style.border_width_right = 1
+	style.border_width_bottom = 1
+	style.corner_radius_top_left = 4
+	style.corner_radius_top_right = 4
+	style.corner_radius_bottom_left = 4
+	style.corner_radius_bottom_right = 4
+	style.content_margin_left = 8.0
+	style.content_margin_right = 8.0
+	style.content_margin_top = 2.0
+	style.content_margin_bottom = 2.0
+	skill_dock.add_theme_stylebox_override("panel", style)
+
+	var hbox := HBoxContainer.new()
+	hbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	hbox.add_theme_constant_override("separation", 8)
+	skill_dock.add_child(hbox)
+
+	# 1. Skill 1 Card [U]
+	var s1_box := _create_skill_card("[ U ]", "SKILL 1", "BLINK SLASH", Color(0.2, 0.95, 1.0))
+	skill1_badge = s1_box.get_node("HBox/Badge") as Label
+	skill1_name_label = s1_box.get_node("HBox/VBox/NameLabel") as Label
+	hbox.add_child(s1_box)
+
+	# 2. Skill 2 Card [I]
+	var s2_box := _create_skill_card("[ I ]", "SKILL 2", "DEFLECTION MATRIX", Color(0.2, 0.95, 1.0))
+	skill2_badge = s2_box.get_node("HBox/Badge") as Label
+	skill2_name_label = s2_box.get_node("HBox/VBox/NameLabel") as Label
+	hbox.add_child(s2_box)
+
+	# 3. Ultimate Card [O]
+	ultimate_card = _create_skill_card("[ O ]", "ULTIMATE", "ABSOLUTE ZERO (0%)", Color(1.0, 0.85, 0.2))
+	ultimate_badge = ultimate_card.get_node("HBox/Badge") as Label
+	ultimate_name_label = ultimate_card.get_node("HBox/VBox/NameLabel") as Label
+	hbox.add_child(ultimate_card)
+
+	# Separator
+	var sep := VSeparator.new()
+	sep.modulate = Color(0.3, 0.5, 0.7, 0.6)
+	hbox.add_child(sep)
+
+	# 4. Combat Keys Reference
+	var keys_box := HBoxContainer.new()
+	keys_box.alignment = BoxContainer.ALIGNMENT_CENTER
+	keys_box.add_theme_constant_override("separation", 6)
+
+	var combat_hints := [
+		{"key": "[J/Z]", "act": "LIGHT"},
+		{"key": "[K/C]", "act": "HEAVY"},
+		{"key": "[L]", "act": "PARRY"},
+		{"key": "[X/Shift]", "act": "DASH"},
+		{"key": "[Space]", "act": "JUMP"},
+		{"key": "[H]", "act": "HINT"}
+	]
+
+	for h in combat_hints:
+		var item := HBoxContainer.new()
+		item.add_theme_constant_override("separation", 2)
+		var k_lbl := Label.new()
+		k_lbl.text = h["key"]
+		k_lbl.add_theme_font_size_override("font_size", 7)
+		k_lbl.modulate = Color(1.0, 0.9, 0.35)
+		item.add_child(k_lbl)
+
+		var a_lbl := Label.new()
+		a_lbl.text = h["act"]
+		a_lbl.add_theme_font_size_override("font_size", 7)
+		a_lbl.modulate = Color(0.75, 0.85, 0.95)
+		item.add_child(a_lbl)
+		keys_box.add_child(item)
+
+	hbox.add_child(keys_box)
+
+	add_child(skill_dock)
+
+func _create_skill_card(key_text: String, slot_text: String, move_text: String, theme_col: Color) -> Control:
+	var card := PanelContainer.new()
+	card.custom_minimum_size = Vector2(108, 24)
+
+	var card_style := StyleBoxFlat.new()
+	card_style.bg_color = Color(0.06, 0.1, 0.16, 0.8)
+	card_style.border_color = theme_col * Color(1, 1, 1, 0.6)
+	card_style.border_width_left = 1
+	card_style.border_width_top = 1
+	card_style.border_width_right = 1
+	card_style.border_width_bottom = 1
+	card_style.corner_radius_top_left = 3
+	card_style.corner_radius_top_right = 3
+	card_style.corner_radius_bottom_left = 3
+	card_style.corner_radius_bottom_right = 3
+	card_style.content_margin_left = 4.0
+	card_style.content_margin_right = 4.0
+	card_style.content_margin_top = 1.0
+	card_style.content_margin_bottom = 1.0
+	card.add_theme_stylebox_override("panel", card_style)
+
+	var hbox := HBoxContainer.new()
+	hbox.name = "HBox"
+	hbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	hbox.add_theme_constant_override("separation", 4)
+	card.add_child(hbox)
+
+	var badge := Label.new()
+	badge.name = "Badge"
+	badge.text = key_text
+	badge.add_theme_font_size_override("font_size", 8)
+	badge.modulate = Color(1.0, 0.9, 0.3)
+	hbox.add_child(badge)
+
+	var vbox := VBoxContainer.new()
+	vbox.name = "VBox"
+	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	vbox.add_theme_constant_override("separation", -2)
+	hbox.add_child(vbox)
+
+	var slot_lbl := Label.new()
+	slot_lbl.name = "SlotLabel"
+	slot_lbl.text = slot_text
+	slot_lbl.add_theme_font_size_override("font_size", 6)
+	slot_lbl.modulate = Color(0.65, 0.75, 0.85)
+	vbox.add_child(slot_lbl)
+
+	var name_lbl := Label.new()
+	name_lbl.name = "NameLabel"
+	name_lbl.text = move_text
+	name_lbl.add_theme_font_size_override("font_size", 7)
+	name_lbl.modulate = theme_col
+	vbox.add_child(name_lbl)
+
+	return card
+
+func set_p1_skills(s1_name: String, s2_name: String, ult_name: String, col: Color = Color.CYAN) -> void:
+	current_p1_ult_name = ult_name
+	if skill1_name_label:
+		skill1_name_label.text = s1_name
+		skill1_name_label.modulate = col
+	if skill2_name_label:
+		skill2_name_label.text = s2_name
+		skill2_name_label.modulate = col
+	if ultimate_name_label:
+		ultimate_name_label.text = "%s (0%%)" % ult_name
+		ultimate_name_label.modulate = col
+
+func _detect_and_bind_p1_skills(fighter: Node2D) -> void:
+	if not is_instance_valid(fighter):
+		return
+
+	var f_name := fighter.name.to_lower()
+	var arch: String = ""
+	if fighter.has_method("get_archetype"):
+		arch = String(fighter.get_archetype()).to_lower()
+	elif "archetype" in fighter:
+		arch = String(fighter.get("archetype")).to_lower()
+
+	if arch.contains("viper") or f_name.contains("viper"):
+		set_p1_skills("BLINK SLASH", "DEFLECTION MATRIX", "ABSOLUTE ZERO", Color(0.2, 0.95, 1.0))
+	elif arch.contains("bulwark") or f_name.contains("bulwark") or arch.contains("titan") or f_name.contains("titan"):
+		set_p1_skills("HYDRAULIC PILEDRIVER", "RIOT SHIELD", "ORBITAL SIEGE CANNON", Color(1.0, 0.55, 0.15))
+	elif arch.contains("pulsar") or f_name.contains("pulsar"):
+		set_p1_skills("PHOTON RAILGUN", "DISRUPTER DRONE", "SUPERNOVA HORIZON", Color(0.75, 0.25, 1.0))
+	elif arch.contains("kage") or f_name.contains("kage"):
+		set_p1_skills("STANCE SHIFT", "IAIDO CRESCENT", "SHADOW BLOSSOM", Color(1.0, 0.15, 0.25))
+		if fighter.has_signal("stance_changed") and not fighter.stance_changed.is_connected(_on_kage_stance_changed):
+			fighter.stance_changed.connect(_on_kage_stance_changed)
+	elif f_name.contains("boss") or f_name.contains("unit_zero"):
+		set_p1_skills("SHADOW SHOCKWAVE", "CATACLYSM SLASH", "ZERO OVERLOAD", Color(1.1, 0.1, 0.3))
+	else:
+		set_p1_skills("SPECIAL SKILL 1", "SPECIAL SKILL 2", "OVERCLOCK PROTOCOL", Color(0.2, 0.95, 1.0))
+
+func _on_kage_stance_changed(new_stance: StringName) -> void:
+	if skill2_name_label:
+		if String(new_stance) == "shinobi":
+			skill2_name_label.text = "SHURIKEN STORM"
+		else:
+			skill2_name_label.text = "IAIDO CRESCENT"
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.is_pressed() and not event.is_echo():
+		if event.keycode == KEY_H:
+			if skill_dock:
+				skill_dock.visible = !skill_dock.visible
 
 func bind_fighters(p1: Node2D, p2: Node2D, mm: Node = null) -> void:
 	p1_fighter = p1
@@ -77,6 +296,8 @@ func bind_fighters(p1: Node2D, p2: Node2D, mm: Node = null) -> void:
 
 		if p1_name_label:
 			p1_name_label.text = "P1 // " + p1_fighter.name.to_upper()
+
+		_detect_and_bind_p1_skills(p1_fighter)
 
 	if p2_fighter:
 		if p2_fighter.has_signal("hp_changed"):
@@ -201,6 +422,25 @@ func update_p1_ultimate(current: float, max_val: float = 100.0) -> void:
 
 	if p1_ultimate_text:
 		p1_ultimate_text.text = "PROTOCOL READY (100%)" if is_max else "ULTIMATE: %d%%" % int(current)
+
+	# Update dock ultimate card
+	if ultimate_name_label:
+		if is_max:
+			ultimate_name_label.text = "★ READY ★ " + current_p1_ult_name
+			ultimate_name_label.modulate = COLOR_ULTIMATE_MAX
+			if ultimate_badge:
+				ultimate_badge.text = "[ O ] READY!"
+				ultimate_badge.modulate = COLOR_ULTIMATE_MAX
+			if ultimate_card:
+				ultimate_card.modulate = Color(1.2, 1.2, 1.0, 1.0)
+		else:
+			ultimate_name_label.text = "%s (%d%%)" % [current_p1_ult_name, int(current)]
+			ultimate_name_label.modulate = Color(1.0, 0.85, 0.2)
+			if ultimate_badge:
+				ultimate_badge.text = "[ O ]"
+				ultimate_badge.modulate = Color(1.0, 0.9, 0.3)
+			if ultimate_card:
+				ultimate_card.modulate = Color(1.0, 1.0, 1.0, 1.0)
 
 func update_p2_ultimate(current: float, max_val: float = 100.0) -> void:
 	if not p2_ultimate_bar:

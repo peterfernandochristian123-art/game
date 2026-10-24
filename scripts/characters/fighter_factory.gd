@@ -36,10 +36,11 @@ const ROSTER: Array[Dictionary] = [
 		"theme_color": Color(0.2, 0.9, 1.0, 1.0), # Cyan
 		"description": "High-velocity duelist equipped with dual beam rapiers, 400px Blink Slash teleport, and Absolute Zero heat lock.",
 		"signature_moves": [
-			"5L / 5H: Beam Rapier 3-Hit Combo",
-			"Skill 1: Blink Slash (400px Teleport Cut)",
-			"Skill 2: Deflection Matrix (Shield)",
-			"Ultimate: Absolute Zero Protocol (Heat Lock)"
+			"[J / Z] Normal Attack: Beam Rapier 3-Hit Combo",
+			"[U] Skill 1: Blink Slash (400px Teleport Cut)",
+			"[I] Skill 2: Deflection Matrix (Hex Shield)",
+			"[O] Ultimate: Absolute Zero Protocol (Heat Lock)",
+			"[L] Spark Parry | [X / Shift] Thruster Dash"
 		]
 	},
 	{
@@ -56,10 +57,11 @@ const ROSTER: Array[Dictionary] = [
 		"theme_color": Color(0.95, 0.45, 0.15, 1.0), # Industrial Orange
 		"description": "Armored colossus with passive -5% damage reduction, unblockable Hydraulic Piledriver command grab, and Riot Shield.",
 		"signature_moves": [
-			"5L / 5H: Heavy Iron Hammer Strike",
-			"Skill 1: Hydraulic Piledriver (Command Grab)",
-			"Skill 2: Riot Shield Deploy (Super Armor)",
-			"Ultimate: Orbital Siege Cannon (450 Dmg)"
+			"[J / Z] Normal Attack: Heavy Iron Hammer Strike",
+			"[U] Skill 1: Hydraulic Piledriver (Command Grab)",
+			"[I] Skill 2: Riot Shield Deploy (Super Armor)",
+			"[O] Ultimate: Orbital Siege Cannon (450 Dmg)",
+			"[L] Spark Parry | [X / Shift] Heavy Dash"
 		]
 	},
 	{
@@ -76,10 +78,11 @@ const ROSTER: Array[Dictionary] = [
 		"theme_color": Color(0.7, 0.3, 1.0, 1.0), # Neon Violet
 		"description": "Spatial control specialist wielding high-caliber photon railguns, floating disrupter drone pods, and 360° supernova.",
 		"signature_moves": [
-			"5L / 5H: Plasma Pulse & Beam Lance",
-			"Skill 1: Photon Railgun (Linear Beam 110 Dmg)",
-			"Skill 2: Disrupter Drone (120f Area Denial)",
-			"Ultimate: Supernova Horizon (360° Shockwave)"
+			"[J / Z] Normal Attack: Plasma Pulse & Beam Lance",
+			"[U] Skill 1: Photon Railgun (Linear Beam 110 Dmg)",
+			"[I] Skill 2: Disrupter Drone (120f Area Denial)",
+			"[O] Ultimate: Supernova Horizon (360° Singularity)",
+			"[L] Spark Parry | [X / Shift] Warp Dash"
 		]
 	},
 	{
@@ -96,10 +99,11 @@ const ROSTER: Array[Dictionary] = [
 		"theme_color": Color(0.95, 0.15, 0.25, 1.0), # Crimson Red
 		"description": "Shadow assassin mastering dual combat stances: close-quarters Kenjutsu Katana and ranged Shinobi Shurikens with evasive feints.",
 		"signature_moves": [
-			"5L / 5H: Katana Slash (Kenjutsu) / Kunai Poke (Shinobi)",
-			"Skill 1: Stance Shift & Shadow Feint (Dual Stance Swap)",
-			"Skill 2: Iaido Crescent (Kenjutsu) / Shuriken Storm (Shinobi)",
-			"Ultimate: Tsukuyomi Shadow Blossom (420 Dmg Full Screen)"
+			"[J / Z] Normal Attack: Katana Slash (Kenjutsu) / Kunai (Shinobi)",
+			"[U] Skill 1: Stance Shift & Shadow Feint (Dual Stance Swap)",
+			"[I] Skill 2: Iaido Crescent (Kenjutsu) / Shuriken Storm (Shinobi)",
+			"[O] Ultimate: Tsukuyomi Shadow Blossom (420 Dmg Full Screen)",
+			"[L] Spark Parry | [X / Shift] Shadow Dash"
 		]
 	}
 ]
