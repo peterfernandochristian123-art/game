@@ -13,6 +13,7 @@ signal state_changed(character: Node2D, previous_state: StringName, new_state: S
 signal overclock_triggered(character: Node2D, is_active: bool)
 signal game_mode_selected(mode: StringName)
 signal menu_navigated()
+signal skill_cast(caster: Node2D, skill_name: StringName, pos: Vector2, facing: int)
 
 func _ready() -> void:
 	if OS.is_debug_build():

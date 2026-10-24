@@ -104,6 +104,10 @@ func activate_absolute_zero_protocol() -> bool:
 
 	if OS.is_debug_build():
 		print("[ULTIMATE][%s] ABSOLUTE ZERO PROTOCOL AKTIF! 8 Detik Cryogenic Mode!" % name)
+
+	var bus = get_node_or_null("/root/EventBus")
+	if bus and bus.has_signal("skill_cast"):
+		bus.skill_cast.emit(self, &"AbsoluteZeroProtocol", global_position, facing_direction)
 	return true
 
 func _physics_process(delta: float) -> void:

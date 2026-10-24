@@ -1,12 +1,22 @@
 class_name VFXManager
 extends Node2D
 
-## Pengelola Sistem Partikel & Efek Visual Pertarungan (Story 6.2)
-## Mendengarkan sinyal kontak dari EventBus dan memunculkan percikan las,
-## tebasan energi neon 32-bit, dan semburan uap panas tanpa overhead memori
+## Pengelola Sistem Partikel & Efek Visual Pertarungan (Story 6.2 & Skill VFX Update)
+## Mendengarkan sinyal kontak & aktivasi skill dari EventBus dan memunculkan percikan las,
+## tebasan energi neon, kristal es kriogenik, perisai heksagonal, laser partikel,
+## hantaman seismik, badai shuriken, kabut ninja, dan ledakan supernova 32-bit.
 
 const VFXSparksScene = preload("res://scenes/vfx/vfx_welding_sparks.tscn")
 const VFXSlashScene = preload("res://scenes/vfx/vfx_energy_slash.tscn")
+const VFXCryoFreezeScript = preload("res://scripts/visual/vfx_cryo_freeze.gd")
+const VFXHexBarrierScript = preload("res://scripts/visual/vfx_hex_barrier.gd")
+const VFXSeismicImpactScript = preload("res://scripts/visual/vfx_seismic_impact.gd")
+const VFXOrbitalBeamScript = preload("res://scripts/visual/vfx_orbital_beam.gd")
+const VFXDisrupterDroneScript = preload("res://scripts/visual/vfx_disrupter_drone.gd")
+const VFXSupernovaScript = preload("res://scripts/visual/vfx_supernova.gd")
+const VFXShadowSmokeScript = preload("res://scripts/visual/vfx_shadow_smoke.gd")
+const VFXShurikenStormScript = preload("res://scripts/visual/vfx_shuriken_storm.gd")
+const VFXCinematicSlashScript = preload("res://scripts/visual/vfx_cinematic_slash.gd")
 
 @export var enabled: bool = true
 
@@ -15,6 +25,88 @@ func _ready() -> void:
 		EventBus.hit_confirmed.connect(_on_hit_confirmed)
 		if EventBus.has_signal("parry_triggered"):
 			EventBus.parry_triggered.connect(_on_parry_triggered)
+		if EventBus.has_signal("skill_cast"):
+			EventBus.skill_cast.connect(_on_skill_cast)
+
+func _on_skill_cast(caster: Node2D, skill_name: StringName, pos: Vector2, facing: int) -> void:
+	if not enabled or not is_instance_valid(caster):
+		return
+
+	var s_name := String(skill_name)
+	var caster_name := caster.name.to_lower()
+
+	# 1. Viper Skills
+	if s_name.contains("Blink") or s_name == "BlinkSlash":
+		spawn_slash(pos, facing, Color(0.2, 0.95, 1.0))
+		spawn_cryo_freeze(pos, 38.0, Color(0.2, 0.95, 1.0))
+	elif s_name.contains("Deflection") or s_name == "DeflectionMatrix":
+		spawn_hex_barrier(caster, pos, 0.5, Color(0.2, 0.95, 1.0), 54.0)
+	elif s_name.contains("AbsoluteZero") or s_name.contains("Protocol"):
+		spawn_cryo_freeze(pos, 130.0, Color(0.3, 0.98, 1.0))
+
+	# 2. Bulwark Skills
+	elif s_name.contains("Piledriver") or s_name.contains("Hydraulic"):
+		spawn_seismic_impact(pos + Vector2(facing * 35.0, 10.0), facing, Color(1.0, 0.55, 0.15), 110.0)
+	elif s_name.contains("RiotShield") or s_name.contains("Shield"):
+		spawn_hex_barrier(caster, pos, 0.75, Color(1.0, 0.65, 0.2), 60.0)
+	elif s_name.contains("Orbital") or s_name.contains("SiegeCannon"):
+		spawn_orbital_beam(pos + Vector2(facing * 60.0, -320.0), Vector2.DOWN, 700.0, 60.0, Color(1.0, 0.6, 0.15))
+
+	# 3. Pulsar Skills
+	elif s_name.contains("Railgun") or s_name.contains("Photon"):
+		spawn_orbital_beam(pos, Vector2(facing, 0.0), 750.0, 36.0, Color(0.75, 0.25, 1.0))
+	elif s_name.contains("Drone") or s_name.contains("Disrupter"):
+		spawn_disrupter_drone(pos + Vector2(facing * 100.0, -40.0), 2.0, Color(0.7, 0.3, 1.0))
+	elif s_name.contains("Supernova") or s_name.contains("Horizon"):
+		spawn_supernova(pos, 200.0, Color(0.8, 0.25, 1.0))
+
+	# 4. Kage Skills
+	elif s_name.contains("Stance") or s_name == "StanceShift":
+		spawn_shadow_smoke(pos, Color(0.95, 0.15, 0.25), 16, 0.4)
+	elif s_name.contains("Iaido") or s_name == "IaidoCrescent":
+		spawn_cinematic_slash(pos, 1, Color(1.0, 0.15, 0.25), 0.35, 200.0)
+	elif s_name.contains("Shuriken") or s_name == "ShurikenStorm":
+		spawn_shuriken_storm(pos, facing, Color(1.0, 0.2, 0.3))
+	elif s_name.contains("Blossom") or s_name == "ShadowBlossom":
+		spawn_cinematic_slash(pos, 5, Color(1.0, 0.1, 0.25), 0.45, 260.0)
+
+	# 5. Unit-0 Boss Skills
+	elif s_name.contains("Cataclysm"):
+		spawn_cinematic_slash(pos, 3, Color(1.2, 0.1, 0.3), 0.4, 250.0)
+	elif s_name.contains("Shockwave"):
+		spawn_seismic_impact(pos, facing, Color(0.9, 0.1, 0.3), 120.0)
+	elif s_name.contains("Overload") or s_name.contains("Zero"):
+		spawn_supernova(pos, 220.0, Color(1.1, 0.1, 0.3))
+
+	# Fallback untuk Skill1 / Skill2 umum
+	elif s_name == "Skill1":
+		if caster_name.contains("viper"):
+			spawn_slash(pos, facing, Color(0.2, 0.95, 1.0))
+			spawn_cryo_freeze(pos, 38.0, Color(0.2, 0.95, 1.0))
+		elif caster_name.contains("bulwark"):
+			spawn_seismic_impact(pos + Vector2(facing * 35.0, 10.0), facing, Color(1.0, 0.55, 0.15), 110.0)
+		elif caster_name.contains("pulsar"):
+			spawn_orbital_beam(pos, Vector2(facing, 0.0), 750.0, 36.0, Color(0.75, 0.25, 1.0))
+		elif caster_name.contains("kage"):
+			spawn_shadow_smoke(pos, Color(0.95, 0.15, 0.25), 16, 0.4)
+	elif s_name == "Skill2":
+		if caster_name.contains("viper"):
+			spawn_hex_barrier(caster, pos, 0.5, Color(0.2, 0.95, 1.0), 54.0)
+		elif caster_name.contains("bulwark"):
+			spawn_hex_barrier(caster, pos, 0.75, Color(1.0, 0.65, 0.2), 60.0)
+		elif caster_name.contains("pulsar"):
+			spawn_disrupter_drone(pos + Vector2(facing * 100.0, -40.0), 2.0, Color(0.7, 0.3, 1.0))
+		elif caster_name.contains("kage"):
+			spawn_shuriken_storm(pos, facing, Color(1.0, 0.2, 0.3))
+	elif s_name == "Ultimate":
+		if caster_name.contains("viper"):
+			spawn_cryo_freeze(pos, 130.0, Color(0.3, 0.98, 1.0))
+		elif caster_name.contains("bulwark"):
+			spawn_orbital_beam(pos + Vector2(facing * 60.0, -320.0), Vector2.DOWN, 700.0, 60.0, Color(1.0, 0.6, 0.15))
+		elif caster_name.contains("pulsar"):
+			spawn_supernova(pos, 200.0, Color(0.8, 0.25, 1.0))
+		elif caster_name.contains("kage"):
+			spawn_cinematic_slash(pos, 5, Color(1.0, 0.1, 0.25), 0.45, 260.0)
 
 func _on_hit_confirmed(attacker: Node2D, victim: Node2D, hit_data: Variant) -> void:
 	if not enabled or not is_instance_valid(attacker) or not is_instance_valid(victim):
@@ -36,16 +128,31 @@ func _on_hit_confirmed(attacker: Node2D, victim: Node2D, hit_data: Variant) -> v
 	var is_blocked: bool = data_dict.get("is_blocked", false)
 	var is_energy: bool = data_dict.get("is_energy", false)
 	var atk_name: String = str(data_dict.get("name", "5L"))
+	var facing: int = int(dir_to_victim)
 
-	# 1. Munculkan percikan api las logam
+	# 1. Munculkan percikan api las logam umum
 	spawn_sparks(contact_pos, spark_angle, false)
 
-	# 2. Jika serangan tajam / slash atau energi, munculkan busur tebasan
+	# 2. Deteksi efek khusus skill saat kontak berhasil
+	if not is_blocked:
+		if atk_name.contains("Blink") or (atk_name.contains("Skill") and attacker.name.to_lower().contains("viper")):
+			spawn_cryo_freeze(contact_pos, 44.0, Color(0.2, 0.95, 1.0))
+		elif atk_name.contains("Piledriver") or (atk_name.contains("Skill") and attacker.name.to_lower().contains("bulwark")):
+			spawn_seismic_impact(victim.global_position, facing, Color(1.0, 0.55, 0.15), 80.0)
+		elif atk_name.contains("Railgun") or atk_name.contains("Supernova"):
+			spawn_supernova(contact_pos, 80.0, Color(0.8, 0.25, 1.0), 0.3)
+		elif atk_name.contains("Iaido") or atk_name.contains("Blossom"):
+			spawn_cinematic_slash(contact_pos, 2, Color(1.0, 0.15, 0.25), 0.3, 160.0)
+
+	# 3. Jika serangan tajam / slash atau energi, munculkan busur tebasan
 	if not is_blocked and (is_energy or atk_name.contains("L") or atk_name.contains("H") or atk_name.contains("Skill")):
 		var slash_col := Color(0.2, 0.95, 1.0) # Default Cyan (Apex Viper)
 		if attacker.name.to_lower().contains("bulwark") or attacker.name.to_lower().contains("p2"):
 			slash_col = Color(1.0, 0.45, 0.15) # Amber/Crimson (Titan Bulwark)
-		var facing: int = int(dir_to_victim)
+		elif attacker.name.to_lower().contains("pulsar"):
+			slash_col = Color(0.75, 0.25, 1.0) # Violet (Ray-X Pulsar)
+		elif attacker.name.to_lower().contains("kage") or attacker.name.to_lower().contains("unit_zero") or attacker.name.to_lower().contains("boss"):
+			slash_col = Color(1.0, 0.15, 0.25) # Crimson (Phantom Kage / Boss)
 		spawn_slash(contact_pos, facing, slash_col)
 
 func _on_parry_triggered(defender: Node2D, attacker: Node2D) -> void:
@@ -71,3 +178,57 @@ func spawn_slash(pos: Vector2, facing_dir: int = 1, color_tint: Color = Color.TR
 	if slash.has_method("trigger_slash"):
 		slash.trigger_slash(pos, facing_dir, color_tint)
 	return slash
+
+func spawn_cryo_freeze(pos: Vector2, burst_radius: float = 48.0, custom_color: Color = Color.TRANSPARENT) -> Node2D:
+	var cryo = VFXCryoFreezeScript.new()
+	add_child(cryo)
+	cryo.trigger_freeze(pos, burst_radius, custom_color)
+	return cryo
+
+func spawn_hex_barrier(target: Node2D = null, at_pos: Vector2 = Vector2.ZERO, duration: float = 0.5, color_tint: Color = Color.TRANSPARENT, barrier_radius: float = 52.0) -> Node2D:
+	var barrier = VFXHexBarrierScript.new()
+	add_child(barrier)
+	barrier.trigger_barrier(target, at_pos, duration, color_tint, barrier_radius)
+	return barrier
+
+func spawn_seismic_impact(pos: Vector2, facing_dir: int = 1, custom_color: Color = Color.TRANSPARENT, length: float = 90.0, duration: float = 0.45) -> Node2D:
+	var seismic = VFXSeismicImpactScript.new()
+	add_child(seismic)
+	seismic.trigger_impact(pos, facing_dir, custom_color, length, duration)
+	return seismic
+
+func spawn_orbital_beam(origin: Vector2, dir: Vector2 = Vector2.DOWN, length: float = 700.0, width: float = 48.0, custom_color: Color = Color.TRANSPARENT, duration: float = 0.45) -> Node2D:
+	var beam = VFXOrbitalBeamScript.new()
+	add_child(beam)
+	beam.trigger_beam(origin, dir, length, width, custom_color, duration)
+	return beam
+
+func spawn_disrupter_drone(pos: Vector2, duration: float = 2.0, custom_color: Color = Color.TRANSPARENT) -> Node2D:
+	var drone = VFXDisrupterDroneScript.new()
+	add_child(drone)
+	drone.trigger_drone(pos, duration, custom_color)
+	return drone
+
+func spawn_supernova(pos: Vector2, radius: float = 190.0, custom_color: Color = Color.TRANSPARENT, duration: float = 0.55) -> Node2D:
+	var nova = VFXSupernovaScript.new()
+	add_child(nova)
+	nova.trigger_supernova(pos, radius, custom_color, duration)
+	return nova
+
+func spawn_shadow_smoke(pos: Vector2, custom_color: Color = Color.TRANSPARENT, count: int = 14, duration: float = 0.38) -> Node2D:
+	var smoke = VFXShadowSmokeScript.new()
+	add_child(smoke)
+	smoke.trigger_smoke(pos, custom_color, count, duration)
+	return smoke
+
+func spawn_shuriken_storm(pos: Vector2, facing_dir: int = 1, custom_color: Color = Color.TRANSPARENT, duration: float = 0.35) -> Node2D:
+	var storm = VFXShurikenStormScript.new()
+	add_child(storm)
+	storm.trigger_shurikens(pos, facing_dir, custom_color, duration)
+	return storm
+
+func spawn_cinematic_slash(pos: Vector2, slash_count: int = 1, custom_color: Color = Color.TRANSPARENT, duration: float = 0.35, length: float = 220.0) -> Node2D:
+	var c_slash = VFXCinematicSlashScript.new()
+	add_child(c_slash)
+	c_slash.trigger_cinematic_slash(pos, slash_count, custom_color, duration, length)
+	return c_slash

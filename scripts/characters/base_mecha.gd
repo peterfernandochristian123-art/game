@@ -509,6 +509,20 @@ func request_attack(attack_data: Variant) -> void:
 			attack_state.setup_attack(attack_data)
 			state_machine.change_state(&"Attack")
 
+	# Sinyal skill_cast ke EventBus jika serangan adalah skill atau ultimate
+	var atk_name_str := ""
+	if attack_data is Resource and attack_data.has_method("to_dict"):
+		atk_name_str = str(attack_data.to_dict().get("name", ""))
+	elif attack_data is Dictionary:
+		atk_name_str = str(attack_data.get("name", ""))
+	elif attack_data != null and "name" in attack_data:
+		atk_name_str = str(attack_data.name)
+
+	if atk_name_str != "" and not atk_name_str.begins_with("5L") and not atk_name_str.begins_with("5H") and atk_name_str != "Punch" and atk_name_str != "Slam":
+		var bus = get_node_or_null("/root/EventBus")
+		if bus and bus.has_signal("skill_cast"):
+			bus.skill_cast.emit(self, StringName(atk_name_str), global_position, facing_direction)
+
 func request_attack_by_name(atk_name: StringName) -> void:
 	if atk_name in attack_resources:
 		request_attack(attack_resources[atk_name])

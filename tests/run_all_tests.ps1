@@ -54,7 +54,9 @@ $testScenes = @(
     # Epic 14: Settings Modal, In-Match Pause System & Battle Records Persistence
     "res://tests/test_settings_and_records.tscn",
     # Epic 15: Arcade Ladder & Boss Gauntlet Mode
-    "res://tests/test_arcade_ladder.tscn"
+    "res://tests/test_arcade_ladder.tscn",
+    # Skill VFX Diversity & Visual Impact Polish
+    "res://tests/test_skill_vfx.tscn"
 )
 
 Write-Host "==========================================================" -ForegroundColor Cyan
