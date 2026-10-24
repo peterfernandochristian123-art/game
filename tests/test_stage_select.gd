@@ -158,7 +158,20 @@ func _test_arena_stage_all_12_maps() -> void:
 		_check(arena.get_node_or_null("Platform") != null, "Platform fisik ada pada stage " + String(s_id))
 		_check(arena.get("floor_visual") != null, "Visual lantai bertema ada pada stage " + String(s_id))
 		var plats = arena.get("elevated_platforms")
-		_check(plats != null and plats.size() >= 2, "Tersedia platform melayang bertema (>= 2) pada stage " + String(s_id))
+		_check(plats != null and plats.size() >= 3, "Tersedia platform bertingkat (>= 3) pada stage " + String(s_id))
+		var has_center: bool = false
+		var has_p1_spawn: bool = false
+		var has_p2_spawn: bool = false
+		for p in plats:
+			if absf(p.position.x - 704.0) < 10.0:
+				has_center = true
+			if absf(p.position.x - 540.0) < 30.0:
+				has_p1_spawn = true
+			if absf(p.position.x - 868.0) < 30.0:
+				has_p2_spawn = true
+		_check(has_center == true, "Tengah arena (X=704) tidak kosong pada stage " + String(s_id))
+		_check(has_p1_spawn == true, "Area spawn karakter P1 tidak kosong pada stage " + String(s_id))
+		_check(has_p2_spawn == true, "Area spawn karakter P2 tidak kosong pada stage " + String(s_id))
 		_check(plats != null and plats[0].stage_id == s_id, "Platform melayang sesuai tema stage " + String(s_id))
 		_check(plats != null and plats[0].collision_shape.one_way_collision == true, "Platform melayang memiliki one_way_collision untuk " + String(s_id))
 		_check(arena.get_node_or_null("LeftWall") != null, "Dinding kiri ada pada stage " + String(s_id))

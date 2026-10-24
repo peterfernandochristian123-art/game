@@ -52,27 +52,134 @@ func _setup_themed_platforms() -> void:
 		floor_visual.name = "StageFloorVisual"
 		platform_body.add_child(floor_visual)
 
-	# 2. Pasang platform melayang bertingkat (elevated battle platforms) sesuai tema
+	# 2. Pasang platform bertingkat sesuai konfigurasi tema
+	# Syarat:
+	# - Tengah TIDAK BOLEH KOSONG (selalu ada platform di X=704)
+	# - Tempat munculnya karakter (P1 di X=560, P2 di X=848) TIDAK BOLEH KOSONG
+	# - Semua platform memiliki variasi posisi, dimensi, dan layout sesuai tema 12 map
 	elevated_platforms.clear()
-	var left_plat = StageThemedPlatformScript.new(stage_id, Vector2(170.0, 14.0), true)
-	left_plat.name = "ThemedPlatform_Left"
-	left_plat.position = Vector2(440.0, 204.0)
-	add_child(left_plat)
-	elevated_platforms.append(left_plat)
+	var configs := _get_platform_configs_for_stage(stage_id)
+	for i in range(configs.size()):
+		var cfg: Dictionary = configs[i]
+		var pos: Vector2 = cfg.get("pos", Vector2(CENTER_X, 196.0))
+		var size: Vector2 = cfg.get("size", Vector2(170.0, 14.0))
+		var is_left: bool = cfg.get("is_left", pos.x < CENTER_X)
+		var p_name: String = cfg.get("name", "ThemedPlatform_%d" % i)
+		var plat = StageThemedPlatformScript.new(stage_id, size, is_left)
+		plat.name = p_name
+		plat.position = pos
+		add_child(plat)
+		elevated_platforms.append(plat)
 
-	var right_plat = StageThemedPlatformScript.new(stage_id, Vector2(170.0, 14.0), false)
-	right_plat.name = "ThemedPlatform_Right"
-	right_plat.position = Vector2(968.0, 204.0)
-	add_child(right_plat)
-	elevated_platforms.append(right_plat)
-
-	# Platform ketiga (center upper platform) untuk stage bertingkat tinggi
-	if stage_id in [&"space_station", &"moon_castle", &"hell_gate", &"ruin_factory"]:
-		var center_plat = StageThemedPlatformScript.new(stage_id, Vector2(140.0, 12.0), false)
-		center_plat.name = "ThemedPlatform_Center"
-		center_plat.position = Vector2(704.0, 134.0)
-		add_child(center_plat)
-		elevated_platforms.append(center_plat)
+## Menghasilkan konfigurasi layout platform yang unik & bervariasi untuk masing-masing 12 map
+func _get_platform_configs_for_stage(s_id: StringName) -> Array[Dictionary]:
+	match s_id:
+		&"sakura_temple":
+			return [
+				{"name": "Center_ShrineAltar", "pos": Vector2(704.0, 196.0), "size": Vector2(190.0, 14.0)},
+				{"name": "P1_ToriiBeam", "pos": Vector2(540.0, 224.0), "size": Vector2(160.0, 14.0), "is_left": true},
+				{"name": "P2_ToriiBeam", "pos": Vector2(868.0, 224.0), "size": Vector2(160.0, 14.0), "is_left": false},
+				{"name": "Left_LanternLedge", "pos": Vector2(340.0, 178.0), "size": Vector2(130.0, 12.0), "is_left": true},
+				{"name": "Right_LanternLedge", "pos": Vector2(1068.0, 178.0), "size": Vector2(130.0, 12.0), "is_left": false}
+			]
+		&"neon_city":
+			return [
+				{"name": "Center_HoloMatrix", "pos": Vector2(704.0, 180.0), "size": Vector2(210.0, 14.0)},
+				{"name": "P1_HardlightRamp", "pos": Vector2(550.0, 218.0), "size": Vector2(160.0, 14.0), "is_left": true},
+				{"name": "P2_HardlightRamp", "pos": Vector2(858.0, 218.0), "size": Vector2(160.0, 14.0), "is_left": false},
+				{"name": "Left_CyberPad", "pos": Vector2(350.0, 160.0), "size": Vector2(130.0, 12.0), "is_left": true},
+				{"name": "Right_CyberPad", "pos": Vector2(1058.0, 160.0), "size": Vector2(130.0, 12.0), "is_left": false}
+			]
+		&"ruin_factory":
+			return [
+				{"name": "Center_GirderCatwalk", "pos": Vector2(704.0, 204.0), "size": Vector2(220.0, 16.0)},
+				{"name": "P1_PipeGantry", "pos": Vector2(530.0, 228.0), "size": Vector2(150.0, 14.0), "is_left": true},
+				{"name": "P2_PipeGantry", "pos": Vector2(878.0, 228.0), "size": Vector2(150.0, 14.0), "is_left": false},
+				{"name": "Upper_CraneBeam", "pos": Vector2(704.0, 136.0), "size": Vector2(160.0, 14.0)},
+				{"name": "Left_ScrapGantry", "pos": Vector2(330.0, 172.0), "size": Vector2(130.0, 12.0), "is_left": true},
+				{"name": "Right_ScrapGantry", "pos": Vector2(1078.0, 172.0), "size": Vector2(130.0, 12.0), "is_left": false}
+			]
+		&"forest_shrine":
+			return [
+				{"name": "Center_SacredCanopy", "pos": Vector2(704.0, 192.0), "size": Vector2(190.0, 14.0)},
+				{"name": "P1_CedarBranch", "pos": Vector2(540.0, 220.0), "size": Vector2(160.0, 14.0), "is_left": true},
+				{"name": "P2_CedarBranch", "pos": Vector2(868.0, 220.0), "size": Vector2(160.0, 14.0), "is_left": false},
+				{"name": "Left_MossBoulder", "pos": Vector2(360.0, 184.0), "size": Vector2(130.0, 12.0), "is_left": true},
+				{"name": "Right_MossBoulder", "pos": Vector2(1048.0, 184.0), "size": Vector2(130.0, 12.0), "is_left": false}
+			]
+		&"rooftop":
+			return [
+				{"name": "Center_VentBridge", "pos": Vector2(704.0, 188.0), "size": Vector2(210.0, 14.0)},
+				{"name": "P1_HelipadCatwalk", "pos": Vector2(530.0, 222.0), "size": Vector2(150.0, 14.0), "is_left": true},
+				{"name": "P2_HelipadCatwalk", "pos": Vector2(878.0, 222.0), "size": Vector2(150.0, 14.0), "is_left": false},
+				{"name": "Left_TowerPlatform", "pos": Vector2(350.0, 168.0), "size": Vector2(130.0, 12.0), "is_left": true},
+				{"name": "Right_TankPlatform", "pos": Vector2(1058.0, 168.0), "size": Vector2(130.0, 12.0), "is_left": false}
+			]
+		&"snow_field":
+			return [
+				{"name": "Center_GlacierLedge", "pos": Vector2(704.0, 194.0), "size": Vector2(190.0, 14.0)},
+				{"name": "P1_SnowTerrace", "pos": Vector2(530.0, 224.0), "size": Vector2(160.0, 14.0), "is_left": true},
+				{"name": "P2_SnowTerrace", "pos": Vector2(878.0, 224.0), "size": Vector2(160.0, 14.0), "is_left": false},
+				{"name": "Left_IceSpire", "pos": Vector2(340.0, 172.0), "size": Vector2(130.0, 12.0), "is_left": true},
+				{"name": "Right_IceSpire", "pos": Vector2(1068.0, 172.0), "size": Vector2(130.0, 12.0), "is_left": false}
+			]
+		&"canyon":
+			return [
+				{"name": "Center_MesaOutcrop", "pos": Vector2(704.0, 198.0), "size": Vector2(210.0, 14.0)},
+				{"name": "P1_RedSandstone", "pos": Vector2(540.0, 226.0), "size": Vector2(150.0, 14.0), "is_left": true},
+				{"name": "P2_RedSandstone", "pos": Vector2(868.0, 226.0), "size": Vector2(150.0, 14.0), "is_left": false},
+				{"name": "Left_DesertRidge", "pos": Vector2(360.0, 174.0), "size": Vector2(140.0, 14.0), "is_left": true},
+				{"name": "Right_DesertRidge", "pos": Vector2(1048.0, 174.0), "size": Vector2(140.0, 14.0), "is_left": false}
+			]
+		&"moon_castle":
+			return [
+				{"name": "Center_CastleBalcony", "pos": Vector2(704.0, 186.0), "size": Vector2(200.0, 14.0)},
+				{"name": "P1_GothicParapet", "pos": Vector2(530.0, 220.0), "size": Vector2(150.0, 14.0), "is_left": true},
+				{"name": "P2_GothicParapet", "pos": Vector2(878.0, 220.0), "size": Vector2(150.0, 14.0), "is_left": false},
+				{"name": "Upper_Observatory", "pos": Vector2(704.0, 128.0), "size": Vector2(140.0, 12.0)},
+				{"name": "Left_TurretLedge", "pos": Vector2(340.0, 168.0), "size": Vector2(120.0, 12.0), "is_left": true},
+				{"name": "Right_TurretLedge", "pos": Vector2(1068.0, 168.0), "size": Vector2(120.0, 12.0), "is_left": false}
+			]
+		&"ancient_ruins":
+			return [
+				{"name": "Center_TempleAltar", "pos": Vector2(704.0, 190.0), "size": Vector2(200.0, 14.0)},
+				{"name": "P1_PillarCapital", "pos": Vector2(540.0, 222.0), "size": Vector2(150.0, 14.0), "is_left": true},
+				{"name": "P2_PillarCapital", "pos": Vector2(868.0, 222.0), "size": Vector2(150.0, 14.0), "is_left": false},
+				{"name": "Left_AncientMonolith", "pos": Vector2(350.0, 166.0), "size": Vector2(130.0, 12.0), "is_left": true},
+				{"name": "Right_AncientMonolith", "pos": Vector2(1058.0, 166.0), "size": Vector2(130.0, 12.0), "is_left": false}
+			]
+		&"space_station":
+			return [
+				{"name": "Center_CommandRepulsor", "pos": Vector2(704.0, 174.0), "size": Vector2(220.0, 14.0)},
+				{"name": "P1_DockingDeck", "pos": Vector2(530.0, 214.0), "size": Vector2(160.0, 14.0), "is_left": true},
+				{"name": "P2_DockingDeck", "pos": Vector2(878.0, 214.0), "size": Vector2(160.0, 14.0), "is_left": false},
+				{"name": "Upper_FusionCore", "pos": Vector2(704.0, 120.0), "size": Vector2(150.0, 12.0)},
+				{"name": "Left_TelemetryRelay", "pos": Vector2(330.0, 168.0), "size": Vector2(120.0, 12.0), "is_left": true},
+				{"name": "Right_TelemetryRelay", "pos": Vector2(1078.0, 168.0), "size": Vector2(120.0, 12.0), "is_left": false}
+			]
+		&"traditional_town":
+			return [
+				{"name": "Center_BridgePavilion", "pos": Vector2(704.0, 196.0), "size": Vector2(210.0, 14.0)},
+				{"name": "P1_VerandaDeck", "pos": Vector2(530.0, 224.0), "size": Vector2(150.0, 14.0), "is_left": true},
+				{"name": "P2_VerandaDeck", "pos": Vector2(878.0, 224.0), "size": Vector2(150.0, 14.0), "is_left": false},
+				{"name": "Left_EavesPlatform", "pos": Vector2(350.0, 176.0), "size": Vector2(130.0, 12.0), "is_left": true},
+				{"name": "Right_EavesPlatform", "pos": Vector2(1058.0, 176.0), "size": Vector2(130.0, 12.0), "is_left": false}
+			]
+		&"hell_gate":
+			return [
+				{"name": "Center_MagmaCrag", "pos": Vector2(704.0, 192.0), "size": Vector2(210.0, 14.0)},
+				{"name": "P1_VolcanicRock", "pos": Vector2(530.0, 224.0), "size": Vector2(160.0, 14.0), "is_left": true},
+				{"name": "P2_VolcanicRock", "pos": Vector2(878.0, 224.0), "size": Vector2(160.0, 14.0), "is_left": false},
+				{"name": "Upper_HellAltar", "pos": Vector2(704.0, 130.0), "size": Vector2(150.0, 12.0)},
+				{"name": "Left_ObsidianSpire", "pos": Vector2(340.0, 170.0), "size": Vector2(130.0, 12.0), "is_left": true},
+				{"name": "Right_ObsidianSpire", "pos": Vector2(1068.0, 170.0), "size": Vector2(130.0, 12.0), "is_left": false}
+			]
+		_:
+			return [
+				{"name": "Center_Platform", "pos": Vector2(704.0, 196.0), "size": Vector2(180.0, 14.0)},
+				{"name": "P1_Platform", "pos": Vector2(540.0, 220.0), "size": Vector2(150.0, 14.0), "is_left": true},
+				{"name": "P2_Platform", "pos": Vector2(868.0, 220.0), "size": Vector2(150.0, 14.0), "is_left": false}
+			]
 
 func get_elevated_platforms() -> Array[StaticBody2D]:
 	return elevated_platforms
