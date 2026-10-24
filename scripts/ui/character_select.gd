@@ -217,7 +217,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		MenuAudio.play_nav_beep(self)
 		_update_p2_display()
 
-	# Ganti Arena: Tab / T
+	# Buka Menu Map Selector (12 Maps): M
+	if event is InputEventKey and event.pressed and event.keycode == KEY_M:
+		_open_stage_selector()
+
+	# Ganti Arena / Map: Tab / T
 	if event is InputEventKey and event.pressed and (event.keycode == KEY_TAB or event.keycode == KEY_T):
 		toggle_stage()
 
@@ -229,6 +233,13 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel") or (event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE):
 		_cancel_or_return()
 
+func _open_stage_selector() -> void:
+	is_transitioning = true
+	MenuAudio.play_confirm_chime(self)
+	_fade_out_and_execute(func():
+		get_tree().change_scene_to_file(STAGE_SELECT_SCENE)
+	)
+
 func toggle_stage() -> void:
 	MatchConfigScript.cycle_next_arena()
 	MenuAudio.play_nav_beep(self)
@@ -237,19 +248,38 @@ func toggle_stage() -> void:
 func _update_stage_ui() -> void:
 	if not stage_label:
 		return
-	match MatchConfigScript.selected_arena:
-		&"reactor":
-			stage_label.text = "[TAB] ARENA: UNDERGROUND REACTOR (HAZARD ACTIVE)"
-			stage_label.modulate = Color(1.0, 0.45, 0.1, 1.0)
-		&"orbital":
-			stage_label.text = "[TAB] ARENA: ORBITAL SPACE STATION (SOLAR ARRAY)"
-			stage_label.modulate = Color(0.3, 0.9, 1.0, 1.0)
-		&"highway":
-			stage_label.text = "[TAB] ARENA: NEO-SHIBUYA HIGHWAY (RAINY OVERPASS)"
-			stage_label.modulate = Color(1.0, 0.25, 0.65, 1.0)
-		_:
-			stage_label.text = "[TAB] ARENA: ZERO-G SKYSCRAPER (OPEN CLIFF)"
-			stage_label.modulate = Color(0.2, 0.9, 1.0, 1.0)
+	if not stage_label.gui_input.is_connected(_on_stage_label_input):
+		stage_label.mouse_filter = Control.MOUSE_FILTER_STOP
+		stage_label.gui_input.connect(_on_stage_label_input)
+
+	if MatchConfigScript.selected_arena == &"stage":
+		var cur_id = MatchConfigScript.selected_stage
+		var stage_data = StageManager.get_stage(cur_id)
+		var s_idx = StageManager.index_of(cur_id) + 1
+		stage_label.text = "[M / CLICK] MAP: %s (%d/12 - %s) | [TAB] NEXT" % [
+			stage_data.get("name", "STAGE"),
+			s_idx,
+			stage_data.get("tag", "MAP")
+		]
+		stage_label.modulate = stage_data.get("accent", Color(0.2, 0.95, 1.0))
+	else:
+		match MatchConfigScript.selected_arena:
+			&"reactor":
+				stage_label.text = "[TAB] ARENA: UNDERGROUND REACTOR | [M] BROWSE 12 MAPS"
+				stage_label.modulate = Color(1.0, 0.45, 0.1, 1.0)
+			&"orbital":
+				stage_label.text = "[TAB] ARENA: ORBITAL SPACE STATION | [M] BROWSE 12 MAPS"
+				stage_label.modulate = Color(0.3, 0.9, 1.0, 1.0)
+			&"highway":
+				stage_label.text = "[TAB] ARENA: NEO-SHIBUYA HIGHWAY | [M] BROWSE 12 MAPS"
+				stage_label.modulate = Color(1.0, 0.25, 0.65, 1.0)
+			_:
+				stage_label.text = "[TAB] ARENA: ZERO-G SKYSCRAPER | [M] BROWSE 12 MAPS"
+				stage_label.modulate = Color(0.2, 0.9, 1.0, 1.0)
+
+func _on_stage_label_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		_open_stage_selector()
 
 func _change_p1_index(delta: int) -> void:
 	var total = FighterFactoryScript.get_roster_count()

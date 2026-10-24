@@ -54,9 +54,10 @@ horizontal_alignment = 1
 
 [node name="StageLabel" type="Label" parent="TopBar"]
 layout_mode = 2
+mouse_filter = 0
 theme_override_colors/font_color = Color(1, 0.75, 0.2, 1)
 theme_override_font_sizes/font_size = 9
-text = "[TAB] ARENA: ZERO-G SKYSCRAPER"
+text = "[M / CLICK] MAP SELECTOR (12 MAPS) | [TAB] NEXT"
 horizontal_alignment = 1
 
 [node name="RosterArea" type="CenterContainer" parent="."]

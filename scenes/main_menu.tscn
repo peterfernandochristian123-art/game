@@ -114,6 +114,12 @@ layout_mode = 2
 theme_override_constants/separation = 3
 alignment = 1
 
+[node name="BtnArcade" type="Button" parent="MenuContainer/OptionsList"]
+layout_mode = 2
+focus_mode = 0
+text = "   ARCADE LADDER   "
+flat = true
+
 [node name="BtnVersusAI" type="Button" parent="MenuContainer/OptionsList"]
 layout_mode = 2
 focus_mode = 0
@@ -130,6 +136,12 @@ flat = true
 layout_mode = 2
 focus_mode = 0
 text = "   LOCAL 2P VERSUS   "
+flat = true
+
+[node name="BtnStageSelect" type="Button" parent="MenuContainer/OptionsList"]
+layout_mode = 2
+focus_mode = 0
+text = "   STAGE SELECT (12 MAPS)   "
 flat = true
 
 [node name="BtnSettings" type="Button" parent="MenuContainer/OptionsList"]

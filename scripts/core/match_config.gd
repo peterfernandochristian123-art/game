@@ -46,6 +46,14 @@ static func set_stage(stage_id: StringName) -> bool:
 	selected_arena = &"stage"
 	return true
 
+static func cycle_next_stage() -> StringName:
+	var total := StageManager.get_count()
+	var cur_idx := StageManager.index_of(selected_stage)
+	var next_idx := (cur_idx + 1) % total
+	selected_stage = StageManager.get_stages()[next_idx]["id"]
+	selected_arena = &"stage"
+	return selected_stage
+
 static func cycle_next_arena() -> StringName:
 	var idx = AVAILABLE_ARENAS.find(selected_arena)
 	if idx == -1:
