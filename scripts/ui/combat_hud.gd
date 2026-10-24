@@ -45,14 +45,17 @@ const COLOR_ULTIMATE_MAX := Color(0.3, 1.0, 0.9, 1.0)       # Cyan Flash
 
 # Skill & Command Keybind Dock Nodes
 var skill_dock: PanelContainer = null
+var skill1_card: Control = null
 var skill1_badge: Label = null
 var skill1_name_label: Label = null
+var skill2_card: Control = null
 var skill2_badge: Label = null
 var skill2_name_label: Label = null
 var ultimate_badge: Label = null
 var ultimate_name_label: Label = null
 var ultimate_card: Control = null
 var current_p1_ult_name: String = "ABSOLUTE ZERO"
+var _hud_time: float = 0.0
 
 var p1_fighter: Node2D = null
 var p2_fighter: Node2D = null
@@ -63,6 +66,34 @@ func _ready() -> void:
 	update_round_wins(0, 0)
 	update_timer(90.0)
 	_setup_skill_command_dock()
+	if is_instance_valid(EventBus) and EventBus.has_signal("skill_cast"):
+		EventBus.skill_cast.connect(_on_hud_skill_cast)
+
+func _process(delta: float) -> void:
+	_hud_time += delta
+	# Pulsing glow animation untuk Ultimate Card saat 100% siap
+	if ultimate_card and p1_ultimate_bar and p1_ultimate_bar.value >= p1_ultimate_bar.max_value:
+		var pulse: float = 0.85 + 0.35 * sin(_hud_time * 6.0)
+		ultimate_card.modulate = Color(1.0 + pulse * 0.3, 1.0 + pulse * 0.3, 0.9 + pulse * 0.1, 1.0)
+
+func _on_hud_skill_cast(caster: Node2D, skill_name: StringName, _pos: Vector2, _facing: int) -> void:
+	if caster != p1_fighter and (not is_instance_valid(p1_fighter) or caster.name != p1_fighter.name):
+		return
+	var s_name := String(skill_name).to_lower()
+	if s_name.contains("blink") or s_name.contains("piledriver") or s_name.contains("railgun") or s_name.contains("stance") or s_name.contains("shockwave") or s_name == "skill1":
+		_flash_card(skill1_card)
+	elif s_name.contains("deflection") or s_name.contains("shield") or s_name.contains("drone") or s_name.contains("iaido") or s_name.contains("shuriken") or s_name.contains("cataclysm") or s_name == "skill2":
+		_flash_card(skill2_card)
+	elif s_name.contains("ultimate") or s_name.contains("protocol") or s_name.contains("cannon") or s_name.contains("supernova") or s_name.contains("blossom") or s_name.contains("overload"):
+		_flash_card(ultimate_card)
+
+func _flash_card(card: Control) -> void:
+	if not card:
+		return
+	var tween := create_tween()
+	card.modulate = Color(1.8, 1.8, 1.8, 1.0)
+	tween.tween_property(card, "modulate", Color.WHITE, 0.35)
+
 
 func _setup_skill_command_dock() -> void:
 	if skill_dock != null:
@@ -108,12 +139,14 @@ func _setup_skill_command_dock() -> void:
 
 	# 1. Skill 1 Card [U]
 	var s1_box := _create_skill_card("[ U ]", "SKILL 1", "BLINK SLASH", Color(0.2, 0.95, 1.0))
+	skill1_card = s1_box
 	skill1_badge = s1_box.get_node("HBox/Badge") as Label
 	skill1_name_label = s1_box.get_node("HBox/VBox/NameLabel") as Label
 	hbox.add_child(s1_box)
 
 	# 2. Skill 2 Card [I]
 	var s2_box := _create_skill_card("[ I ]", "SKILL 2", "DEFLECTION MATRIX", Color(0.2, 0.95, 1.0))
+	skill2_card = s2_box
 	skill2_badge = s2_box.get_node("HBox/Badge") as Label
 	skill2_name_label = s2_box.get_node("HBox/VBox/NameLabel") as Label
 	hbox.add_child(s2_box)

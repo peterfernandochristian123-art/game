@@ -13,6 +13,11 @@ const VFXCinematicSlashScript = preload("res://scripts/visual/vfx_cinematic_slas
 const VFXHitSparkScript = preload("res://scripts/visual/vfx_hitspark.gd")
 const VFXGuardSparkScript = preload("res://scripts/visual/vfx_guard_spark.gd")
 const VFXCyberDebrisScript = preload("res://scripts/visual/vfx_cyber_debris.gd")
+const VFXSuperFlashScript = preload("res://scripts/visual/vfx_super_flash.gd")
+const VFXFloatingTextScript = preload("res://scripts/visual/vfx_floating_text.gd")
+const VFXGroundDecalScript = preload("res://scripts/visual/vfx_ground_decal.gd")
+const VFXGhostTrailScript = preload("res://scripts/visual/vfx_ghost_trail.gd")
+const CombatCameraScript = preload("res://scripts/visual/combat_camera.gd")
 const ApexViperScript = preload("res://scripts/characters/apex_viper.gd")
 const TitanBulwarkScript = preload("res://scripts/characters/titan_bulwark.gd")
 const RayPulsarScript = preload("res://scripts/characters/ray_pulsar.gd")
@@ -50,7 +55,8 @@ func _ready() -> void:
 		_test_vfx_manager_hit_impact_effects,
 		_test_character_skill_cast_integration,
 		_test_vfx_showcase_scene,
-		_test_mecha_pixel_sprite_distinct_attack_techniques
+		_test_mecha_pixel_sprite_distinct_attack_techniques,
+		_test_cinematic_juice_systems
 	]
 
 	var passed: int = 0
@@ -348,3 +354,57 @@ func _test_mecha_pixel_sprite_distinct_attack_techniques() -> void:
 			_check(spr.attack_type == atk, "Sprite %s sukses mengonfigurasi teknik menyerang '%s'." % [arch, atk])
 
 	spr.queue_free()
+
+func _test_cinematic_juice_systems() -> void:
+	# 1. VFXSuperFlash
+	var flash := VFXSuperFlashScript.new()
+	add_child(flash)
+	flash.trigger_super_flash(Vector2(400, 300), Color.CYAN, 0.42)
+	_check(flash.is_active == true, "VFXSuperFlash aktif dengan screen dimming & lens flare.")
+	flash.notification(CanvasItem.NOTIFICATION_DRAW)
+	flash.queue_free()
+
+	# 2. VFXFloatingText
+	var ftext := VFXFloatingTextScript.new()
+	add_child(ftext)
+	ftext.trigger_text(Vector2(400, 300), "120 CRITICAL!", Color.RED, true, 0.65)
+	_check(ftext.is_active == true and ftext.is_critical == true, "VFXFloatingText aktif untuk hit kritis pop-up.")
+	ftext.notification(CanvasItem.NOTIFICATION_DRAW)
+	ftext.queue_free()
+
+	# 3. VFXGroundDecal
+	var decal := VFXGroundDecalScript.new()
+	add_child(decal)
+	decal.trigger_decal(Vector2(400, 480), &"cracks", Color.ORANGE, 70.0, 2.0)
+	_check(decal.is_active == true and decal.decal_type == &"cracks", "VFXGroundDecal aktif untuk retakan tanah.")
+	decal.notification(CanvasItem.NOTIFICATION_DRAW)
+	decal.queue_free()
+
+	# 4. CombatCamera Zoom Punch & Super Zoom
+	var cam := CombatCameraScript.new()
+	add_child(cam)
+	cam.request_zoom_punch(1.08, 8)
+	_check(cam.current_zoom_factor >= 1.08 and cam.zoom_frames_left == 8, "CombatCamera zoom punch terkonfigurasi.")
+	cam.request_super_zoom(Vector2(500, 300), 1.25, 24)
+	_check(cam.super_zoom_frames_left == 24 and cam.current_zoom_factor >= 1.25, "CombatCamera super freeze zoom terkonfigurasi.")
+	cam.queue_free()
+
+	# 5. VFXGhostTrail 4 Archetypes
+	var archs: Array[StringName] = [&"viper", &"bulwark", &"pulsar", &"kage"]
+	for a in archs:
+		var ghost := VFXGhostTrailScript.new()
+		add_child(ghost)
+		ghost.setup(Vector2(400, 300), 1, a)
+		ghost.notification(CanvasItem.NOTIFICATION_DRAW)
+		_check(ghost.archetype == a, "VFXGhostTrail berhasil membuat siluet arketipe '%s'." % a)
+		ghost.queue_free()
+
+	# 6. VFXManager Spawn Helpers
+	var mgr := VFXManagerScript.new()
+	add_child(mgr)
+	var spawned_flash = mgr.spawn_super_flash(Vector2(100, 100))
+	var spawned_text = mgr.spawn_floating_text(Vector2(100, 100), "75")
+	var spawned_decal = mgr.spawn_ground_decal(Vector2(100, 100))
+	var spawned_ghost = mgr.spawn_ghost_trail(Vector2(100, 100))
+	_check(spawned_flash != null and spawned_text != null and spawned_decal != null and spawned_ghost != null, "VFXManager berhasil memunculkan seluruh 4 node efek juice baru.")
+	mgr.queue_free()

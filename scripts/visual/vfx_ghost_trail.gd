@@ -59,6 +59,10 @@ func _draw() -> void:
 	# Menggambar siluet mecha 32-bit pixel art transparan
 	if archetype == &"bulwark":
 		_draw_bulwark_silhouette()
+	elif archetype == &"pulsar":
+		_draw_pulsar_silhouette()
+	elif archetype == &"kage":
+		_draw_kage_silhouette()
 	else:
 		_draw_viper_silhouette()
 
@@ -86,3 +90,31 @@ func _draw_bulwark_silhouette() -> void:
 	draw_rect(Rect2(2, 6, 7, 13), trail_color)
 	# Thruster flare bayangan
 	draw_rect(Rect2(-14, -5, 4, 7), Color(trail_color.r, trail_color.g, trail_color.b, trail_color.a * 0.7))
+
+func _draw_pulsar_silhouette() -> void:
+	# Bodi Ramping Foton Monk
+	draw_rect(Rect2(-7, -11, 14, 15), trail_color)
+	# Kepala & Halo
+	draw_rect(Rect2(-4, -18, 8, 7), trail_color)
+	draw_arc(Vector2(0, -22), 6.0, 0.0, TAU, 12, Color(trail_color.r, trail_color.g, trail_color.b, trail_color.a * 0.8), 1.5)
+	# Kaki & Floating Robe Trim
+	draw_rect(Rect2(-6, 4, 5, 14), trail_color)
+	draw_rect(Rect2(1, 4, 5, 14), trail_color)
+	# Photon Mantle Fins
+	draw_rect(Rect2(-11, -8, 3, 10), Color(trail_color.r, trail_color.g, trail_color.b, trail_color.a * 0.6))
+	draw_rect(Rect2(8, -8, 3, 10), Color(trail_color.r, trail_color.g, trail_color.b, trail_color.a * 0.6))
+
+func _draw_kage_silhouette() -> void:
+	# Bodi Gesit Ninja
+	draw_rect(Rect2(-6, -10, 12, 14), trail_color)
+	# Kepala & Masker
+	draw_rect(Rect2(-4, -17, 8, 7), trail_color)
+	# Scarf / Selendang Ninja melambai ke belakang
+	draw_line(Vector2(-4, -13), Vector2(-14, -9), Color(trail_color.r, trail_color.g, trail_color.b, trail_color.a * 0.85), 2.5)
+	draw_line(Vector2(-14, -9), Vector2(-20, -4), Color(trail_color.r, trail_color.g, trail_color.b, trail_color.a * 0.5), 1.8)
+	# Kaki Ninja
+	draw_rect(Rect2(-5, 4, 4, 14), trail_color)
+	draw_rect(Rect2(1, 4, 4, 14), trail_color)
+	# Siluet Katana di punggung
+	draw_line(Vector2(-6, -15), Vector2(-12, 2), Color(trail_color.r, trail_color.g, trail_color.b, trail_color.a * 0.9), 1.5)
+

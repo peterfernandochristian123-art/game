@@ -21,6 +21,10 @@ const VFXCinematicSlashScript = preload("res://scripts/visual/vfx_cinematic_slas
 const VFXHitSparkScript = preload("res://scripts/visual/vfx_hitspark.gd")
 const VFXGuardSparkScript = preload("res://scripts/visual/vfx_guard_spark.gd")
 const VFXCyberDebrisScript = preload("res://scripts/visual/vfx_cyber_debris.gd")
+const VFXSuperFlashScript = preload("res://scripts/visual/vfx_super_flash.gd")
+const VFXFloatingTextScript = preload("res://scripts/visual/vfx_floating_text.gd")
+const VFXGroundDecalScript = preload("res://scripts/visual/vfx_ground_decal.gd")
+const VFXGhostTrailScript = preload("res://scripts/visual/vfx_ghost_trail.gd")
 
 @export var enabled: bool = true
 
@@ -38,49 +42,78 @@ func _on_skill_cast(caster: Node2D, skill_name: StringName, pos: Vector2, facing
 
 	var s_name := String(skill_name)
 	var caster_name := caster.name.to_lower()
+	var is_ult: bool = (s_name == "Ultimate" or s_name.contains("Protocol") or s_name.contains("Cannon") or s_name.contains("Supernova") or s_name.contains("Blossom") or s_name.contains("Overload"))
+
+	# Tentukan warna aksen caster
+	var caster_col := Color(0.2, 0.95, 1.0)
+	if caster_name.contains("bulwark") or caster_name.contains("titan"):
+		caster_col = Color(1.0, 0.55, 0.15)
+	elif caster_name.contains("pulsar"):
+		caster_col = Color(0.75, 0.25, 1.0)
+	elif caster_name.contains("kage") or caster_name.contains("boss") or caster_name.contains("unit_zero"):
+		caster_col = Color(1.0, 0.15, 0.25)
+
+	# 0. Efek Sinematik Super Flash pada Ultimate
+	if is_ult:
+		spawn_super_flash(pos, caster_col, 0.42)
+		if is_instance_valid(EventBus) and EventBus.has_signal("hitstop_requested"):
+			EventBus.hitstop_requested.emit(14)
 
 	# 1. Viper Skills
 	if s_name.contains("Blink") or s_name == "BlinkSlash":
 		spawn_slash(pos, facing, Color(0.2, 0.95, 1.0))
 		spawn_cryo_freeze(pos, 38.0, Color(0.2, 0.95, 1.0))
+		spawn_ghost_trail(pos, facing, &"viper", Color(0.2, 0.95, 1.0))
+		spawn_ground_decal(pos, &"frost", Color(0.2, 0.95, 1.0), 65.0)
 	elif s_name.contains("Deflection") or s_name == "DeflectionMatrix":
 		spawn_hex_barrier(caster, pos, 0.5, Color(0.2, 0.95, 1.0), 54.0)
 	elif s_name.contains("AbsoluteZero") or s_name.contains("Protocol"):
 		spawn_cryo_freeze(pos, 130.0, Color(0.3, 0.98, 1.0))
+		spawn_ground_decal(pos, &"frost", Color(0.3, 0.98, 1.0), 120.0, 2.8)
 
 	# 2. Bulwark Skills
 	elif s_name.contains("Piledriver") or s_name.contains("Hydraulic"):
 		spawn_seismic_impact(pos + Vector2(facing * 35.0, 10.0), facing, Color(1.0, 0.55, 0.15), 110.0)
+		spawn_ground_decal(pos + Vector2(facing * 35.0, 10.0), &"cracks", Color(1.0, 0.55, 0.15), 90.0)
 	elif s_name.contains("RiotShield") or s_name.contains("Shield"):
 		spawn_hex_barrier(caster, pos, 0.75, Color(1.0, 0.65, 0.2), 60.0)
 	elif s_name.contains("Orbital") or s_name.contains("SiegeCannon"):
 		spawn_orbital_beam(pos + Vector2(facing * 60.0, -320.0), Vector2.DOWN, 700.0, 60.0, Color(1.0, 0.6, 0.15))
+		spawn_ground_decal(pos + Vector2(facing * 60.0, 10.0), &"cracks", Color(1.0, 0.6, 0.15), 110.0, 2.5)
 
 	# 3. Pulsar Skills
 	elif s_name.contains("Railgun") or s_name.contains("Photon"):
 		spawn_orbital_beam(pos, Vector2(facing, 0.0), 750.0, 36.0, Color(0.75, 0.25, 1.0))
+		spawn_ground_decal(pos + Vector2(facing * 60.0, 0.0), &"scorch", Color(0.75, 0.25, 1.0), 90.0)
 	elif s_name.contains("Drone") or s_name.contains("Disrupter"):
 		spawn_disrupter_drone(pos + Vector2(facing * 100.0, -40.0), 2.0, Color(0.7, 0.3, 1.0))
 	elif s_name.contains("Supernova") or s_name.contains("Horizon"):
 		spawn_supernova(pos, 200.0, Color(0.8, 0.25, 1.0))
+		spawn_ground_decal(pos, &"scorch", Color(0.8, 0.25, 1.0), 130.0, 2.5)
 
 	# 4. Kage Skills
 	elif s_name.contains("Stance") or s_name == "StanceShift":
 		spawn_shadow_smoke(pos, Color(0.95, 0.15, 0.25), 16, 0.4)
+		spawn_ghost_trail(pos, facing, &"kage", Color(1.0, 0.15, 0.25))
 	elif s_name.contains("Iaido") or s_name == "IaidoCrescent":
 		spawn_cinematic_slash(pos, 1, Color(1.0, 0.15, 0.25), 0.35, 200.0)
+		spawn_ground_decal(pos, &"slash", Color(1.0, 0.15, 0.25), 80.0)
 	elif s_name.contains("Shuriken") or s_name == "ShurikenStorm":
 		spawn_shuriken_storm(pos, facing, Color(1.0, 0.2, 0.3))
 	elif s_name.contains("Blossom") or s_name == "ShadowBlossom":
 		spawn_cinematic_slash(pos, 5, Color(1.0, 0.1, 0.25), 0.45, 260.0)
+		spawn_ground_decal(pos, &"slash", Color(1.0, 0.1, 0.25), 120.0, 2.5)
 
 	# 5. Unit-0 Boss Skills
 	elif s_name.contains("Cataclysm"):
 		spawn_cinematic_slash(pos, 3, Color(1.2, 0.1, 0.3), 0.4, 250.0)
+		spawn_ground_decal(pos, &"slash", Color(1.2, 0.1, 0.3), 110.0)
 	elif s_name.contains("Shockwave"):
 		spawn_seismic_impact(pos, facing, Color(0.9, 0.1, 0.3), 120.0)
+		spawn_ground_decal(pos, &"cracks", Color(0.9, 0.1, 0.3), 100.0)
 	elif s_name.contains("Overload") or s_name.contains("Zero"):
 		spawn_supernova(pos, 220.0, Color(1.1, 0.1, 0.3))
+		spawn_ground_decal(pos, &"scorch", Color(1.1, 0.1, 0.3), 130.0)
 
 	# Fallback untuk Skill1 / Skill2 umum
 	elif s_name == "Skill1":
@@ -149,6 +182,7 @@ func _on_hit_confirmed(attacker: Node2D, victim: Node2D, hit_data: Variant) -> v
 		# Munculkan riak guard spark matriks heksagonal pelindung
 		spawn_guard_spark(contact_pos, -facing, Color(0.2, 0.85, 1.0))
 		spawn_sparks(contact_pos, spark_angle, false)
+		spawn_floating_text(contact_pos, "GUARD", Color(0.35, 0.85, 1.0), false)
 		return
 
 	# 2. Jika Serangan MASUK BERSIH / HIT CONFIRMED:
@@ -169,6 +203,14 @@ func _on_hit_confirmed(attacker: Node2D, victim: Node2D, hit_data: Variant) -> v
 	# Munculkan Hitspark Bintang Geometris Fighting Game (✦)
 	spawn_hitspark(contact_pos, hit_level, char_col, Vector2(facing, 0.0))
 
+	# Munculkan Angka Kerusakan & Status Pop-up Mengambang (Floating Damage Numbers)
+	if is_counter:
+		spawn_floating_text(contact_pos, "%d COUNTER!" % int(dmg), Color(1.0, 0.2, 0.15), true)
+	elif hit_level >= 2:
+		spawn_floating_text(contact_pos, "%d CRITICAL!" % int(dmg), Color(1.0, 0.85, 0.2), true)
+	else:
+		spawn_floating_text(contact_pos, "%d" % int(dmg), Color(1.0, 0.95, 0.4), false)
+
 	# Munculkan serpihan lempeng baja mecha (Cyber Debris) jika pukulan medium/heavy
 	if hit_level >= 1:
 		var shard_count := 6 if hit_level == 1 else (10 if hit_level == 2 else 14)
@@ -180,12 +222,16 @@ func _on_hit_confirmed(attacker: Node2D, victim: Node2D, hit_data: Variant) -> v
 	# 3. Deteksi efek khusus skill saat kontak berhasil
 	if atk_name.contains("Blink") or (atk_name.contains("Skill") and atk_owner.contains("viper")):
 		spawn_cryo_freeze(contact_pos, 44.0, Color(0.2, 0.95, 1.0))
+		spawn_ground_decal(contact_pos, &"frost", Color(0.2, 0.95, 1.0), 60.0)
 	elif atk_name.contains("Piledriver") or (atk_name.contains("Skill") and atk_owner.contains("bulwark")):
 		spawn_seismic_impact(victim.global_position, facing, Color(1.0, 0.55, 0.15), 80.0)
+		spawn_ground_decal(victim.global_position, &"cracks", Color(1.0, 0.55, 0.15), 85.0)
 	elif atk_name.contains("Railgun") or atk_name.contains("Supernova"):
 		spawn_supernova(contact_pos, 80.0, Color(0.8, 0.25, 1.0), 0.3)
+		spawn_ground_decal(contact_pos, &"scorch", Color(0.75, 0.25, 1.0), 75.0)
 	elif atk_name.contains("Iaido") or atk_name.contains("Blossom"):
 		spawn_cinematic_slash(contact_pos, 2, Color(1.0, 0.15, 0.25), 0.3, 160.0)
+		spawn_ground_decal(contact_pos, &"slash", Color(1.0, 0.15, 0.25), 80.0)
 
 	# 4. Busur tebasan energi bergradasi
 	if is_energy or atk_name.contains("L") or atk_name.contains("M") or atk_name.contains("H") or atk_name.contains("Skill"):
@@ -202,6 +248,7 @@ func _on_parry_triggered(defender: Node2D, attacker: Node2D) -> void:
 	spawn_hitspark(contact_pos, 3, Color(1.0, 0.85, 0.2), Vector2(0, -1.0))
 	spawn_guard_spark(contact_pos, 1, Color(1.0, 0.85, 0.2))
 	spawn_sparks(contact_pos, 0.0, true)
+	spawn_floating_text(contact_pos, "★ PARRY! ★", Color(1.0, 0.9, 0.2), true)
 
 func spawn_hitspark(pos: Vector2, level: int = 1, custom_color: Color = Color.TRANSPARENT, dir: Vector2 = Vector2.RIGHT) -> Node2D:
 	var spark = VFXHitSparkScript.new()
@@ -288,3 +335,27 @@ func spawn_cinematic_slash(pos: Vector2, slash_count: int = 1, custom_color: Col
 	add_child(c_slash)
 	c_slash.trigger_cinematic_slash(pos, slash_count, custom_color, duration, length)
 	return c_slash
+
+func spawn_super_flash(pos: Vector2, custom_color: Color = Color.TRANSPARENT, duration: float = 0.42) -> Node2D:
+	var flash = VFXSuperFlashScript.new()
+	add_child(flash)
+	flash.trigger_super_flash(pos, custom_color, duration)
+	return flash
+
+func spawn_floating_text(pos: Vector2, text: String, color: Color = Color.TRANSPARENT, critical: bool = false, duration: float = 0.65) -> Node2D:
+	var ftext = VFXFloatingTextScript.new()
+	add_child(ftext)
+	ftext.trigger_text(pos, text, color, critical, duration)
+	return ftext
+
+func spawn_ground_decal(pos: Vector2, type: StringName = &"cracks", custom_color: Color = Color.TRANSPARENT, width: float = 60.0, duration: float = 2.0) -> Node2D:
+	var decal = VFXGroundDecalScript.new()
+	add_child(decal)
+	decal.trigger_decal(pos, type, custom_color, width, duration)
+	return decal
+
+func spawn_ghost_trail(pos: Vector2, facing: int = 1, arch: StringName = &"viper", custom_color: Color = Color.TRANSPARENT) -> Node2D:
+	var ghost = VFXGhostTrailScript.new()
+	add_child(ghost)
+	ghost.setup(pos, facing, arch, custom_color)
+	return ghost
