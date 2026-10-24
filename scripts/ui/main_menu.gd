@@ -13,14 +13,16 @@ signal option_selected(index: int, item_id: StringName)
 signal transition_completed(target_scene: String)
 
 enum MenuItem {
-	VERSUS_AI = 0,
-	TRAINING_MODE = 1,
-	LOCAL_2P = 2,
-	SETTINGS = 3,
-	EXIT = 4
+	ARCADE_LADDER = 0,
+	VERSUS_AI = 1,
+	TRAINING_MODE = 2,
+	LOCAL_2P = 3,
+	SETTINGS = 4,
+	EXIT = 5
 }
 
 const MENU_DATA: Array[Dictionary] = [
+	{"id": &"arcade", "label": "ARCADE LADDER", "scene": "res://scenes/character_select.tscn", "subtext": "4-STAGE GAUNTLET & FINAL BOSS BATTLE"},
 	{"id": &"versus_ai", "label": "VERSUS AI", "scene": "res://scenes/character_select.tscn", "subtext": "SOLO DUEL VS AI (NOVICE / VETERAN / ACE)"},
 	{"id": &"training", "label": "TRAINING MODE", "scene": "res://scenes/training_mode.tscn", "subtext": "PRACTICE LAB & FRAME DATA INSPECTOR"},
 	{"id": &"local_2p", "label": "LOCAL 2P VERSUS", "scene": "res://scenes/character_select.tscn", "subtext": "2-PLAYER BATTLE ON A SINGLE SCREEN"},

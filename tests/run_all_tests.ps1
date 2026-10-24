@@ -52,7 +52,9 @@ $testScenes = @(
     # Epic 13: Playable 4th Mecha Roster - Phantom-9 Kage (Stance Switcher)
     "res://tests/test_phantom_kage.tscn",
     # Epic 14: Settings Modal, In-Match Pause System & Battle Records Persistence
-    "res://tests/test_settings_and_records.tscn"
+    "res://tests/test_settings_and_records.tscn",
+    # Epic 15: Arcade Ladder & Boss Gauntlet Mode
+    "res://tests/test_arcade_ladder.tscn"
 )
 
 Write-Host "==========================================================" -ForegroundColor Cyan
@@ -92,6 +94,6 @@ if ($failed -gt 0) {
     }
     exit 1
 } else {
-    Write-Host ("SEMUA {0} TEST SUITES DARI EPIC 1 - 14 BERHASIL 100%!" -f $testScenes.Count) -ForegroundColor Green
+    Write-Host ("SEMUA {0} TEST SUITES DARI EPIC 1 - 15 BERHASIL 100%!" -f $testScenes.Count) -ForegroundColor Green
     exit 0
 }

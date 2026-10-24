@@ -8,7 +8,8 @@ extends Node
 enum Difficulty {
 	NOVICE,
 	VETERAN,
-	ACE
+	ACE,
+	NIGHTMARE
 }
 
 @export var difficulty: Difficulty = Difficulty.VETERAN:
@@ -88,6 +89,15 @@ func _apply_difficulty_profile() -> void:
 			dash_punish_chance = 0.95
 			aggression = 0.90
 			preferred_spacing = 75.0
+			overclock_focus = true
+		Difficulty.NIGHTMARE:
+			reaction_delay_frames = 3
+			block_chance = 0.98
+			parry_chance = 0.90
+			combo_extension_chance = 1.0
+			dash_punish_chance = 0.98
+			aggression = 0.95
+			preferred_spacing = 65.0
 			overclock_focus = true
 
 	difficulty_changed.emit(difficulty)

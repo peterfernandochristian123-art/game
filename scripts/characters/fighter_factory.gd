@@ -9,6 +9,7 @@ const ApexViperScript = preload("res://scripts/characters/apex_viper.gd")
 const TitanBulwarkScript = preload("res://scripts/characters/titan_bulwark.gd")
 const RayPulsarScript = preload("res://scripts/characters/ray_pulsar.gd")
 const PhantomKageScript = preload("res://scripts/characters/phantom_kage.gd")
+const BossUnitZeroScript = preload("res://scripts/characters/boss_unit_zero.gd")
 
 const StateMachineScript = preload("res://scripts/combat/fsm/state_machine.gd")
 const IdleStateScript = preload("res://scripts/combat/fsm/idle_state.gd")
@@ -129,6 +130,9 @@ static func create_fighter(char_id: StringName, player_idx: int = 1) -> Characte
 		&"kage":
 			fighter = PhantomKageScript.new()
 			fighter.name = "Kage_P%d" % player_idx
+		&"unit_zero":
+			fighter = BossUnitZeroScript.new()
+			fighter.name = "UnitZero_P%d" % player_idx
 		&"viper", _:
 			fighter = ApexViperScript.new()
 			fighter.name = "Viper_P%d" % player_idx

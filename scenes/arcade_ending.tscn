@@ -1,0 +1,184 @@
+[gd_scene load_steps=2 format=3 uid="uid://arcadeending01zero"]
+
+[ext_resource type="Script" path="res://scripts/arcade/arcade_ending.gd" id="1_end"]
+
+[node name="ArcadeEnding" type="Control"]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_end")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.03, 0.07, 1)
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="CenterContainer"]
+custom_minimum_size = Vector2(580, 320)
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="CenterContainer/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 14
+
+[node name="VBox" type="VBoxContainer" parent="CenterContainer/Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HeaderLabel" type="Label" parent="CenterContainer/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "// ZERO CIRCUIT CONQUERED - MISSION COMPLETE //"
+horizontal_alignment = 1
+
+[node name="HSeparator1" type="HSeparator" parent="CenterContainer/Panel/Margin/VBox"]
+layout_mode = 2
+
+[node name="RankBox" type="HBoxContainer" parent="CenterContainer/Panel/Margin/VBox"]
+layout_mode = 2
+alignment = 1
+
+[node name="RankLabel" type="Label" parent="CenterContainer/Panel/Margin/VBox/RankBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+theme_override_font_sizes/font_size = 32
+text = "S"
+horizontal_alignment = 1
+
+[node name="VSep" type="VSeparator" parent="CenterContainer/Panel/Margin/VBox/RankBox"]
+layout_mode = 2
+
+[node name="RankTitleLabel" type="Label" parent="CenterContainer/Panel/Margin/VBox/RankBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+theme_override_font_sizes/font_size = 12
+text = "CYBER CHAMPION (PERFECT)"
+vertical_alignment = 1
+
+[node name="StatsGrid" type="GridContainer" parent="CenterContainer/Panel/Margin/VBox"]
+layout_mode = 2
+columns = 4
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 4
+
+[node name="ScoreLbl" type="Label" parent="CenterContainer/Panel/Margin/VBox/StatsGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.7, 0.8, 0.8)
+theme_override_font_sizes/font_size = 9
+text = "TOTAL SCORE:"
+
+[node name="ScoreVal" type="Label" parent="CenterContainer/Panel/Margin/VBox/StatsGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 10
+text = "1,520,000 PTS"
+
+[node name="TimeLbl" type="Label" parent="CenterContainer/Panel/Margin/VBox/StatsGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.7, 0.8, 0.8)
+theme_override_font_sizes/font_size = 9
+text = "CLEAR TIME:"
+
+[node name="TimeVal" type="Label" parent="CenterContainer/Panel/Margin/VBox/StatsGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 10
+text = "02:45"
+
+[node name="ContinuesLbl" type="Label" parent="CenterContainer/Panel/Margin/VBox/StatsGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.7, 0.8, 0.8)
+theme_override_font_sizes/font_size = 9
+text = "CONTINUES:"
+
+[node name="ContinuesVal" type="Label" parent="CenterContainer/Panel/Margin/VBox/StatsGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 10
+text = "0"
+
+[node name="ParriesLbl" type="Label" parent="CenterContainer/Panel/Margin/VBox/StatsGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.7, 0.8, 0.8)
+theme_override_font_sizes/font_size = 9
+text = "SPARK PARRIES:"
+
+[node name="ParriesVal" type="Label" parent="CenterContainer/Panel/Margin/VBox/StatsGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 10
+text = "6"
+
+[node name="RingoutsLbl" type="Label" parent="CenterContainer/Panel/Margin/VBox/StatsGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.7, 0.8, 0.8)
+theme_override_font_sizes/font_size = 9
+text = "RING-OUT K.O.:"
+
+[node name="RingoutsVal" type="Label" parent="CenterContainer/Panel/Margin/VBox/StatsGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 10
+text = "1"
+
+[node name="HSeparator2" type="HSeparator" parent="CenterContainer/Panel/Margin/VBox"]
+layout_mode = 2
+
+[node name="EpilogueBox" type="VBoxContainer" parent="CenterContainer/Panel/Margin/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 4
+
+[node name="HeadlineLabel" type="Label" parent="CenterContainer/Panel/Margin/VBox/EpilogueBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 11
+text = "THE ABSOLUTE ZERO ASCENSION"
+
+[node name="BodyLabel" type="Label" parent="CenterContainer/Panel/Margin/VBox/EpilogueBox"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.85, 0.9, 0.95, 0.95)
+theme_override_font_sizes/font_size = 9
+text = "Epilogue text describing the pilot's journey and future..."
+autowrap_mode = 2
+
+[node name="HBoxButtons" type="HBoxContainer" parent="CenterContainer/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="BtnPlayAgain" type="Button" parent="CenterContainer/Panel/Margin/VBox/HBoxButtons"]
+custom_minimum_size = Vector2(150, 24)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 10
+text = "PLAY AGAIN (ARCADE)"
+
+[node name="BtnMainMenu" type="Button" parent="CenterContainer/Panel/Margin/VBox/HBoxButtons"]
+custom_minimum_size = Vector2(130, 24)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.4, 0.3, 1)
+theme_override_font_sizes/font_size = 10
+text = "RETURN TO MENU"

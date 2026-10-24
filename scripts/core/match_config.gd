@@ -39,6 +39,8 @@ static func set_mode(mode: StringName) -> void:
 
 static func get_target_scene() -> String:
 	match game_mode:
+		&"arcade":
+			return "res://scenes/arcade_ladder_mode.tscn"
 		&"versus_ai":
 			return "res://scenes/versus_ai_mode.tscn"
 		&"local_2p":

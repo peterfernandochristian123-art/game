@@ -58,6 +58,8 @@ func _ready() -> void:
 	_update_p1_display()
 	_update_p2_display()
 	_update_stage_ui()
+	if MatchConfigScript.game_mode == &"arcade" and mode_label:
+		mode_label.text = "MODE: ARCADE GAUNTLET (4-STAGE)"
 	_fade_in()
 
 func _setup_audio() -> void:
@@ -142,6 +144,17 @@ func _update_p1_display() -> void:
 	p1_selection_changed.emit(p1_index, char_data["id"])
 
 func _update_p2_display() -> void:
+	if MatchConfigScript.game_mode == &"arcade":
+		p2_name_label.text = "ARCADE RIVALS & BOSS"
+		p2_name_label.add_theme_color_override("font_color", Color(1.0, 0.25, 0.35, 1.0))
+		p2_archetype_label.text = "4-Stage Gauntlet"
+		p2_stats_label.text = "Stage 1-3: Rivals | Stage 4: Unit-0"
+		p2_moves_label.text = "Defeat all challengers to conquer the Zero Circuit!"
+		if p2_ready_badge:
+			p2_ready_badge.visible = true
+			p2_ready_badge.text = "[ READY ]"
+		return
+
 	var char_data = FighterFactoryScript.get_character_at(p2_index)
 	p2_name_label.text = "P2: " + char_data["name"]
 	p2_name_label.add_theme_color_override("font_color", char_data["theme_color"])
@@ -234,7 +247,7 @@ func _confirm_selection() -> void:
 		p1_locked = true
 		MenuAudio.play_confirm_chime(self)
 		_update_p1_display()
-		if MatchConfigScript.game_mode == &"versus_ai":
+		if MatchConfigScript.game_mode == &"versus_ai" or MatchConfigScript.game_mode == &"arcade":
 			p2_locked = true
 			_update_p2_display()
 
@@ -267,7 +280,7 @@ func _launch_match() -> void:
 	MatchConfigScript.set_p2(p2_id)
 	selection_confirmed.emit(p1_id, p2_id)
 
-	prompt_label.text = "LAUNCHING ARENA..."
+	prompt_label.text = "LAUNCHING ARCADE..." if MatchConfigScript.game_mode == &"arcade" else "LAUNCHING ARENA..."
 	prompt_label.modulate = Color(0.2, 0.95, 1.0, 1.0)
 
 	_fade_out_and_execute(func():

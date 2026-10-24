@@ -58,9 +58,9 @@ func _instantiate_menu() -> MainMenu:
 func _test_scene_structure() -> void:
 	var menu := _instantiate_menu()
 	_check(menu != null, "Scene main_menu.tscn berhasil diinstansiasi.")
-	_check(menu.button_nodes.size() == 5, "Main Menu memiliki tepat 5 tombol navigasi (Ditemukan: %d)." % menu.button_nodes.size())
+	_check(menu.button_nodes.size() == 6, "Main Menu memiliki 6 tombol navigasi (Ditemukan: %d)." % menu.button_nodes.size())
 
-	var expected_ids := [&"versus_ai", &"training", &"local_2p", &"settings", &"exit"]
+	var expected_ids := [&"arcade", &"versus_ai", &"training", &"local_2p", &"settings", &"exit"]
 	for i in range(expected_ids.size()):
 		_check(MainMenu.MENU_DATA[i]["id"] == expected_ids[i], "ID opsi index %d cocok: %s" % [i, expected_ids[i]])
 
@@ -68,10 +68,10 @@ func _test_scene_structure() -> void:
 
 func _test_initial_focus() -> void:
 	var menu := _instantiate_menu()
-	_check(menu.current_focus_index == 0, "Fokus awal berada pada index 0 (VERSUS AI).")
+	_check(menu.current_focus_index == 0, "Fokus awal berada pada index 0 (ARCADE LADDER).")
 	var btn0: Button = menu.button_nodes[0]
-	_check(btn0.text.begins_with("> [") and btn0.text.ends_with("] <"), "Tombol index 0 mendapatkan format visual fokus '> [ VERSUS AI ] <' (Teks: '%s')." % btn0.text)
-	_check(menu.subtext_label != null and menu.subtext_label.text.contains("SOLO DUEL"), "Subtext label menampilkan deskripsi mode index 0.")
+	_check(btn0.text.begins_with("> [") and btn0.text.ends_with("] <"), "Tombol index 0 mendapatkan format visual fokus '> [ ARCADE LADDER ] <' (Teks: '%s')." % btn0.text)
+	_check(menu.subtext_label != null and menu.subtext_label.text.contains("GAUNTLET"), "Subtext label menampilkan deskripsi mode index 0.")
 	menu.queue_free()
 
 func _test_navigation_cycle_and_wraparound() -> void:
@@ -88,19 +88,19 @@ func _test_navigation_cycle_and_wraparound() -> void:
 
 	# 1 -> Down -> 2
 	menu._move_focus(1)
-	_check(menu.current_focus_index == 2, "Pergerakan ke bawah memindahkan fokus ke index 2 (LOCAL 2P).")
+	_check(menu.current_focus_index == 2, "Pergerakan ke bawah memindahkan fokus ke index 2 (TRAINING MODE).")
 
-	# Pindah langsung ke index 4 (EXIT)
-	menu.set_focus_index(4, false)
-	_check(menu.current_focus_index == 4, "Fokus berpindah ke index 4 (EXIT).")
+	# Pindah langsung ke index 5 (EXIT)
+	menu.set_focus_index(5, false)
+	_check(menu.current_focus_index == 5, "Fokus berpindah ke index 5 (EXIT).")
 
-	# 4 -> Down -> Wrap-around ke 0
+	# 5 -> Down -> Wrap-around ke 0
 	menu._move_focus(1)
-	_check(menu.current_focus_index == 0, "Wrap-around ke bawah dari index 4 berhasil kembali ke index 0.")
+	_check(menu.current_focus_index == 0, "Wrap-around ke bawah dari index 5 berhasil kembali ke index 0.")
 
-	# 0 -> Up -> Wrap-around ke 4
+	# 0 -> Up -> Wrap-around ke 5
 	menu._move_focus(-1)
-	_check(menu.current_focus_index == 4, "Wrap-around ke atas dari index 0 berhasil menuju index 4.")
+	_check(menu.current_focus_index == 5, "Wrap-around ke atas dari index 0 berhasil menuju index 5.")
 
 	_check(stats["nav"] >= 4, "Sinyal focus_changed terpancar pada setiap perpindahan fokus (%dx)." % stats["nav"])
 	_check(stats["bus"] >= 4, "EventBus.menu_navigated terpancar global (%dx)." % stats["bus"])
@@ -115,14 +115,14 @@ func _test_mouse_touch_direct_selection() -> void:
 		sel["id"] = id
 	)
 
-	# Simulasi hover / sentuhan langsung pada index 2
-	menu.set_focus_index(2, false)
-	_check(menu.current_focus_index == 2, "Fokus berpindah ke index 2.")
+	# Simulasi hover / sentuhan langsung pada index 3 (LOCAL 2P)
+	menu.set_focus_index(3, false)
+	_check(menu.current_focus_index == 3, "Fokus berpindah ke index 3.")
 
 	# Simulasi klik tombol
-	menu.button_nodes[2].pressed.emit()
-	_check(sel["idx"] == 2, "Klik tombol index 2 memicu option_selected dengan index 2 (Hasil: %d)." % sel["idx"])
-	_check(sel["id"] == &"local_2p", "Klik tombol index 2 memicu ID 'local_2p' (Hasil: %s)." % sel["id"])
+	menu.button_nodes[3].pressed.emit()
+	_check(sel["idx"] == 3, "Klik tombol index 3 memicu option_selected dengan index 3 (Hasil: %d)." % sel["idx"])
+	_check(sel["id"] == &"local_2p", "Klik tombol index 3 memicu ID 'local_2p' (Hasil: %s)." % sel["id"])
 	_check(menu.is_transitioning == true, "State is_transitioning aktif setelah pemilihan.")
 	_check(menu.can_navigate == false, "Input terkunci saat transisi berlangsung untuk mencegah input berulang.")
 
@@ -133,7 +133,7 @@ func _test_event_bus_emission_on_select() -> void:
 	var ev := {"mode": &""}
 	EventBus.game_mode_selected.connect(func(mode): ev["mode"] = mode)
 
-	menu.set_focus_index(1, false)
+	menu.set_focus_index(2, false)
 	menu._select_current()
 	_check(ev["mode"] == &"training", "EventBus.game_mode_selected memancarkan mode 'training' dengan tepat (Hasil: %s)." % ev["mode"])
 

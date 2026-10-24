@@ -26,7 +26,9 @@ const DEFAULT_RECORDS: Dictionary = {
 		"ring_outs": 0,
 		"parries_executed": 0,
 		"meltdowns_triggered": 0,
-		"favorite_character": "viper"
+		"favorite_character": "viper",
+		"arcade_clears": 0,
+		"arcade_best_rank": "-"
 	},
 	"characters": {
 		"viper": 0,
@@ -112,8 +114,29 @@ func record_match(p1_won: bool, p1_char: StringName, _p2_char: StringName, is_ri
 	save_records()
 	records_updated.emit()
 
+func record_arcade_clear(p1_char: StringName, rank: String, _clear_time_sec: float) -> void:
+	var clears: int = get_stat("arcade_clears", 0) + 1
+	_config.set_value("stats", "arcade_clears", clears)
+
+	# Bandingkan ranking terbaik (S > A > B > C)
+	var cur_rank: String = String(get_stat("arcade_best_rank", "-"))
+	var ranks_order := {"S": 4, "A": 3, "B": 2, "C": 1, "-": 0}
+	var new_score: int = ranks_order.get(rank, 1)
+	var old_score: int = ranks_order.get(cur_rank, 0)
+	if new_score >= old_score:
+		_config.set_value("stats", "arcade_best_rank", rank)
+
+	# Tingkatkan pemakaian karakter
+	var char_key := String(p1_char).to_lower()
+	var current_usage := get_char_usage(char_key) + 1
+	_config.set_value("characters", char_key, current_usage)
+
+	save_records()
+	records_updated.emit()
+
 func reset_records() -> void:
 	_config.clear()
 	_apply_defaults()
 	save_records()
 	records_updated.emit()
+

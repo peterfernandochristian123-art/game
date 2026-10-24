@@ -142,6 +142,10 @@ Mewujudkan petarung mecha ke-4 bertipe Stance Switcher ninja bertema bayangan da
 Menyediakan antarmuka konfigurasi audio/display interaktif dengan penyimpanan persistent (user://settings.cfg), sistem jeda pertarungan in-match (Pause Menu), serta pelacakan rekor statistik karir pemain (user://records.cfg).
 **Requirements covered:** NFR8, UX-DR3, GDD 6.1
 
+### Epic 15: Arcade Ladder & Boss Gauntlet Mode
+Menyediakan petualangan solo arcade klasik 4-tahap bertingkat dengan eskalasi AI (Novice ➔ Veteran ➔ Ace), dialog cutscene clash & victory quote antar karakter, duel pamungkas melawan Final Boss \"Unit-0 Shadow Core\" (Nightmare AI & Overclock Unbound), evaluasi peringkat S/A/B/C, serta epilog naratif sinematik.
+**Requirements covered:** FR16, NFR8, UX-DR3, GDD 6.2
+
 ---
 
 ## Epic 1: Core Physics & Movement Engine
@@ -807,5 +811,74 @@ So that I can monitor my combat mastery and track my competitive progression ove
 **Then** `RecordsManager` memperbarui statistik karir di `user://records.cfg` (Total Matches +1, Wins/Losses, Ring-Outs, Parries, Meltdowns, dan Mecha usage count),
 **And** pemain dapat mengakses modal `scenes/records_panel.tscn` via tombol "PILOT RECORDS" di Settings Menu,
 **And** panel rekor menampilkan ringkasan performa secara akurat serta menyediakan tombol "RESET STATS" untuk menghapus rekor karir jika diinginkan.
+
+---
+
+## Epic 15: Arcade Ladder & Boss Gauntlet Mode
+
+Menghadirkan mode petualangan solo arcade klasik 4-tahap bertingkat dengan eskalasi AI (Novice ➔ Veteran ➔ Ace), sistem dialog cutscene clash & victory quote antar karakter, pertarungan pamungkas melawan Final Boss \"Unit-0 Shadow Core\" (Nightmare AI & Overclock Unbound), evaluasi peringkat S/A/B/C, serta epilog naratif sinematik.
+
+### Story 15.1: Arcade Ladder Mode State & Progression Engine
+
+As a single-player gladiator,
+I want a 4-stage sequential Arcade Gauntlet mode with escalating AI bot difficulties and stage transitions,
+So that I can test my combat endurance through an authentic retro arcade tournament campaign.
+
+**Acceptance Criteria:**
+
+**Given** pemain memilih mode "ARCADE LADDER" dari Main Menu dan mengunci karakter pilihan di Character Select,
+**When** scene `scenes/arcade_ladder_mode.tscn` dimuat,
+**Then** sistem membangun sekuens 4 panggung bertingkat melawan 3 petarung roster berbeda (Stage 1: Novice, Stage 2: Veteran, Stage 3: Ace) dan panggung puncak Stage 4 melawan Final Boss Unit-0,
+**And** banner pengantar stage ("STAGE X / 4") muncul sebelum duel dimulai dan durasi run dicatat secara akumulatif,
+**And** jika pemain kalah, layar "CONTINUE?" dengan hitung mundur 10 detik muncul dan memungkinkan retry ronde seketika.
+
+---
+
+### Story 15.2: Pre-Battle & Victory Dialogue Cutscene System
+
+As a story-invested player,
+I want to witness character-specific clash dialogues before matches and victory quotes after round conclusions,
+So that the fighters' personalities, rivalries, and New Babel-01 lore are dynamically brought to life.
+
+**Acceptance Criteria:**
+
+**Given** duel antar petarung akan dimulai di awal setiap stage arcade,
+**When** `DialogueOverlay` (`scenes/dialogue_overlay.tscn`) aktif,
+**Then** sistem menampilkan kartu potret pixel art, nama petarung, warna tema, simbol khas, dan percakapan rivalitas dua arah (contoh: *Viper vs Bulwark*, *Kage vs Pulsar*) dengan efek teks pengetikan (typer effect),
+**And** pemain dapat mempercepat / melewatkan dialog menggunakan tombol Space, Enter, atau Button A gamepad,
+**And** setelah memenangkan pertarungan, kutipan kemenangan karakter (*victory quote*) ditampilkan sebelum berpindah ke stage berikutnya.
+
+---
+
+### Story 15.3: Final Boss Fight - Unit-0 "Shadow Core" (Overclock Proto-Core)
+
+As a master fighting game player,
+I want to face a terrifying and powerful final boss at the climax of the Arcade Gauntlet,
+So that the arcade summit provides a thrilling and memorable test of mechanical skill.
+
+**Acceptance Criteria:**
+
+**Given** pemain mencapai Stage 4 dalam Arcade Gauntlet,
+**When** pertarungan melawan Unit-0 "Shadow Core" dimulai,
+**Then** boss Unit-0 diinisialisasi dengan Max HP 1500, pasif damage reduction 10%, kecepatan jalan 340 px/s, dash 880 px/s, dan aura glitch crimson/purple,
+**And** Unit-0 beroperasi dalam status *Permanent Overclock Zone* (90% Heat terkunci tanpa mengalami meltdown lockout), memperoleh 1-Hit Super Armor pada frame startup dan +20% damage output,
+**And** Unit-0 dikendalikan oleh profil AI tingkat `NIGHTMARE` (3-frame reaction delay, 90% parry rate, dan 100% kombo punish agresif).
+
+---
+
+### Story 15.4: Arcade Ending, Victory Summary & Rank Evaluation
+
+As a victorious pilot who conquered the Zero Circuit,
+I want to see my battle statistics evaluated into an arcade ranking (S/A/B/C) and read an epilogue story card for my pilot,
+So that I feel a sense of triumph and can strive for a high score run.
+
+**Acceptance Criteria:**
+
+**Given** pemain berhasil mengalahkan Unit-0 pada Stage 4,
+**When** scene `scenes/arcade_ending.tscn` dimuat,
+**Then** sistem menghitung skor akhir berdasarkan waktu tempuh, jumlah continue yang digunakan, parry presisi, dan Ring-Out K.O., memberikan predikat Rank S / A / B / C,
+**And** layar menampilkan kartu epilog cerita unik untuk karakter terpilih (Viper: *The Absolute Zero Ascension*, Bulwark: *The Iron Reign*, Pulsar: *Solar Harmony*, Kage: *The Shadow Dispersal*),
+**And** statistik pencapaian (Arcade Clears dan Best Rank) dicatat secara permanen ke `user://records.cfg` melalui `RecordsManager`.
+
 
 
