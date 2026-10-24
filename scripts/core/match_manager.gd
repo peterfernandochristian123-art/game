@@ -196,7 +196,7 @@ func reset_fighters_for_round() -> void:
 			player1.reset_combo_state()
 		if player1.state_machine:
 			player1.state_machine.change_state(&"Idle")
-		player1.global_position = Vector2(350.0, 280.0)
+		player1.global_position = _get_spawn_points()[0]
 		if player1.has_method("set_facing_direction"):
 			player1.set_facing_direction(1)
 
@@ -209,9 +209,22 @@ func reset_fighters_for_round() -> void:
 			player2.reset_combo_state()
 		if player2.state_machine:
 			player2.state_machine.change_state(&"Idle")
-		player2.global_position = Vector2(1050.0, 280.0)
+		player2.global_position = _get_spawn_points()[1]
 		if player2.has_method("set_facing_direction"):
 			player2.set_facing_direction(-1)
+
+## Titik spawn: diambil dari arena yang menyediakan get_spawn_points() (mis. ArenaStage), jika tidak default lama.
+func _get_spawn_points() -> Array[Vector2]:
+	var result: Array[Vector2] = [Vector2(350.0, 280.0), Vector2(1050.0, 280.0)]
+	var scene_root: Node = get_parent()
+	if scene_root:
+		for child in scene_root.get_children():
+			if child.has_method("get_spawn_points"):
+				var pts = child.get_spawn_points()
+				if pts is Array and pts.size() >= 2:
+					result = [pts[0], pts[1]]
+				break
+	return result
 
 func _physics_process(delta: float) -> void:
 	process_match(delta)

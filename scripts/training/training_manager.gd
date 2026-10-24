@@ -25,6 +25,8 @@ func _ready() -> void:
 	if not p1 or not dummy:
 		return
 
+	_apply_arena_selection()
+
 	# 1. Setup HUD & Bindings
 	if hud:
 		hud.bind_fighters(p1, dummy)
@@ -37,7 +39,7 @@ func _ready() -> void:
 	if collision_overlay:
 		collision_overlay.register_monitored_node(p1)
 		collision_overlay.register_monitored_node(dummy)
-		var platform := get_node_or_null("ArenaSkyscraper/Platform") as Node2D
+		var platform := _find_arena_platform()
 		if platform:
 			collision_overlay.register_monitored_node(platform)
 
@@ -73,6 +75,29 @@ func _ready() -> void:
 		var atk_state = p1.state_machine.get_node_or_null("Attack")
 		if atk_state and atk_state.has_signal("attack_started"):
 			atk_state.attack_started.connect(_on_p1_attack_started)
+
+func _apply_arena_selection() -> void:
+	if MatchConfig.selected_arena == &"skyscraper":
+		return
+	var current_arena := get_node_or_null("ArenaSkyscraper")
+	if not current_arena:
+		return
+	var arena_scene = load(MatchConfig.get_arena_scene())
+	if arena_scene:
+		var new_arena = arena_scene.instantiate()
+		var idx := current_arena.get_index()
+		current_arena.name = "ArenaSkyscraper_Old"
+		current_arena.queue_free()
+		add_child(new_arena)
+		move_child(new_arena, idx)
+
+func _find_arena_platform() -> Node2D:
+	for child in get_children():
+		if child.name.begins_with("Arena") and not child.name.ends_with("_Old"):
+			var platform := child.get_node_or_null("Platform") as Node2D
+			if platform:
+				return platform
+	return null
 
 func _on_p1_attack_started(attack_data: Resource) -> void:
 	if frame_inspector and attack_data:

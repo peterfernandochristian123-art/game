@@ -58,7 +58,9 @@ $testScenes = @(
     # Skill VFX Diversity & Visual Impact Polish
     "res://tests/test_skill_vfx.tscn",
     # New Arenas: Orbital Station & Cyber Highway
-    "res://tests/test_new_arenas.tscn"
+    "res://tests/test_new_arenas.tscn",
+    # 12 Stages & Stage Select Screen
+    "res://tests/test_stage_select.tscn"
 )
 
 Write-Host "==========================================================" -ForegroundColor Cyan

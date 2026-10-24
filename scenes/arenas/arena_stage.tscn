@@ -1,0 +1,58 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://scripts/arena/arena_stage.gd" id="1_stage"]
+[ext_resource type="Script" path="res://scripts/visual/combat_camera.gd" id="2_cam"]
+[ext_resource type="Script" path="res://scripts/combat/components/hitstop_component.gd" id="3_hitstop"]
+[ext_resource type="Script" path="res://scripts/visual/vfx_manager.gd" id="4_vfx"]
+[ext_resource type="Script" path="res://scripts/audio/audio_manager.gd" id="5_audio"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platform"]
+size = Vector2(1280, 24)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_left_wall"]
+size = Vector2(24, 340)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_right_wall"]
+size = Vector2(24, 340)
+
+[node name="ArenaStage" type="Node2D"]
+script = ExtResource("1_stage")
+
+[node name="Platform" type="StaticBody2D" parent="."]
+position = Vector2(704, 300)
+collision_layer = 1
+collision_mask = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platform"]
+shape = SubResource("RectangleShape2D_platform")
+
+[node name="LeftWall" type="StaticBody2D" parent="."]
+position = Vector2(52, 140)
+collision_layer = 1
+collision_mask = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LeftWall"]
+shape = SubResource("RectangleShape2D_left_wall")
+
+[node name="RightWall" type="StaticBody2D" parent="."]
+position = Vector2(1356, 140)
+collision_layer = 1
+collision_mask = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RightWall"]
+shape = SubResource("RectangleShape2D_right_wall")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(704, 209)
+zoom = Vector2(1, 1)
+script = ExtResource("2_cam")
+default_y = 209.0
+
+[node name="HitstopComponent" type="Node" parent="."]
+script = ExtResource("3_hitstop")
+
+[node name="VFXManager" type="Node2D" parent="."]
+script = ExtResource("4_vfx")
+
+[node name="AudioManager" type="Node" parent="."]
+script = ExtResource("5_audio")

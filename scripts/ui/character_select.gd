@@ -11,6 +11,7 @@ const MatchConfigScript = preload("res://scripts/core/match_config.gd")
 const MenuAudio = preload("res://scripts/ui/menu_audio.gd")
 const MechaPixelSpriteScript = preload("res://scripts/visual/mecha_pixel_sprite.gd")
 const AudioManagerScript = preload("res://scripts/audio/audio_manager.gd")
+const STAGE_SELECT_SCENE := "res://scenes/menus/stage_select.tscn"
 
 signal p1_selection_changed(index: int, char_id: StringName)
 signal p2_selection_changed(index: int, char_id: StringName)
@@ -289,6 +290,8 @@ func _launch_match() -> void:
 
 	_fade_out_and_execute(func():
 		var target_scene = MatchConfigScript.get_target_scene()
+		if MatchConfigScript.game_mode != &"arcade":
+			target_scene = STAGE_SELECT_SCENE
 		get_tree().change_scene_to_file(target_scene)
 	)
 

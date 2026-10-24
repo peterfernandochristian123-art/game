@@ -11,6 +11,8 @@ static var game_mode: StringName = &"versus_ai"
 static var ai_difficulty: int = 1 # 0: Novice, 1: Veteran, 2: Ace
 static var selected_arena: StringName = &"skyscraper" # &"skyscraper" | &"reactor" | &"orbital" | &"highway"
 const AVAILABLE_ARENAS: Array[StringName] = [&"skyscraper", &"reactor", &"orbital", &"highway"]
+## Stage Select: id map (lihat StageManager). Jika selected_arena == &"stage", arena_stage.tscn dimuat.
+static var selected_stage: StringName = &"sakura_temple"
 
 static func reset_defaults() -> void:
 	p1_character = &"viper"
@@ -18,9 +20,17 @@ static func reset_defaults() -> void:
 	game_mode = &"versus_ai"
 	ai_difficulty = 1
 	selected_arena = &"skyscraper"
+	selected_stage = &"sakura_temple"
 
 static func set_arena(arena_id: StringName) -> void:
 	selected_arena = arena_id
+
+static func set_stage(stage_id: StringName) -> bool:
+	if not StageManager.has_stage(stage_id):
+		return false
+	selected_stage = stage_id
+	selected_arena = &"stage"
+	return true
 
 static func cycle_next_arena() -> StringName:
 	var idx = AVAILABLE_ARENAS.find(selected_arena)
@@ -32,6 +42,8 @@ static func cycle_next_arena() -> StringName:
 
 static func get_arena_scene() -> String:
 	match selected_arena:
+		&"stage":
+			return "res://scenes/arenas/arena_stage.tscn"
 		&"reactor":
 			return "res://scenes/arena_underground_reactor.tscn"
 		&"orbital":
