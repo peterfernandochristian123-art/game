@@ -163,6 +163,10 @@ func _draw() -> void:
 		draw_rect(Rect2(-12, -19, 24, 38), Color(1.0, 1.0, 1.0, 0.85))
 		return
 
+	# 1. Layer Efek Belakang (Underlay VFX: Aura, Pijaran Lantai, Uap, Partikel, Orbit Belakang)
+	_draw_vfx_underlay()
+
+	# 2. Render Karakter Utama Sesuai Archetype
 	if archetype == &"bulwark":
 		_draw_bulwark_fighter()
 	elif archetype == &"pulsar":
@@ -172,13 +176,177 @@ func _draw() -> void:
 	else:
 		_draw_viper_fighter()
 
-	# Efek Aura Overclock (Aura api petarung)
-	if is_overclocked and (anim_tick % 6 < 4):
-		var aura_col = Color(col_highlight.r, col_highlight.g, col_highlight.b, 0.35)
-		draw_polyline(PackedVector2Array([
-			Vector2(-12, 18), Vector2(-13, 0), Vector2(-10, -14),
-			Vector2(0, -21), Vector2(10, -14), Vector2(13, 0), Vector2(12, 18)
-		]), aura_col, 1.5)
+	# 3. Layer Efek Depan (Overlay VFX: Visor Flare, Kilau Senjata, Busur Serangan, Orbit Depan, Petir Overclock)
+	_draw_vfx_overlay()
+
+## =========================================================================
+## LAYER EFEK VISUAL BELAKANG (UNDERLAY VFX)
+## =========================================================================
+func _draw_vfx_underlay() -> void:
+	var t: float = float(anim_tick) * 0.1
+	var is_moving: bool = current_state in [&"Walk", &"Dash", &"AirDash"]
+
+	# A. Overclock / Meltdown Super Saiyan Flame Aura (Semua Karakter)
+	if is_overclocked or is_meltdown:
+		var flame_col := col_highlight
+		flame_col.a = 0.45 if is_overclocked else 0.7
+		var core_col := col_armor
+		core_col.a = 0.3
+		# 5 Lidah api energi dinamis yang berkobar ke atas
+		for i in range(5):
+			var fx: float = -14.0 + float(i) * 7.0
+			var h_flame: float = 24.0 + sin(t * 8.0 + float(i) * 1.5) * 8.0
+			var flame_pts := PackedVector2Array([
+				Vector2(fx - 4, 18),
+				Vector2(fx + 4, 18),
+				Vector2(fx + sin(t * 6.0 + float(i)) * 3.0, 18 - h_flame)
+			])
+			draw_colored_polygon(flame_pts, core_col)
+			draw_polyline(flame_pts, flame_col, 1.2)
+
+	# B. Efek Khusus per Karakter (Underlay)
+	match archetype:
+		&"viper":
+			# Percikan plasma cyan di sekitar kaki saat bergerak/kuda-kuda
+			for i in range(3):
+				var px: float = -8.0 + float(i) * 8.0 + sin(t * 5.0 + float(i)) * 3.0
+				var py: float = 18.0 - abs(sin(t * 6.0 + float(i))) * 6.0
+				draw_circle(Vector2(px, py), 1.5, col_armor)
+			if is_moving:
+				# Cincin hembusan angin dash di belakang
+				draw_arc(Vector2(-10, 8), 7.0, PI * 0.6, PI * 1.4, 6, Color(col_armor.r, col_armor.g, col_armor.b, 0.45), 1.5)
+
+		&"bulwark":
+			# Semburan uap knalpot termal hidrolik dari ventilasi bahu
+			var steam_phase := sin(t * 4.0)
+			if steam_phase > 0.0:
+				var s_alpha := steam_phase * 0.5
+				draw_circle(Vector2(-8, -17 - steam_phase * 5.0), 3.0 + steam_phase * 2.0, Color(0.9, 0.9, 0.95, s_alpha))
+				draw_circle(Vector2(5, -17 - steam_phase * 5.0), 3.0 + steam_phase * 2.0, Color(0.9, 0.9, 0.95, s_alpha))
+			# Gelombang debu seismik di tanah saat melangkah / idle
+			var shock_r := 10.0 + sin(t * 3.0) * 4.0
+			draw_arc(Vector2(0, 19), shock_r, 0.0, PI, 8, Color(col_armor.r, col_armor.g, col_armor.b, 0.35), 1.5)
+
+		&"pulsar":
+			# Cincin Lotus Zen Mandala bercahaya di bawah kaki
+			var lotus_rot := t * 1.5
+			var r_zen := 12.0
+			draw_arc(Vector2(0, 19), r_zen, 0.0, TAU, 12, Color(col_highlight.r, col_highlight.g, col_highlight.b, 0.35), 1.2)
+			for k in range(4):
+				var ang := lotus_rot + float(k) * (TAU / 4.0)
+				var petal_tip := Vector2(cos(ang) * (r_zen + 3.0), 19.0 + sin(ang) * 2.0)
+				draw_circle(petal_tip, 1.5, col_energy)
+			# Setengah belakang dari 3 Bola Foton Magatama yang mengorbit
+			_draw_pulsar_orbit_beads(t, true)
+
+		&"kage":
+			# Gumpalan asap bayangan hitam keunguan (Shadow Ink Wisps)
+			for i in range(3):
+				var ix: float = -10.0 + float(i) * 10.0 + sin(t * 4.0 + float(i)) * 4.0
+				var iy: float = 14.0 - float((anim_tick * 2 + i * 25) % 35)
+				var alpha: float = clampf(1.0 - (14.0 - iy) / 35.0, 0.0, 0.55)
+				draw_circle(Vector2(ix, iy), 3.0, Color(0.06, 0.04, 0.1, alpha))
+			# Kelopak bunga mawar crimson melayang di belakang
+			var petal_x := -12.0 + sin(t * 3.0) * 5.0
+			var petal_y := 4.0 + cos(t * 2.5) * 6.0
+			draw_rect(Rect2(petal_x, petal_y, 3, 2), Color(0.95, 0.15, 0.25, 0.8))
+
+## =========================================================================
+## LAYER EFEK VISUAL DEPAN (OVERLAY VFX)
+## =========================================================================
+func _draw_vfx_overlay() -> void:
+	var t: float = float(anim_tick) * 0.1
+	var is_attacking: bool = (current_state == &"Attack" or attack_type != &"")
+
+	# A. Busur Kilatan Petir Overclock (Semua Karakter)
+	if is_overclocked and (anim_tick % 4 == 0):
+		var p1 := Vector2(randf_range(-8, 8), randf_range(-16, 16))
+		var p2 := p1 + Vector2(randf_range(-6, 6), randf_range(-6, 6))
+		draw_line(p1, p2, Color.WHITE, 1.5)
+		draw_line(p1, p2, col_highlight, 3.0)
+
+	# B. Efek Khusus per Karakter (Overlay)
+	match archetype:
+		&"viper":
+			# Visor Laser Streak (Kilauan garis mata tajam saat bergerak/menyerang)
+			var eye_y := -13.0 + sin(anim_tick * 0.15) * 1.5
+			var flare_len := 12.0 if is_attacking else 6.0
+			draw_line(Vector2(0, eye_y), Vector2(flare_len, eye_y), col_armor, 2.0)
+			draw_line(Vector2(2, eye_y), Vector2(flare_len - 2, eye_y), Color.WHITE, 1.2)
+			# Kilau Berlian (✦ Sparkle) pada gagang bilah pedang di pinggul
+			if anim_tick % 30 < 6:
+				_draw_sparkle_cross(Vector2(-6, 5), 3.5, Color.WHITE, col_highlight)
+			# Busur Tebasan Plasma Cyan saat menyerang
+			if is_attacking:
+				var arc_rad := 20.0
+				draw_arc(Vector2(6, 0), arc_rad, -PI * 0.45, PI * 0.45, 10, col_armor, 2.5)
+				draw_arc(Vector2(6, 0), arc_rad - 2.0, -PI * 0.35, PI * 0.35, 8, Color.WHITE, 1.5)
+
+		&"bulwark":
+			# Bara Api Magma Membara pada Tangan/Sarung Tinju
+			var fist_pulse := 0.7 + 0.3 * sin(t * 8.0)
+			var fist_pos := Vector2(10, 4) if is_attacking else Vector2(8, 2)
+			draw_circle(fist_pos, 4.0, Color(1.0, 0.4, 0.05, 0.7 * fist_pulse))
+			draw_circle(fist_pos, 2.0, Color(1.0, 0.9, 0.3, 0.9))
+			# Reaktor Inti Dada Oranye berdenyut
+			draw_circle(Vector2(1, -2), 2.5, Color(1.0, 0.55, 0.1, 0.8 * fist_pulse))
+			# Ledakan Benturan Seismik Kinetik saat menyerang
+			if is_attacking:
+				draw_line(Vector2(10, 0), Vector2(24, -6), Color(1.0, 0.6, 0.1), 3.0)
+				draw_line(Vector2(10, 4), Vector2(26, 4), Color(1.0, 0.9, 0.2), 3.0)
+				draw_line(Vector2(10, 8), Vector2(24, 14), Color(1.0, 0.6, 0.1), 3.0)
+
+		&"pulsar":
+			# Setengah depan dari 3 Bola Foton Magatama yang mengorbit
+			_draw_pulsar_orbit_beads(t, false)
+			# Kilau Mata Ketiga Zen (Lens Flare Cross di dahi)
+			if anim_tick % 24 < 6:
+				_draw_sparkle_cross(Vector2(3, -15), 4.0, Color.WHITE, col_energy)
+			# Gelombang Cincin Foton saat menyerang
+			if is_attacking:
+				draw_arc(Vector2(16, -2), 12.0, -PI * 0.5, PI * 0.5, 8, col_armor, 2.5)
+				draw_arc(Vector2(20, -2), 16.0, -PI * 0.4, PI * 0.4, 8, col_energy, 2.0)
+				draw_line(Vector2(12, -2), Vector2(26, -2), Color.WHITE, 1.8)
+
+		&"kage":
+			# Jejak Mata Iblis Merah (Crimson Eye Streak)
+			var kage_eye_y := -13.0 + sin(anim_tick * 0.15) * 1.5
+			draw_line(Vector2(1, kage_eye_y), Vector2(10, kage_eye_y), Color(1.0, 0.1, 0.2), 2.0)
+			draw_line(Vector2(3, kage_eye_y), Vector2(8, kage_eye_y), Color.WHITE, 1.0)
+			# Bayangan Hitam Mengabur di Belakang Tubuh (Shadow Silhouette)
+			draw_rect(Rect2(-10, -15, 8, 28), Color(0.04, 0.02, 0.08, 0.35))
+			# Busur Tebasan Sabit Merah Darah saat menyerang
+			if is_attacking:
+				var kage_arc_rad := 22.0
+				draw_arc(Vector2(8, -2), kage_arc_rad, -PI * 0.5, PI * 0.4, 10, Color(0.95, 0.15, 0.25), 3.0)
+				draw_arc(Vector2(8, -2), kage_arc_rad - 2.0, -PI * 0.4, PI * 0.3, 8, Color.WHITE, 1.5)
+
+## Gambar 3 Bola Foton Magatama yang mengorbit tubuh Pulsar secara dinamis
+func _draw_pulsar_orbit_beads(t: float, is_rear_layer: bool) -> void:
+	var num_beads := 3
+	var rx := 16.0
+	var ry := 7.0
+	var cy := -2.0
+	for i in range(num_beads):
+		var ang: float = t * 2.5 + float(i) * (TAU / float(num_beads))
+		var sin_val := sin(ang)
+		var is_rear := sin_val < 0.0
+		if is_rear != is_rear_layer:
+			continue
+		var bx: float = cos(ang) * rx
+		var by: float = cy + sin_val * ry
+		var bead_radius: float = 3.0 if not is_rear else 2.2
+		# Bola foton bercahaya
+		draw_circle(Vector2(bx, by), bead_radius + 1.5, Color(col_armor.r, col_armor.g, col_armor.b, 0.4))
+		draw_circle(Vector2(bx, by), bead_radius, col_armor)
+		draw_circle(Vector2(bx, by), bead_radius * 0.5, Color.WHITE)
+
+## Gambar efek kilau bintang salib (✦ Diamond Sparkle)
+func _draw_sparkle_cross(pos: Vector2, size: float, core_c: Color, glow_c: Color) -> void:
+	draw_line(pos - Vector2(size, 0), pos + Vector2(size, 0), glow_c, 2.5)
+	draw_line(pos - Vector2(0, size), pos + Vector2(0, size), glow_c, 2.5)
+	draw_line(pos - Vector2(size * 0.7, 0), pos + Vector2(size * 0.7, 0), core_c, 1.2)
+	draw_line(pos - Vector2(0, size * 0.7), pos + Vector2(0, size * 0.7), core_c, 1.2)
 
 ## Kompatibilitas mundur dengan nama lama
 func _draw_viper_mecha() -> void:
