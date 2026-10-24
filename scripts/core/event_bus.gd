@@ -14,6 +14,9 @@ signal overclock_triggered(character: Node2D, is_active: bool)
 signal game_mode_selected(mode: StringName)
 signal menu_navigated()
 signal skill_cast(caster: Node2D, skill_name: StringName, pos: Vector2, facing: int)
+signal dramatic_finish_triggered(winner_id: int, reason: StringName)
+signal wall_splat_triggered(character: Node2D, wall_pos: Vector2, facing: int)
+signal palette_changed(player_index: int, palette_id: int)
 
 func _ready() -> void:
 	if OS.is_debug_build():

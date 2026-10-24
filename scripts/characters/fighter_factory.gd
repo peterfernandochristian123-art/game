@@ -9,6 +9,7 @@ const ApexViperScript = preload("res://scripts/characters/apex_viper.gd")
 const TitanBulwarkScript = preload("res://scripts/characters/titan_bulwark.gd")
 const RayPulsarScript = preload("res://scripts/characters/ray_pulsar.gd")
 const PhantomKageScript = preload("res://scripts/characters/phantom_kage.gd")
+const KuroganeTriggerScript = preload("res://scripts/characters/kurogane_trigger.gd")
 const BossUnitZeroScript = preload("res://scripts/characters/boss_unit_zero.gd")
 
 const StateMachineScript = preload("res://scripts/combat/fsm/state_machine.gd")
@@ -105,6 +106,27 @@ const ROSTER: Array[Dictionary] = [
 			"[O] Ultimate: Tsukuyomi Shadow Blossom (420 Dmg Full Screen)",
 			"[L] Spark Parry | [X / Shift] Shadow Dash"
 		]
+	},
+	{
+		"id": &"trigger",
+		"name": "Kurogane \"Trigger\"",
+		"archetype": "Cyber-Gunslinger / Dual Revolver Acrobat",
+		"hp": 940,
+		"walk_speed": 340.0,
+		"dash_speed": 820.0,
+		"speed_grade": "A",
+		"defense_grade": "B",
+		"range_grade": "S",
+		"complexity": "Medium",
+		"theme_color": Color(0.95, 0.65, 0.15, 1.0), # Amber Gold
+		"description": "Acrobatic gunslinger armed with twin energy magnums, ricochet trajectory bullets, evasive rolls, and Bullet Hell Zero.",
+		"signature_moves": [
+			"[J / Z] Normal Attack: Twin Magnum Double-Tap Combo",
+			"[U] Skill 1: Ricochet Orbit (Bouncing Energy Round)",
+			"[I] Skill 2: Gunslinger Vault (Invulnerable Evasive Roll)",
+			"[O] Ultimate: Bullet Hell Zero (360° Barrage 430 Dmg)",
+			"[L] Spark Parry | [X / Shift] Gunslinger Dash"
+		]
 	}
 ]
 
@@ -134,6 +156,9 @@ static func create_fighter(char_id: StringName, player_idx: int = 1) -> Characte
 		&"kage":
 			fighter = PhantomKageScript.new()
 			fighter.name = "Kage_P%d" % player_idx
+		&"trigger":
+			fighter = KuroganeTriggerScript.new()
+			fighter.name = "Trigger_P%d" % player_idx
 		&"unit_zero":
 			fighter = BossUnitZeroScript.new()
 			fighter.name = "UnitZero_P%d" % player_idx

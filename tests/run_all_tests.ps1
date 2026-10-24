@@ -60,7 +60,9 @@ $testScenes = @(
     # New Arenas: Orbital Station & Cyber Highway
     "res://tests/test_new_arenas.tscn",
     # 12 Stages & Stage Select Screen
-    "res://tests/test_stage_select.tscn"
+    "res://tests/test_stage_select.tscn",
+    # Kurogane Trigger, Palette Swatches & Dramatic Finish
+    "res://tests/test_kurogane_trigger.tscn"
 )
 
 Write-Host "==========================================================" -ForegroundColor Cyan

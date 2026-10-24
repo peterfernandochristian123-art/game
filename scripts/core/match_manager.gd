@@ -152,6 +152,19 @@ func resolve_round_end(winner_id: int, reason: StringName) -> void:
 	if bus and bus.has_signal("round_ended"):
 		bus.round_ended.emit(winner_id, reason)
 
+	# Dramatic Finish Slow-Motion & Screen Shake saat K.O.
+	if reason == &"ko" or reason == &"double_ko":
+		if bus and bus.has_signal("dramatic_finish_triggered"):
+			bus.dramatic_finish_triggered.emit(winner_id, reason)
+		if bus and bus.has_signal("screen_shake_requested"):
+			bus.screen_shake_requested.emit(18.0, 24)
+		Engine.time_scale = 0.22
+		var tree := get_tree()
+		if tree:
+			var tw := tree.create_tween()
+			tw.tween_interval(0.12)
+			tw.tween_property(Engine, "time_scale", 1.0, 0.4)
+
 	# Skor seri memicu Sudden Death jika bukan sudah dalam Sudden Death
 	if winner_id == 0:
 		if not is_sudden_death:

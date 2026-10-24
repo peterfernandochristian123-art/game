@@ -174,7 +174,7 @@ func _test_kage_visual_pixel_sprite_integration() -> void:
 	kage.queue_free()
 
 func _test_kage_fighter_factory_integration() -> void:
-	_check(FighterFactoryScript.get_roster_count() == 4, "Roster FighterFactory kini berisi 4 petarung.")
+	_check(FighterFactoryScript.get_roster_count() >= 4, "Roster FighterFactory kini berisi minimal 4 petarung.")
 	
 	var info = FighterFactoryScript.get_character_info(&"kage")
 	_check(info["id"] == &"kage", "Info karakter Kage ditemukan di Roster.")

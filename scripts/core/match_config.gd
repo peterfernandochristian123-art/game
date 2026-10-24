@@ -7,6 +7,8 @@ extends RefCounted
 
 static var p1_character: StringName = &"viper"
 static var p2_character: StringName = &"bulwark"
+static var p1_palette: int = 0
+static var p2_palette: int = 0
 static var game_mode: StringName = &"versus_ai"
 static var ai_difficulty: int = 1 # 0: Novice, 1: Veteran, 2: Ace
 static var selected_arena: StringName = &"skyscraper" # &"skyscraper" | &"reactor" | &"orbital" | &"highway"
@@ -14,13 +16,25 @@ const AVAILABLE_ARENAS: Array[StringName] = [&"skyscraper", &"reactor", &"orbita
 ## Stage Select: id map (lihat StageManager). Jika selected_arena == &"stage", arena_stage.tscn dimuat.
 static var selected_stage: StringName = &"sakura_temple"
 
+const PALETTE_NAMES: Array[String] = ["DEFAULT", "VOID SHADOW", "MONARCH GOLD", "CYBER NEON"]
+
 static func reset_defaults() -> void:
 	p1_character = &"viper"
 	p2_character = &"bulwark"
+	p1_palette = 0
+	p2_palette = 0
 	game_mode = &"versus_ai"
 	ai_difficulty = 1
 	selected_arena = &"skyscraper"
 	selected_stage = &"sakura_temple"
+
+static func cycle_p1_palette() -> int:
+	p1_palette = (p1_palette + 1) % 4
+	return p1_palette
+
+static func cycle_p2_palette() -> int:
+	p2_palette = (p2_palette + 1) % 4
+	return p2_palette
 
 static func set_arena(arena_id: StringName) -> void:
 	selected_arena = arena_id

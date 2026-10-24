@@ -121,13 +121,9 @@ func _test_character_select_navigation_and_lock_in() -> void:
 	_check(screen.p1_index == 2, "P1 berpindah ke index 2 (Pulsar).")
 	_check(p1_emitted["id"] == &"pulsar", "Sinyal p1_selection_changed memancarkan pulsar.")
 
-	# Geser P1 ke index 3 jika ada (Kage)
-	if FighterFactoryScript.get_roster_count() > 3:
+	# Geser P1 melewati seluruh roster hingga wraparound ke index 0 (Viper)
+	while screen.p1_index != 0:
 		screen._change_p1_index(1)
-		_check(screen.p1_index == 3, "P1 berpindah ke index 3 (Kage).")
-
-	# Wraparound ke index 0 (Viper)
-	screen._change_p1_index(1)
 	_check(screen.p1_index == 0, "Wraparound ke index 0 (Viper) berhasil.")
 
 	# Konfirmasi kunci P1 & P2

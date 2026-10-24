@@ -187,6 +187,11 @@ func _setup_visual_node() -> void:
 		visual_root = vis
 
 	var existing_spr = visual_root.get_node_or_null("Sprite")
+	var p_idx = 0
+	var mc = load("res://scripts/core/match_config.gd")
+	if mc:
+		p_idx = mc.p1_palette if player_index == 1 else mc.p2_palette
+
 	if not existing_spr or existing_spr is ColorRect:
 		if existing_spr and existing_spr is ColorRect:
 			visual_root.remove_child(existing_spr)
@@ -194,11 +199,26 @@ func _setup_visual_node() -> void:
 		var pixel_spr := MechaPixelSpriteScript.new()
 		pixel_spr.name = "Sprite"
 		pixel_spr.archetype = get_archetype()
+		pixel_spr.set_palette_index(p_idx)
 		visual_root.add_child(pixel_spr)
+	elif existing_spr and existing_spr.has_method("set_palette_index"):
+		existing_spr.set_palette_index(p_idx)
+
+func set_palette_index(idx: int) -> void:
+	if visual_root and visual_root.has_node("Sprite"):
+		var spr = visual_root.get_node("Sprite")
+		if spr.has_method("set_palette_index"):
+			spr.set_palette_index(idx)
 
 func get_archetype() -> StringName:
 	if "Titan" in name or "Bulwark" in name:
 		return &"bulwark"
+	elif "Pulsar" in name or "Ray" in name:
+		return &"pulsar"
+	elif "Kage" in name or "Phantom" in name:
+		return &"kage"
+	elif "Trigger" in name or "Kurogane" in name:
+		return &"trigger"
 	return &"viper"
 
 func trigger_hit_flash(frames: int = 4) -> void:
@@ -614,6 +634,16 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 	_update_hud()
+
+	# Deteksi Wall-Splat / Stage Boundary Impact saat terlempar dalam Hitstun
+	if state_machine and state_machine.current_state and state_machine.current_state.name == &"Hitstun":
+		var is_wall_hit = is_on_wall() or global_position.x <= 75.0 or global_position.x >= 1335.0
+		if is_wall_hit and abs(velocity.x) > 160.0:
+			var normal = Vector2.LEFT if global_position.x >= 700.0 else Vector2.RIGHT
+			var bus = get_node_or_null("/root/EventBus")
+			if bus and bus.has_signal("wall_splat_triggered"):
+				bus.wall_splat_triggered.emit(global_position, normal)
+			velocity.x = -velocity.x * 0.25
 
 	# Deteksi Ring-Out saat mecha jatuh melewati batas bawah arena (Story 4.3 AC 2)
 	if global_position.y > CombatConstants.RING_OUT_KILL_Y and not is_eliminated:

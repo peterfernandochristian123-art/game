@@ -7,7 +7,8 @@ extends Node2D
 ## - Animasi pose bela diri autentik (idle bounce, stepping walk, martial arts guard, snap punch, X-block, ledge struggle)
 ## - 3 Persona Petarung: Apex-0 Viper (Cyber-Ninja), Titan-V Bulwark (Heavy Brawler), Ray-X Pulsar (Shaolin Master)
 
-@export var archetype: StringName = &"viper" # &"viper", &"bulwark", atau &"pulsar"
+@export var archetype: StringName = &"viper" # &"viper", &"bulwark", &"pulsar", &"kage", &"trigger"
+@export var palette_index: int = 0
 
 # Warna Palet Karakter & Kostum Bela Diri
 var col_chassis: Color = Color(0.10, 0.13, 0.20)
@@ -40,6 +41,11 @@ func _ready() -> void:
 	_apply_archetype_palette()
 	set_physics_process(true)
 
+func set_palette_index(idx: int) -> void:
+	palette_index = clampi(idx, 0, 3)
+	_apply_archetype_palette()
+	queue_redraw()
+
 func _detect_parent_mecha() -> void:
 	var p = get_parent()
 	while p:
@@ -57,6 +63,8 @@ func _detect_parent_mecha() -> void:
 			archetype = &"pulsar"
 		elif "Kage" in parent_mecha.name or "Phantom" in parent_mecha.name:
 			archetype = &"kage"
+		elif "Trigger" in parent_mecha.name or "Kurogane" in parent_mecha.name:
+			archetype = &"trigger"
 		else:
 			archetype = &"viper"
 		
@@ -65,50 +73,211 @@ func _detect_parent_mecha() -> void:
 				parent_mecha.heat_changed.connect(_on_heat_changed)
 
 func _apply_archetype_palette() -> void:
-	if archetype == &"bulwark":
-		col_chassis = Color(0.14, 0.15, 0.18)
-		col_armor = Color(1.00, 0.55, 0.10)
-		col_highlight = Color(1.00, 0.75, 0.25)
-		col_visor = Color(1.00, 0.25, 0.20)
-		col_thruster = Color(1.00, 0.40, 0.05)
-		col_energy = Color(1.00, 0.60, 0.15)
-		col_skin = Color(0.86, 0.62, 0.44)
-		col_skin_shadow = Color(0.68, 0.45, 0.30)
-		col_hair = Color(0.18, 0.15, 0.14)
-		col_belt = Color(0.95, 0.65, 0.10) # Golden champion belt
-	elif archetype == &"pulsar":
-		col_chassis = Color(0.12, 0.08, 0.20)
-		col_armor = Color(0.65, 0.25, 0.95)
-		col_highlight = Color(0.85, 0.50, 1.00)
-		col_visor = Color(1.00, 0.90, 0.15)
-		col_thruster = Color(0.80, 0.30, 1.00)
-		col_energy = Color(1.00, 0.85, 0.20)
-		col_skin = Color(0.92, 0.78, 0.64)
-		col_skin_shadow = Color(0.76, 0.58, 0.45)
-		col_hair = Color(0.08, 0.06, 0.14)
-		col_belt = Color(1.00, 0.85, 0.20) # Golden sash
-	elif archetype == &"kage":
-		col_chassis = Color(0.08, 0.08, 0.12) # Midnight Charcoal
-		col_armor = Color(0.95, 0.15, 0.25) # Crimson Red
-		col_highlight = Color(1.00, 0.40, 0.45) # Neon Rose
-		col_visor = Color(1.00, 0.20, 0.30) # Glowing Crimson
-		col_thruster = Color(0.85, 0.10, 0.20)
-		col_energy = Color(1.00, 0.20, 0.35)
-		col_skin = Color(0.94, 0.88, 0.82)
-		col_skin_shadow = Color(0.74, 0.65, 0.58)
-		col_hair = Color(0.06, 0.06, 0.08) # Jet midnight black
-		col_belt = Color(0.90, 0.12, 0.22) # Crimson flowing ninja scarf
-	else:
-		col_chassis = Color(0.10, 0.13, 0.20)
-		col_armor = Color(0.20, 0.88, 1.00)
-		col_highlight = Color(0.60, 0.95, 1.00)
-		col_visor = Color(0.90, 1.00, 1.00)
-		col_thruster = Color(0.25, 0.70, 1.00)
-		col_energy = Color(0.30, 0.90, 1.00)
-		col_skin = Color(0.96, 0.82, 0.70)
-		col_skin_shadow = Color(0.80, 0.62, 0.48)
-		col_hair = Color(0.10, 0.12, 0.18)
-		col_belt = Color(0.08, 0.08, 0.10) # Black belt
+	match archetype:
+		&"bulwark":
+			match palette_index:
+				1: # Void Shadow (Granite Dark Magma)
+					col_chassis = Color(0.08, 0.08, 0.10)
+					col_armor = Color(0.40, 0.15, 0.15)
+					col_highlight = Color(0.95, 0.35, 0.30)
+					col_visor = Color(1.00, 0.15, 0.15)
+					col_thruster = Color(0.80, 0.20, 0.10)
+					col_energy = Color(0.90, 0.25, 0.20)
+					col_skin = Color(0.72, 0.60, 0.52)
+					col_belt = Color(0.20, 0.05, 0.05)
+				2: # Monarch Gold (Imperial Ivory & Royal Brass)
+					col_chassis = Color(0.22, 0.20, 0.18)
+					col_armor = Color(0.95, 0.85, 0.50)
+					col_highlight = Color(1.00, 0.95, 0.70)
+					col_visor = Color(0.40, 0.85, 1.00)
+					col_thruster = Color(1.00, 0.75, 0.20)
+					col_energy = Color(1.00, 0.85, 0.30)
+					col_skin = Color(0.88, 0.70, 0.55)
+					col_belt = Color(0.85, 0.65, 0.15)
+				3: # Cyber Neon (Electric Cyan & Magenta)
+					col_chassis = Color(0.06, 0.10, 0.16)
+					col_armor = Color(0.10, 0.85, 0.95)
+					col_highlight = Color(1.00, 0.20, 0.75)
+					col_visor = Color(1.00, 0.10, 0.60)
+					col_thruster = Color(0.20, 0.90, 1.00)
+					col_energy = Color(1.00, 0.25, 0.80)
+					col_skin = Color(0.85, 0.75, 0.70)
+					col_belt = Color(0.95, 0.15, 0.70)
+				_: # Default Industrial Orange
+					col_chassis = Color(0.14, 0.15, 0.18)
+					col_armor = Color(1.00, 0.55, 0.10)
+					col_highlight = Color(1.00, 0.75, 0.25)
+					col_visor = Color(1.00, 0.25, 0.20)
+					col_thruster = Color(1.00, 0.40, 0.05)
+					col_energy = Color(1.00, 0.60, 0.15)
+					col_skin = Color(0.86, 0.62, 0.44)
+					col_skin_shadow = Color(0.68, 0.45, 0.30)
+					col_hair = Color(0.18, 0.15, 0.14)
+					col_belt = Color(0.95, 0.65, 0.10)
+
+		&"pulsar":
+			match palette_index:
+				1: # Void Shadow (Deep Navy & Starlight)
+					col_chassis = Color(0.06, 0.08, 0.14)
+					col_armor = Color(0.20, 0.35, 0.65)
+					col_highlight = Color(0.50, 0.75, 1.00)
+					col_visor = Color(0.40, 0.90, 1.00)
+					col_thruster = Color(0.30, 0.50, 0.95)
+					col_energy = Color(0.60, 0.85, 1.00)
+					col_skin = Color(0.85, 0.75, 0.70)
+					col_belt = Color(0.15, 0.25, 0.50)
+				2: # Monarch Gold (Imperial Pure Gold & Jade)
+					col_chassis = Color(0.15, 0.18, 0.15)
+					col_armor = Color(0.90, 0.75, 0.25)
+					col_highlight = Color(0.40, 0.95, 0.70)
+					col_visor = Color(0.30, 1.00, 0.65)
+					col_thruster = Color(0.95, 0.80, 0.20)
+					col_energy = Color(0.40, 1.00, 0.75)
+					col_skin = Color(0.92, 0.80, 0.68)
+					col_belt = Color(0.95, 0.80, 0.20)
+				3: # Cyber Neon (Toxic Lime & Hot Violet)
+					col_chassis = Color(0.08, 0.06, 0.14)
+					col_armor = Color(0.30, 1.00, 0.40)
+					col_highlight = Color(0.85, 0.25, 1.00)
+					col_visor = Color(1.00, 0.20, 0.90)
+					col_thruster = Color(0.40, 1.00, 0.50)
+					col_energy = Color(0.90, 0.30, 1.00)
+					col_skin = Color(0.90, 0.82, 0.74)
+					col_belt = Color(0.80, 0.20, 0.95)
+				_: # Default Neon Violet
+					col_chassis = Color(0.12, 0.08, 0.20)
+					col_armor = Color(0.65, 0.25, 0.95)
+					col_highlight = Color(0.85, 0.50, 1.00)
+					col_visor = Color(1.00, 0.90, 0.15)
+					col_thruster = Color(0.80, 0.30, 1.00)
+					col_energy = Color(1.00, 0.85, 0.20)
+					col_skin = Color(0.92, 0.78, 0.64)
+					col_skin_shadow = Color(0.76, 0.58, 0.45)
+					col_hair = Color(0.08, 0.06, 0.14)
+					col_belt = Color(1.00, 0.85, 0.20)
+
+		&"kage":
+			match palette_index:
+				1: # Void Shadow (Monochrome Ink Black & Pure Silver)
+					col_chassis = Color(0.04, 0.04, 0.06)
+					col_armor = Color(0.25, 0.25, 0.30)
+					col_highlight = Color(0.85, 0.90, 0.95)
+					col_visor = Color(1.00, 1.00, 1.00)
+					col_thruster = Color(0.50, 0.55, 0.65)
+					col_energy = Color(0.90, 0.92, 1.00)
+					col_skin = Color(0.88, 0.84, 0.80)
+					col_belt = Color(0.85, 0.88, 0.95)
+				2: # Monarch Gold (Golden Phoenix & Navy Blue)
+					col_chassis = Color(0.08, 0.10, 0.18)
+					col_armor = Color(0.92, 0.75, 0.20)
+					col_highlight = Color(1.00, 0.88, 0.45)
+					col_visor = Color(1.00, 0.95, 0.30)
+					col_thruster = Color(0.85, 0.65, 0.15)
+					col_energy = Color(1.00, 0.80, 0.25)
+					col_skin = Color(0.92, 0.84, 0.78)
+					col_belt = Color(0.95, 0.75, 0.20)
+				3: # Cyber Neon (Synthwave Cyan & Magenta)
+					col_chassis = Color(0.05, 0.07, 0.12)
+					col_armor = Color(0.00, 0.90, 0.85)
+					col_highlight = Color(1.00, 0.20, 0.65)
+					col_visor = Color(1.00, 0.15, 0.60)
+					col_thruster = Color(0.10, 0.95, 0.90)
+					col_energy = Color(1.00, 0.25, 0.70)
+					col_skin = Color(0.90, 0.85, 0.80)
+					col_belt = Color(1.00, 0.20, 0.65)
+				_: # Default Crimson Red
+					col_chassis = Color(0.08, 0.08, 0.12)
+					col_armor = Color(0.95, 0.15, 0.25)
+					col_highlight = Color(1.00, 0.40, 0.45)
+					col_visor = Color(1.00, 0.20, 0.30)
+					col_thruster = Color(0.85, 0.10, 0.20)
+					col_energy = Color(1.00, 0.20, 0.35)
+					col_skin = Color(0.94, 0.88, 0.82)
+					col_skin_shadow = Color(0.74, 0.65, 0.58)
+					col_hair = Color(0.06, 0.06, 0.08)
+					col_belt = Color(0.90, 0.12, 0.22)
+
+		&"trigger":
+			match palette_index:
+				1: # Void Shadow (Midnight Noir Trenchcoat & Blood Crimson Lenses)
+					col_chassis = Color(0.06, 0.06, 0.08)
+					col_armor = Color(0.20, 0.22, 0.28)
+					col_highlight = Color(0.90, 0.20, 0.30)
+					col_visor = Color(1.00, 0.15, 0.25)
+					col_thruster = Color(0.80, 0.15, 0.20)
+					col_energy = Color(1.00, 0.25, 0.35)
+					col_skin = Color(0.88, 0.76, 0.68)
+					col_belt = Color(0.75, 0.15, 0.20)
+				2: # Monarch Gold (Ivory Marshal Duster & Pure Gold Revolvers)
+					col_chassis = Color(0.20, 0.20, 0.22)
+					col_armor = Color(0.92, 0.90, 0.85)
+					col_highlight = Color(1.00, 0.82, 0.25)
+					col_visor = Color(0.35, 0.85, 1.00)
+					col_thruster = Color(0.95, 0.80, 0.20)
+					col_energy = Color(1.00, 0.85, 0.30)
+					col_skin = Color(0.92, 0.82, 0.70)
+					col_belt = Color(0.85, 0.65, 0.15)
+				3: # Cyber Neon (Toxic Turquoise & Laser Magenta)
+					col_chassis = Color(0.06, 0.09, 0.14)
+					col_armor = Color(0.15, 0.92, 0.80)
+					col_highlight = Color(1.00, 0.25, 0.75)
+					col_visor = Color(1.00, 0.15, 0.65)
+					col_thruster = Color(0.20, 0.95, 0.85)
+					col_energy = Color(1.00, 0.30, 0.80)
+					col_skin = Color(0.90, 0.80, 0.72)
+					col_belt = Color(0.95, 0.20, 0.70)
+				_: # Default Amber Gold Gunslinger
+					col_chassis = Color(0.12, 0.10, 0.15)
+					col_armor = Color(0.92, 0.62, 0.15)
+					col_highlight = Color(1.00, 0.85, 0.35)
+					col_visor = Color(0.25, 0.90, 1.00)
+					col_thruster = Color(0.95, 0.55, 0.10)
+					col_energy = Color(1.00, 0.75, 0.20)
+					col_skin = Color(0.92, 0.78, 0.66)
+					col_skin_shadow = Color(0.76, 0.58, 0.45)
+					col_hair = Color(0.15, 0.12, 0.10)
+					col_belt = Color(0.40, 0.25, 0.12)
+
+		_: # Viper (Default Cyan Rushdown)
+			match palette_index:
+				1: # Void Shadow (Carbon Obsidian & Amethyst Violet)
+					col_chassis = Color(0.07, 0.07, 0.10)
+					col_armor = Color(0.28, 0.22, 0.38)
+					col_highlight = Color(0.75, 0.35, 1.00)
+					col_visor = Color(0.90, 0.40, 1.00)
+					col_thruster = Color(0.70, 0.25, 0.95)
+					col_energy = Color(0.85, 0.40, 1.00)
+					col_skin = Color(0.85, 0.78, 0.72)
+					col_belt = Color(0.65, 0.25, 0.90)
+				2: # Monarch Gold (Royal Obsidian & Emperor Gold)
+					col_chassis = Color(0.10, 0.10, 0.12)
+					col_armor = Color(0.92, 0.76, 0.22)
+					col_highlight = Color(1.00, 0.92, 0.55)
+					col_visor = Color(0.30, 0.90, 1.00)
+					col_thruster = Color(0.95, 0.75, 0.15)
+					col_energy = Color(1.00, 0.85, 0.30)
+					col_skin = Color(0.94, 0.82, 0.70)
+					col_belt = Color(0.90, 0.70, 0.15)
+				3: # Cyber Neon (Lime Surge & Electric Purple)
+					col_chassis = Color(0.08, 0.06, 0.14)
+					col_armor = Color(0.20, 1.00, 0.50)
+					col_highlight = Color(0.85, 0.25, 1.00)
+					col_visor = Color(1.00, 0.95, 0.30)
+					col_thruster = Color(0.30, 1.00, 0.60)
+					col_energy = Color(0.40, 1.00, 0.65)
+					col_skin = Color(0.90, 0.80, 0.72)
+					col_belt = Color(0.15, 0.90, 0.45)
+				_: # Default Cyan
+					col_chassis = Color(0.10, 0.13, 0.20)
+					col_armor = Color(0.20, 0.88, 1.00)
+					col_highlight = Color(0.60, 0.95, 1.00)
+					col_visor = Color(0.90, 1.00, 1.00)
+					col_thruster = Color(0.25, 0.70, 1.00)
+					col_energy = Color(0.30, 0.90, 1.00)
+					col_skin = Color(0.96, 0.82, 0.70)
+					col_skin_shadow = Color(0.80, 0.62, 0.48)
+					col_hair = Color(0.10, 0.12, 0.18)
+					col_belt = Color(0.08, 0.08, 0.10)
 
 func _on_heat_changed(current: float, _max_val: float) -> void:
 	is_overclocked = (current >= 80.0 and current < 100.0)
@@ -173,6 +342,8 @@ func _draw() -> void:
 		_draw_pulsar_fighter()
 	elif archetype == &"kage":
 		_draw_kage_fighter()
+	elif archetype == &"trigger":
+		_draw_trigger_fighter()
 	else:
 		_draw_viper_fighter()
 
@@ -1064,3 +1235,121 @@ func _draw_kunai(pos: Vector2, angle: float) -> void:
 	var base2 := pos + Vector2(-3, 2).rotated(angle)
 	draw_colored_polygon(PackedVector2Array([tip, base1, base2]), col_armor)
 	draw_line(pos + Vector2(-3, 0).rotated(angle), pos + Vector2(-6, 0).rotated(angle), Color.WHITE, 1.2)
+
+## =========================================================================
+## 5. KUROGANE "TRIGGER": CYBER-GUNSLINGER / DUAL REVOLVER ACROBAT
+## =========================================================================
+func _draw_trigger_fighter() -> void:
+	var bob_y: float = 0.0
+	if current_state == &"Idle":
+		bob_y = sin(anim_tick * 0.14) * 1.0
+	elif current_state == &"Walk":
+		bob_y = abs(sin(anim_tick * 0.32)) * 1.4
+	elif current_state == &"Cliffhanger":
+		bob_y = 6.0
+
+	var head_center := Vector2(0, -14.0 + bob_y)
+
+	# 1. Duster Trenchcoat Tails berkibar di belakang
+	var coat_sway: float = sin(anim_tick * 0.2) * 3.0
+	if current_state == &"Walk":
+		coat_sway = -8.0 + sin(anim_tick * 0.4) * 4.0
+	var coat_pts = PackedVector2Array([
+		Vector2(-5, 0 + bob_y),
+		Vector2(-1, 0 + bob_y),
+		Vector2(-3 + coat_sway, 17 + bob_y),
+		Vector2(-9 + coat_sway, 16 + bob_y)
+	])
+	draw_colored_polygon(coat_pts, col_chassis)
+	draw_polyline(coat_pts, col_armor, 1.2)
+
+	# 2. Celana Taktis Gunslinger & Holster Boots
+	if current_state == &"Walk":
+		var stride = sin(anim_tick * 0.32) * 5.0
+		_draw_fighter_leg(Vector2(-5 - stride, 5 + bob_y), Vector2(-6 - stride, 19 + bob_y), col_chassis, col_armor, 4.2)
+		_draw_fighter_leg(Vector2(4 + stride, 5 + bob_y), Vector2(5 + stride, 19 + bob_y), col_chassis, col_armor, 4.2)
+	else:
+		_draw_fighter_leg(Vector2(-5, 5 + bob_y), Vector2(-7, 19 + bob_y), col_chassis, col_armor, 4.2)
+		_draw_fighter_leg(Vector2(4, 5 + bob_y), Vector2(6, 19 + bob_y), col_chassis, col_armor, 4.2)
+
+	# 3. Torso, Rompi Taktis & Bandolier Peluru
+	var vest_pts = PackedVector2Array([
+		Vector2(-6, -8 + bob_y),
+		Vector2(6, -8 + bob_y),
+		Vector2(4, 5 + bob_y),
+		Vector2(-4, 5 + bob_y)
+	])
+	draw_colored_polygon(vest_pts, col_armor)
+	# Bandolier diagonal
+	draw_line(Vector2(-5, -7 + bob_y), Vector2(4, 4 + bob_y), col_belt, 2.5)
+	for i in range(3):
+		var bp = Vector2(-3.5 + float(i) * 2.8, -5.0 + float(i) * 3.5 + bob_y)
+		draw_circle(bp, 1.2, col_highlight)
+
+	# Sabuk pistol
+	draw_rect(Rect2(-5, 3 + bob_y, 10, 2), col_belt)
+
+	# 4. Kepala & Visor Topi / Optik Gunslinger
+	draw_line(Vector2(-8, head_center.y - 2), Vector2(8, head_center.y - 2), col_chassis, 2.0)
+	draw_rect(Rect2(-4, head_center.y - 7, 8, 5), col_chassis)
+	draw_rect(Rect2(-4, head_center.y - 3, 8, 1.5), col_armor)
+	# Wajah & Glowing Target Optic Visor
+	draw_circle(Vector2(head_center.x + 0.5, head_center.y + 0.5), 3.8, col_skin)
+	draw_line(Vector2(1, head_center.y), Vector2(4.5, head_center.y), col_visor, 1.8)
+	draw_circle(Vector2(4.0, head_center.y), 1.0, Color.WHITE)
+
+	# 5. Dual Energy Revolvers & Pose Tempur
+	if current_state == &"Attack":
+		_draw_trigger_attack_pose(bob_y)
+	elif current_state in [&"Blockstun", &"Parry"]:
+		_draw_fighter_arm(Vector2(-4, -5 + bob_y), Vector2(3, -7 + bob_y), col_skin, col_armor)
+		_draw_fighter_arm(Vector2(4, -5 + bob_y), Vector2(-2, -7 + bob_y), col_skin, col_armor)
+		_draw_energy_revolver(Vector2(4, -9 + bob_y), -0.6)
+		_draw_energy_revolver(Vector2(-3, -9 + bob_y), 0.6)
+	else:
+		var r1 = Vector2(-3, -2 + bob_y)
+		var r2 = Vector2(7, -3 + bob_y)
+		_draw_fighter_arm(Vector2(-5, -6 + bob_y), r1, col_skin, col_armor)
+		_draw_fighter_arm(Vector2(4, -6 + bob_y), r2, col_skin, col_armor)
+		_draw_energy_revolver(r1 + Vector2(-1, 0), 0.2)
+		_draw_energy_revolver(r2 + Vector2(2, 0), 0.0)
+
+func _draw_energy_revolver(pos: Vector2, angle: float) -> void:
+	var dir = Vector2.RIGHT.rotated(angle)
+	var up = Vector2.UP.rotated(angle)
+	draw_line(pos, pos + dir * 8.0, col_highlight, 2.2)
+	draw_line(pos + dir * 7.0, pos + dir * 9.0, col_energy, 1.5)
+	draw_circle(pos, 2.2, col_chassis)
+	draw_line(pos, pos - dir * 2.0 - up * 3.0, col_belt, 2.0)
+
+func _draw_trigger_attack_pose(bob_y: float) -> void:
+	var atk_str := String(attack_type).to_lower()
+	if atk_str.contains("hell") or atk_str == "ultimate":
+		var h1 = Vector2(-12, -8 + bob_y)
+		var h2 = Vector2(16, -6 + bob_y)
+		_draw_fighter_arm(Vector2(-4, -6 + bob_y), h1, col_skin, col_armor)
+		_draw_fighter_arm(Vector2(4, -6 + bob_y), h2, col_skin, col_armor)
+		_draw_energy_revolver(h1, PI * 0.8)
+		_draw_energy_revolver(h2, -PI * 0.1)
+		draw_circle(h1 + Vector2(-8, 0), 3.0, col_energy)
+		draw_circle(h2 + Vector2(8, 0), 3.0, col_energy)
+	elif atk_str.contains("magnum") or atk_str.contains("5h"):
+		var h_pos = Vector2(18, -6 + bob_y)
+		_draw_fighter_arm(Vector2(-4, -6 + bob_y), h_pos - Vector2(3, 0), col_skin, col_armor)
+		_draw_fighter_arm(Vector2(4, -6 + bob_y), h_pos, col_skin, col_armor)
+		_draw_energy_revolver(h_pos, 0.0)
+		draw_circle(h_pos + Vector2(10, 0), 4.5, col_energy)
+		draw_circle(h_pos + Vector2(10, 0), 2.0, Color.WHITE)
+		draw_line(h_pos + Vector2(10, 0), h_pos + Vector2(28, 0), col_highlight, 2.5)
+	elif atk_str.contains("roll") or atk_str == "skill2":
+		var roll_h = Vector2(12, 6 + bob_y)
+		_draw_fighter_arm(Vector2(3, 0 + bob_y), roll_h, col_skin, col_armor)
+		_draw_energy_revolver(roll_h, -0.4)
+	else:
+		var h_pos = Vector2(17, -7 + bob_y)
+		_draw_fighter_arm(Vector2(-4, -5 + bob_y), Vector2(-1, -1 + bob_y), col_skin, col_armor)
+		_draw_fighter_arm(Vector2(4, -6 + bob_y), h_pos, col_skin, col_armor)
+		_draw_energy_revolver(h_pos, 0.0)
+		draw_circle(h_pos + Vector2(9, 0), 3.0, col_energy)
+		draw_circle(h_pos + Vector2(9, 0), 1.5, Color.WHITE)
+

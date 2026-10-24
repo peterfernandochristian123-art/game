@@ -27,6 +27,7 @@ const VFXGroundDecalScript = preload("res://scripts/visual/vfx_ground_decal.gd")
 const VFXGhostTrailScript = preload("res://scripts/visual/vfx_ghost_trail.gd")
 const VFXShockwaveScript = preload("res://scripts/visual/vfx_shockwave.gd")
 const VFXLightningArcScript = preload("res://scripts/visual/vfx_lightning.gd")
+const VFXDramaticFinishScript = preload("res://scripts/visual/vfx_dramatic_finish.gd")
 
 @export var enabled: bool = true
 
@@ -37,10 +38,29 @@ func _ready() -> void:
 			EventBus.parry_triggered.connect(_on_parry_triggered)
 		if EventBus.has_signal("skill_cast"):
 			EventBus.skill_cast.connect(_on_skill_cast)
+		if EventBus.has_signal("dramatic_finish_triggered"):
+			EventBus.dramatic_finish_triggered.connect(_on_dramatic_finish_triggered)
+		if EventBus.has_signal("wall_splat_triggered"):
+			EventBus.wall_splat_triggered.connect(_on_wall_splat_triggered)
 
 func _trigger_camera_shake(intensity: float, frames: int) -> void:
 	if is_instance_valid(EventBus) and EventBus.has_signal("screen_shake_requested"):
 		EventBus.screen_shake_requested.emit(intensity, frames)
+
+func _on_dramatic_finish_triggered(winner_id: int, reason: StringName) -> void:
+	if not enabled:
+		return
+	var finish_layer := VFXDramaticFinishScript.new()
+	finish_layer.setup_finish(winner_id, reason)
+	add_child(finish_layer)
+
+func _on_wall_splat_triggered(pos: Vector2, normal: Vector2) -> void:
+	if not enabled:
+		return
+	_trigger_camera_shake(16.0, 16)
+	spawn_shockwave(pos, 110.0, Color(1.0, 0.9, 0.7), 0.28, 4.0)
+	spawn_ground_decal(pos, &"cracks", Color(0.9, 0.9, 1.0), 95.0, 2.5)
+	spawn_cyber_debris(pos, normal, 14, Color(0.8, 0.85, 0.95))
 
 func _on_skill_cast(caster: Node2D, skill_name: StringName, pos: Vector2, facing: int) -> void:
 	if not enabled or not is_instance_valid(caster):
@@ -48,7 +68,7 @@ func _on_skill_cast(caster: Node2D, skill_name: StringName, pos: Vector2, facing
 
 	var s_name := String(skill_name)
 	var caster_name := caster.name.to_lower()
-	var is_ult: bool = (s_name == "Ultimate" or s_name.contains("Protocol") or s_name.contains("Cannon") or s_name.contains("Supernova") or s_name.contains("Blossom") or s_name.contains("Overload"))
+	var is_ult: bool = (s_name == "Ultimate" or s_name.contains("Protocol") or s_name.contains("Cannon") or s_name.contains("Supernova") or s_name.contains("Blossom") or s_name.contains("Overload") or s_name.contains("HellZero") or s_name.contains("BulletHell"))
 
 	# Tentukan warna aksen caster
 	var caster_col := Color(0.2, 0.95, 1.0)
@@ -58,6 +78,8 @@ func _on_skill_cast(caster: Node2D, skill_name: StringName, pos: Vector2, facing
 		caster_col = Color(0.75, 0.25, 1.0)
 	elif caster_name.contains("kage") or caster_name.contains("boss") or caster_name.contains("unit_zero"):
 		caster_col = Color(1.0, 0.15, 0.25)
+	elif caster_name.contains("trigger"):
+		caster_col = Color(0.95, 0.65, 0.15)
 
 	# 0. Efek Sinematik Super Flash pada Ultimate
 	if is_ult:
@@ -147,6 +169,25 @@ func _on_skill_cast(caster: Node2D, skill_name: StringName, pos: Vector2, facing
 		spawn_ground_decal(pos, &"scorch", Color(1.1, 0.1, 0.3), 130.0)
 		spawn_shockwave(pos, 220.0, Color(1.1, 0.1, 0.3), 0.5, 6.0)
 
+	# 6. Trigger (Cyber-Gunslinger) Skills
+	elif s_name.contains("Ricochet") or s_name == "RicochetShot":
+		spawn_shockwave(pos, 95.0, Color(0.95, 0.65, 0.15), 0.25, 3.5)
+		spawn_lightning(pos, pos + Vector2(facing * 260.0, -20.0), Color(1.0, 0.8, 0.25), 0.22, 2)
+		spawn_lightning(pos + Vector2(facing * 260.0, -20.0), pos + Vector2(facing * 200.0, 60.0), Color(1.0, 0.7, 0.2), 0.22, 2)
+		spawn_ground_decal(pos + Vector2(facing * 120.0, 10.0), &"scorch", Color(0.95, 0.65, 0.15), 75.0)
+	elif s_name.contains("Roll") or s_name == "GunslingerRoll":
+		spawn_ghost_trail(pos, facing, &"trigger", Color(0.95, 0.65, 0.15))
+		spawn_shockwave(pos, 70.0, Color(0.95, 0.65, 0.15), 0.22, 2.5)
+		spawn_ground_decal(pos, &"cracks", Color(0.95, 0.65, 0.15), 60.0)
+	elif s_name.contains("BulletHell") or s_name.contains("HellZero"):
+		spawn_super_flash(pos, Color(1.0, 0.7, 0.2), 0.45)
+		spawn_shockwave(pos, 220.0, Color(1.0, 0.7, 0.2), 0.48, 5.5)
+		spawn_ground_decal(pos, &"scorch", Color(1.0, 0.7, 0.2), 140.0, 2.6)
+		for i in range(8):
+			var ang := i * (PI / 4.0)
+			var target_v := pos + Vector2(cos(ang), sin(ang)) * 260.0
+			spawn_lightning(pos, target_v, Color(1.0, 0.85, 0.3), 0.3, 2)
+
 	# Fallback untuk Skill1 / Skill2 umum
 	elif s_name == "Skill1":
 		spawn_shockwave(pos, 90.0, caster_col, 0.28, 3.5)
@@ -159,6 +200,8 @@ func _on_skill_cast(caster: Node2D, skill_name: StringName, pos: Vector2, facing
 			spawn_orbital_beam(pos, Vector2(facing, 0.0), 750.0, 36.0, Color(0.75, 0.25, 1.0))
 		elif caster_name.contains("kage"):
 			spawn_shadow_smoke(pos, Color(0.95, 0.15, 0.25), 16, 0.4)
+		elif caster_name.contains("trigger"):
+			spawn_lightning(pos, pos + Vector2(facing * 260.0, -20.0), Color(1.0, 0.8, 0.25), 0.22, 2)
 	elif s_name == "Skill2":
 		spawn_shockwave(pos, 85.0, caster_col, 0.26, 3.0)
 		if caster_name.contains("viper"):
@@ -169,6 +212,8 @@ func _on_skill_cast(caster: Node2D, skill_name: StringName, pos: Vector2, facing
 			spawn_disrupter_drone(pos + Vector2(facing * 100.0, -40.0), 2.0, Color(0.7, 0.3, 1.0))
 		elif caster_name.contains("kage"):
 			spawn_shuriken_storm(pos, facing, Color(1.0, 0.2, 0.3))
+		elif caster_name.contains("trigger"):
+			spawn_ghost_trail(pos, facing, &"trigger", Color(0.95, 0.65, 0.15))
 	elif s_name == "Ultimate":
 		spawn_shockwave(pos, 200.0, caster_col, 0.48, 5.5)
 		if caster_name.contains("viper"):
@@ -179,6 +224,8 @@ func _on_skill_cast(caster: Node2D, skill_name: StringName, pos: Vector2, facing
 			spawn_supernova(pos, 200.0, Color(0.8, 0.25, 1.0))
 		elif caster_name.contains("kage"):
 			spawn_cinematic_slash(pos, 5, Color(1.0, 0.1, 0.25), 0.45, 260.0)
+		elif caster_name.contains("trigger"):
+			spawn_super_flash(pos, Color(1.0, 0.7, 0.2), 0.45)
 
 func _on_hit_confirmed(attacker: Node2D, victim: Node2D, hit_data: Variant) -> void:
 	if not enabled or not is_instance_valid(attacker) or not is_instance_valid(victim):

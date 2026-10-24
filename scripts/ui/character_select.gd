@@ -118,9 +118,10 @@ func _highlight_cards() -> void:
 
 func _update_p1_display() -> void:
 	var char_data = FighterFactoryScript.get_character_at(p1_index)
-	p1_name_label.text = "P1: " + char_data["name"]
+	var pal_name = MatchConfigScript.PALETTE_NAMES[MatchConfigScript.p1_palette]
+	p1_name_label.text = "P1: %s [C: %s]" % [char_data["name"], pal_name]
 	p1_name_label.add_theme_color_override("font_color", char_data["theme_color"])
-	p1_archetype_label.text = char_data["archetype"]
+	p1_archetype_label.text = "%s | PALETTE: %s [PRESS C]" % [char_data["archetype"], pal_name]
 	p1_stats_label.text = "HP: %d | SPD: %s | DEF: %s | RNG: %s" % [
 		char_data["hp"], char_data["speed_grade"], char_data["defense_grade"], char_data["range_grade"]
 	]
@@ -136,6 +137,7 @@ func _update_p1_display() -> void:
 	var spr := MechaPixelSpriteScript.new()
 	spr.name = "P1Sprite"
 	spr.archetype = char_data["id"]
+	spr.set_palette_index(MatchConfigScript.p1_palette)
 	spr.position = Vector2(40, 50)
 	spr.scale = Vector2(2.5, 2.5)
 	p1_preview_mount.add_child(spr)
@@ -157,9 +159,10 @@ func _update_p2_display() -> void:
 		return
 
 	var char_data = FighterFactoryScript.get_character_at(p2_index)
-	p2_name_label.text = "P2: " + char_data["name"]
+	var pal_name = MatchConfigScript.PALETTE_NAMES[MatchConfigScript.p2_palette]
+	p2_name_label.text = "P2: %s [V: %s]" % [char_data["name"], pal_name]
 	p2_name_label.add_theme_color_override("font_color", char_data["theme_color"])
-	p2_archetype_label.text = char_data["archetype"]
+	p2_archetype_label.text = "%s | PALETTE: %s [PRESS V]" % [char_data["archetype"], pal_name]
 	p2_stats_label.text = "HP: %d | SPD: %s | DEF: %s | RNG: %s" % [
 		char_data["hp"], char_data["speed_grade"], char_data["defense_grade"], char_data["range_grade"]
 	]
@@ -174,6 +177,7 @@ func _update_p2_display() -> void:
 	var spr := MechaPixelSpriteScript.new()
 	spr.name = "P2Sprite"
 	spr.archetype = char_data["id"]
+	spr.set_palette_index(MatchConfigScript.p2_palette)
 	spr.position = Vector2(40, 50)
 	spr.scale = Vector2(-2.5, 2.5) # Hadap kiri
 	p2_preview_mount.add_child(spr)
@@ -200,6 +204,18 @@ func _unhandled_input(event: InputEvent) -> void:
 				_change_p2_index(-1)
 			elif event.keycode == KEY_L or event.keycode == KEY_RIGHT:
 				_change_p2_index(1)
+
+	# Ganti Palette P1: C
+	if event is InputEventKey and event.pressed and event.keycode == KEY_C:
+		MatchConfigScript.cycle_p1_palette()
+		MenuAudio.play_nav_beep(self)
+		_update_p1_display()
+
+	# Ganti Palette P2: V
+	if event is InputEventKey and event.pressed and event.keycode == KEY_V:
+		MatchConfigScript.cycle_p2_palette()
+		MenuAudio.play_nav_beep(self)
+		_update_p2_display()
 
 	# Ganti Arena: Tab / T
 	if event is InputEventKey and event.pressed and (event.keycode == KEY_TAB or event.keycode == KEY_T):

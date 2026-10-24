@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/combat/resources/attack_data.gd" id="1_atk"]
+
+[resource]
+script = ExtResource("1_atk")
+attack_name = &"BulletHellZero"
+startup = 14
+active = 16
+recovery = 28
+damage = 430
+hitstun = 48
+blockstun = 22
+knockback = 480.0
+heat_cost = 0.0
+is_energy = true
+causes_ground_bounce = true
+causes_wall_bounce = true
+chain_level = 4
