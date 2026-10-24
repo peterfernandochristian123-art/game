@@ -156,6 +156,11 @@ func _test_arena_stage_all_12_maps() -> void:
 		
 		_check(arena is ArenaStageScript, "ArenaStage terinstansiasi untuk stage " + String(s_id))
 		_check(arena.get_node_or_null("Platform") != null, "Platform fisik ada pada stage " + String(s_id))
+		_check(arena.get("floor_visual") != null, "Visual lantai bertema ada pada stage " + String(s_id))
+		var plats = arena.get("elevated_platforms")
+		_check(plats != null and plats.size() >= 2, "Tersedia platform melayang bertema (>= 2) pada stage " + String(s_id))
+		_check(plats != null and plats[0].stage_id == s_id, "Platform melayang sesuai tema stage " + String(s_id))
+		_check(plats != null and plats[0].collision_shape.one_way_collision == true, "Platform melayang memiliki one_way_collision untuk " + String(s_id))
 		_check(arena.get_node_or_null("LeftWall") != null, "Dinding kiri ada pada stage " + String(s_id))
 		_check(arena.get_node_or_null("RightWall") != null, "Dinding kanan ada pada stage " + String(s_id))
 		_check(arena.get_node_or_null("Camera2D") != null, "Camera2D ada pada stage " + String(s_id))

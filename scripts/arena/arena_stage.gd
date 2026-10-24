@@ -24,9 +24,14 @@ const CENTER_X: float = 704.0
 @onready var right_wall: StaticBody2D = $RightWall
 @onready var camera: Camera2D = $Camera2D
 
+const StageThemedPlatformScript = preload("res://scripts/arena/stage_themed_platform.gd")
+const StageFloorVisualScript = preload("res://scripts/arena/stage_floor_visual.gd")
+
 var registered_fighters: Array[Node2D] = []
 var background_sprite: Sprite2D = null
 var ambience: StageAmbience = null
+var elevated_platforms: Array[StaticBody2D] = []
+var floor_visual: Node2D = null
 var _track_retries: int = 120
 
 func _ready() -> void:
@@ -35,9 +40,42 @@ func _ready() -> void:
 	if not StageManager.has_stage(stage_id):
 		stage_id = StageManager.DEFAULT_STAGE
 	_setup_background()
+	_setup_themed_platforms()
 	_setup_camera()
 	_setup_audio()
 	_find_fighters_in_tree()
+
+func _setup_themed_platforms() -> void:
+	# 1. Pasang visual lantai utama bertema pada Platform dasar (Y=300)
+	if platform_body:
+		floor_visual = StageFloorVisualScript.new(stage_id, platform_width, 24.0)
+		floor_visual.name = "StageFloorVisual"
+		platform_body.add_child(floor_visual)
+
+	# 2. Pasang platform melayang bertingkat (elevated battle platforms) sesuai tema
+	elevated_platforms.clear()
+	var left_plat = StageThemedPlatformScript.new(stage_id, Vector2(170.0, 14.0), true)
+	left_plat.name = "ThemedPlatform_Left"
+	left_plat.position = Vector2(440.0, 204.0)
+	add_child(left_plat)
+	elevated_platforms.append(left_plat)
+
+	var right_plat = StageThemedPlatformScript.new(stage_id, Vector2(170.0, 14.0), false)
+	right_plat.name = "ThemedPlatform_Right"
+	right_plat.position = Vector2(968.0, 204.0)
+	add_child(right_plat)
+	elevated_platforms.append(right_plat)
+
+	# Platform ketiga (center upper platform) untuk stage bertingkat tinggi
+	if stage_id in [&"space_station", &"moon_castle", &"hell_gate", &"ruin_factory"]:
+		var center_plat = StageThemedPlatformScript.new(stage_id, Vector2(140.0, 12.0), false)
+		center_plat.name = "ThemedPlatform_Center"
+		center_plat.position = Vector2(704.0, 134.0)
+		add_child(center_plat)
+		elevated_platforms.append(center_plat)
+
+func get_elevated_platforms() -> Array[StaticBody2D]:
+	return elevated_platforms
 
 func _setup_camera() -> void:
 	if camera:
