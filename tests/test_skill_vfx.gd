@@ -41,7 +41,8 @@ func _ready() -> void:
 		_test_vfx_manager_spawn_methods,
 		_test_vfx_manager_skill_cast_handling,
 		_test_vfx_manager_hit_impact_effects,
-		_test_character_skill_cast_integration
+		_test_character_skill_cast_integration,
+		_test_vfx_showcase_scene
 	]
 
 	var passed: int = 0
@@ -251,3 +252,13 @@ func _test_character_skill_cast_integration() -> void:
 
 	EventBus.skill_cast.disconnect(on_cast)
 	viper.queue_free()
+
+func _test_vfx_showcase_scene() -> void:
+	var showcase_scene: PackedScene = load("res://scenes/vfx_showcase.tscn")
+	_check(showcase_scene != null, "Scene res://scenes/vfx_showcase.tscn berhasil dimuat.")
+	var showcase = showcase_scene.instantiate()
+	add_child(showcase)
+	_check(showcase.vfx_manager != null, "VFXShowcase memiliki instance VFXManager.")
+	_check(showcase.caster_dummy != null and showcase.target_dummy != null, "VFXShowcase memiliki Caster Dummy dan Target Dummy.")
+	_check(showcase.SKILLS.size() >= 14, "VFXShowcase memuat seluruh 14+ skill mecha roster.")
+	showcase.queue_free()
