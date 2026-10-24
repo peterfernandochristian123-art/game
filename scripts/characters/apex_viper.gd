@@ -27,7 +27,9 @@ func _ready() -> void:
 		&"Skill1": preload("res://resources/attacks/viper_blink_slash.tres"),
 		&"BlinkSlash": preload("res://resources/attacks/viper_blink_slash.tres"),
 		&"Skill2": preload("res://resources/attacks/viper_deflection_matrix.tres"),
-		&"DeflectionMatrix": preload("res://resources/attacks/viper_deflection_matrix.tres")
+		&"DeflectionMatrix": preload("res://resources/attacks/viper_deflection_matrix.tres"),
+		&"Ultimate": preload("res://resources/attacks/viper_blink_slash.tres"),
+		&"AbsoluteZeroProtocol": preload("res://resources/attacks/viper_blink_slash.tres")
 	}
 
 	super._ready()
@@ -109,6 +111,15 @@ func activate_absolute_zero_protocol() -> bool:
 	if bus and bus.has_signal("skill_cast"):
 		bus.skill_cast.emit(self, &"AbsoluteZeroProtocol", global_position, facing_direction)
 	return true
+
+func execute_skill_1() -> void:
+	execute_blink_slash()
+
+func execute_skill_2() -> void:
+	execute_deflection_matrix()
+
+func execute_ultimate() -> void:
+	activate_absolute_zero_protocol()
 
 func _physics_process(delta: float) -> void:
 	if cryogenic_frames_left > 0:

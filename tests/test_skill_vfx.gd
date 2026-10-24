@@ -15,6 +15,9 @@ const VFXGuardSparkScript = preload("res://scripts/visual/vfx_guard_spark.gd")
 const VFXCyberDebrisScript = preload("res://scripts/visual/vfx_cyber_debris.gd")
 const ApexViperScript = preload("res://scripts/characters/apex_viper.gd")
 const TitanBulwarkScript = preload("res://scripts/characters/titan_bulwark.gd")
+const RayPulsarScript = preload("res://scripts/characters/ray_pulsar.gd")
+const PhantomKageScript = preload("res://scripts/characters/phantom_kage.gd")
+const MechaPixelSpriteScript = preload("res://scripts/visual/mecha_pixel_sprite.gd")
 
 var log_file: FileAccess = null
 var _failed: bool = false
@@ -46,7 +49,8 @@ func _ready() -> void:
 		_test_vfx_manager_skill_cast_handling,
 		_test_vfx_manager_hit_impact_effects,
 		_test_character_skill_cast_integration,
-		_test_vfx_showcase_scene
+		_test_vfx_showcase_scene,
+		_test_mecha_pixel_sprite_distinct_attack_techniques
 	]
 
 	var passed: int = 0
@@ -256,26 +260,60 @@ func _test_vfx_manager_hit_impact_effects() -> void:
 	mgr.queue_free()
 
 func _test_character_skill_cast_integration() -> void:
-	var viper: BaseMecha = ApexViperScript.new()
-	add_child(viper)
-
 	var received_skills: Array[StringName] = []
 	var on_cast = func(_caster: Node2D, s_name: StringName, _pos: Vector2, _facing: int):
 		received_skills.append(s_name)
 
 	EventBus.skill_cast.connect(on_cast)
 
-	viper.execute_blink_slash()
-	_check(received_skills.has(&"BlinkSlash"), "Viper execute_blink_slash memancarkan sinyal EventBus.skill_cast.")
-
-	viper.activate_absolute_zero_protocol()
-	# Karena ultimate viper membutuhkan MAX_ULTIMATE, coba isi ultimate terlebih dahulu
+	# 1. Apex-0 Viper
+	var viper: BaseMecha = ApexViperScript.new()
+	add_child(viper)
+	viper.execute_skill_1()
+	_check(received_skills.has(&"BlinkSlash"), "Viper execute_skill_1 memancarkan sinyal EventBus.skill_cast (BlinkSlash).")
+	viper.execute_skill_2()
+	_check(received_skills.has(&"DeflectionMatrix"), "Viper execute_skill_2 memancarkan sinyal DeflectionMatrix.")
 	viper.current_ultimate = 100.0
-	viper.activate_absolute_zero_protocol()
-	_check(received_skills.has(&"AbsoluteZeroProtocol"), "Viper activate_absolute_zero_protocol memancarkan sinyal AbsoluteZeroProtocol.")
+	viper.execute_ultimate()
+	_check(received_skills.has(&"AbsoluteZeroProtocol"), "Viper execute_ultimate memancarkan sinyal AbsoluteZeroProtocol.")
+	viper.queue_free()
+
+	# 2. Titan-V Bulwark
+	var bulwark: BaseMecha = TitanBulwarkScript.new()
+	add_child(bulwark)
+	bulwark.execute_skill_1()
+	_check(received_skills.has(&"HydraulicPiledriver"), "Bulwark execute_skill_1 memancarkan sinyal HydraulicPiledriver.")
+	bulwark.execute_skill_2()
+	_check(received_skills.has(&"RiotShield"), "Bulwark execute_skill_2 memancarkan sinyal RiotShield.")
+	bulwark.current_ultimate = 100.0
+	bulwark.execute_ultimate()
+	_check(received_skills.has(&"OrbitalSiegeCannon"), "Bulwark execute_ultimate memancarkan sinyal OrbitalSiegeCannon.")
+	bulwark.queue_free()
+
+	# 3. Ray-X Pulsar
+	var pulsar: BaseMecha = RayPulsarScript.new()
+	add_child(pulsar)
+	bulwark = null
+	pulsar.execute_skill_1()
+	_check(received_skills.has(&"Skill1"), "Pulsar execute_skill_1 memancarkan sinyal PhotonRailgun / Skill1.")
+	pulsar.execute_skill_2()
+	_check(received_skills.has(&"Skill2"), "Pulsar execute_skill_2 memancarkan sinyal DisrupterDrone / Skill2.")
+	pulsar.execute_ultimate()
+	_check(received_skills.has(&"Ultimate"), "Pulsar execute_ultimate memancarkan sinyal SupernovaHorizon / Ultimate.")
+	pulsar.queue_free()
+
+	# 4. Phantom-9 Kage
+	var kage: BaseMecha = PhantomKageScript.new()
+	add_child(kage)
+	kage.execute_skill_1()
+	_check(received_skills.has(&"Skill1"), "Kage execute_skill_1 memancarkan sinyal StanceShift / Skill1.")
+	kage.execute_skill_2()
+	_check(received_skills.has(&"Skill2"), "Kage execute_skill_2 memancarkan sinyal IaidoCrescent / Skill2.")
+	kage.execute_ultimate()
+	_check(received_skills.has(&"Ultimate"), "Kage execute_ultimate memancarkan sinyal ShadowBlossom / Ultimate.")
+	kage.queue_free()
 
 	EventBus.skill_cast.disconnect(on_cast)
-	viper.queue_free()
 
 func _test_vfx_showcase_scene() -> void:
 	var showcase_scene: PackedScene = load("res://scenes/vfx_showcase.tscn")
@@ -286,3 +324,27 @@ func _test_vfx_showcase_scene() -> void:
 	_check(showcase.caster_dummy != null and showcase.target_dummy != null, "VFXShowcase memiliki Caster Dummy dan Target Dummy.")
 	_check(showcase.SKILLS.size() >= 14, "VFXShowcase memuat seluruh 14+ skill mecha roster.")
 	showcase.queue_free()
+
+func _test_mecha_pixel_sprite_distinct_attack_techniques() -> void:
+	var spr: MechaPixelSprite = MechaPixelSpriteScript.new()
+	add_child(spr)
+
+	var archetypes_attacks: Dictionary = {
+		&"viper": [&"5L", &"5L2", &"5H", &"BlinkSlash", &"DeflectionMatrix", &"AbsoluteZeroProtocol"],
+		&"bulwark": [&"5L", &"5H", &"HydraulicPiledriver", &"RiotShield", &"OrbitalSiegeCannon"],
+		&"pulsar": [&"5L", &"5H", &"PhotonRailgun", &"DisrupterDrone", &"SupernovaHorizon"],
+		&"kage": [&"5L", &"5H", &"IaidoCrescent", &"ShurikenStorm", &"StanceShift", &"ShadowBlossom"]
+	}
+
+	for arch in archetypes_attacks.keys():
+		spr.archetype = arch
+		spr.current_state = &"Attack"
+		for atk in archetypes_attacks[arch]:
+			spr.attack_type = atk
+			spr.attack_frame = 2
+			spr.queue_redraw()
+			# Trigger NOTIFICATION_DRAW sesuai siklus hidup CanvasItem Godot
+			spr.notification(CanvasItem.NOTIFICATION_DRAW)
+			_check(spr.attack_type == atk, "Sprite %s sukses mengonfigurasi teknik menyerang '%s'." % [arch, atk])
+
+	spr.queue_free()

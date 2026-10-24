@@ -518,6 +518,13 @@ func request_attack(attack_data: Variant) -> void:
 	elif attack_data != null and "name" in attack_data:
 		atk_name_str = str(attack_data.name)
 
+	# Sinkronisasi ke visual sprite renderer untuk teknik menyerang spesifik
+	if visual_root and visual_root.has_node("Sprite"):
+		var spr = visual_root.get_node("Sprite")
+		if "attack_type" in spr:
+			spr.attack_type = StringName(atk_name_str)
+			spr.attack_frame = 0
+
 	if atk_name_str != "" and not atk_name_str.begins_with("5L") and not atk_name_str.begins_with("5H") and atk_name_str != "Punch" and atk_name_str != "Slam":
 		var bus = get_node_or_null("/root/EventBus")
 		if bus and bus.has_signal("skill_cast"):
@@ -530,6 +537,24 @@ func request_attack_by_name(atk_name: StringName) -> void:
 		request_attack(CombatConstants.LIGHT_ATTACK)
 	elif atk_name == &"5H":
 		request_attack(CombatConstants.HEAVY_ATTACK)
+	elif atk_name == &"Skill1" and attack_resources.has(&"BlinkSlash"):
+		request_attack(attack_resources[&"BlinkSlash"])
+	elif atk_name == &"Skill2" and attack_resources.has(&"DeflectionMatrix"):
+		request_attack(attack_resources[&"DeflectionMatrix"])
+
+## Eksekusi Skill 1 karakter (Keyboard [U] / Touch SKILL 1)
+func execute_skill_1() -> void:
+	request_attack_by_name(&"Skill1")
+
+## Eksekusi Skill 2 karakter (Keyboard [I] / Touch SKILL 2)
+func execute_skill_2() -> void:
+	request_attack_by_name(&"Skill2")
+
+## Eksekusi Ultimate karakter (Keyboard [O] / Touch ULTI)
+func execute_ultimate() -> void:
+	if current_ultimate >= max_ultimate:
+		drain_ultimate(max_ultimate)
+		request_attack_by_name(&"Ultimate")
 
 func reset_combo_state() -> void:
 	combo_hit_count = 0

@@ -87,6 +87,15 @@ func activate_orbital_siege_cannon() -> bool:
 		print("[ULTIMATE][%s] ORBITAL SIEGE CANNON MENYALA! Meriam partikel 450 HP!" % name)
 	return true
 
+func execute_skill_1() -> void:
+	execute_hydraulic_piledriver()
+
+func execute_skill_2() -> void:
+	execute_riot_shield_deploy()
+
+func execute_ultimate() -> void:
+	activate_orbital_siege_cannon()
+
 func _update_hud() -> void:
 	super._update_hud()
 	var status_label := get_node_or_null("../UI/HUD/StatusLabel") as Label

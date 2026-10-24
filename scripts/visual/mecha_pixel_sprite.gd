@@ -31,6 +31,7 @@ var is_overclocked: bool = false
 var is_meltdown: bool = false
 var weapon_extended: bool = false
 var attack_type: StringName = &""
+var attack_frame: int = 0
 
 var parent_mecha: CharacterBody2D = null
 
@@ -139,6 +140,18 @@ func _physics_process(_delta: float) -> void:
 
 		if parent_mecha.has_method("is_overclocked"):
 			is_overclocked = parent_mecha.is_overclocked()
+
+		if sm and sm.get("current_state"):
+			if sm.current_state.name == &"Attack" and sm.current_state.get("current_attack_data"):
+				var atk_d = sm.current_state.current_attack_data
+				var n = atk_d.get("name", "")
+				if n != "":
+					attack_type = StringName(str(n))
+				if "current_attack_frame" in sm.current_state:
+					attack_frame = sm.current_state.current_attack_frame
+			elif sm.current_state.name != &"Attack":
+				attack_type = &""
+				attack_frame = 0
 
 	if hit_flash_frames > 0:
 		hit_flash_frames -= 1
@@ -285,16 +298,9 @@ func _draw_viper_fighter() -> void:
 	else:
 		draw_line(Vector2(0.5, head_center.y - 1), Vector2(3.5, head_center.y - 1), Color(0.3, 0.4, 0.5), 1.0)
 
-	# 5. Lengan & Kepalan Tangan Bela Diri (Martial Guard / Punch)
+	# 5. Lengan & Kepalan Tangan Bela Diri (Martial Guard / Distinct Techniques)
 	if current_state == &"Attack":
-		# Lengan kiri menjaga dada
-		draw_circle(Vector2(-3, -2 + bob_y), 2.5, col_skin)
-		# Tangan kanan melancarkan pukulan kilat maju ke depan dengan Beam Rapier!
-		var punch_x = 18.0
-		_draw_fighter_arm(Vector2(4, -5 + bob_y), Vector2(punch_x, -5 + bob_y), col_skin, col_armor)
-		# Rapier Beam Blade dari kepalan tangan
-		draw_line(Vector2(punch_x, -5 + bob_y), Vector2(punch_x + 16, -5 + bob_y), col_energy, 2.5)
-		draw_line(Vector2(punch_x, -5 + bob_y), Vector2(punch_x + 14, -5 + bob_y), Color.WHITE, 1.2)
+		_draw_viper_attack_pose(bob_y)
 	elif current_state in [&"Blockstun", &"Parry"]:
 		# X-Guard: Dua lengan menyilang kuat di depan wajah
 		_draw_fighter_arm(Vector2(-4, -4 + bob_y), Vector2(3, -9 + bob_y), col_skin, col_armor)
@@ -380,13 +386,9 @@ func _draw_bulwark_fighter() -> void:
 	draw_circle(Vector2(2.0, head_center.y - 0.5), 1.2, Color.WHITE)
 	draw_circle(Vector2(2.0, head_center.y - 0.5), 0.7, Color.BLACK)
 
-	# 4. Lengan Kekar & Sarung Tinju / Knuckle Wrap
+	# 4. Lengan Kekar & Sarung Tinju / Distinct Brawler Techniques
 	if current_state == &"Attack":
-		# Heavy Haymaker Punch meluncur dahsyat ke depan
-		var punch_pos = Vector2(20.0, -5 + bob_y)
-		_draw_fighter_arm(Vector2(6, -6 + bob_y), punch_pos, col_skin, col_armor, 4.5)
-		draw_circle(punch_pos, 4.5, col_armor) # Sarung tinju tebal
-		draw_circle(punch_pos + Vector2(2, 0), 2.5, col_highlight)
+		_draw_bulwark_attack_pose(bob_y)
 	elif current_state in [&"Blockstun", &"Parry"]:
 		# Full Guard: Dua lengan kekar menutupi seluruh kepala & dada
 		_draw_fighter_arm(Vector2(-5, -5 + bob_y), Vector2(0, -11 + bob_y), col_skin, col_armor, 4.5)
@@ -452,14 +454,9 @@ func _draw_pulsar_fighter() -> void:
 	draw_line(Vector2(-3.5, head_center.y - 2), Vector2(3.5, head_center.y - 2), col_belt, 1.5)
 	draw_circle(Vector2(0, head_center.y - 2), 1.2, col_energy)
 
-	# 4. Lengan & Tapak Bela Diri (Shaolin Palm Stance)
+	# 4. Lengan & Tapak Bela Diri (Shaolin Photon Mastery / Distinct Techniques)
 	if current_state == &"Attack":
-		# Serangan Tapak Sakti / Photon Palm Strike meluncur ke depan
-		var palm_pos = Vector2(17.0, -4 + bob_y)
-		_draw_fighter_arm(Vector2(4, -5 + bob_y), palm_pos, col_skin, col_highlight)
-		# Gelombang foton melingkar di ujung tapak
-		draw_circle(palm_pos, 4.0, Color(col_energy.r, col_energy.g, col_energy.b, 0.7))
-		draw_circle(palm_pos, 2.0, Color.WHITE)
+		_draw_pulsar_attack_pose(bob_y)
 	elif current_state in [&"Blockstun", &"Parry"]:
 		# Lingkaran pertahanan tapak Wing Chun
 		_draw_fighter_arm(Vector2(-4, -4 + bob_y), Vector2(2, -8 + bob_y), col_skin, col_highlight)
@@ -549,19 +546,7 @@ func _draw_kage_fighter() -> void:
 		is_kenjutsu = (parent_mecha.current_stance == &"kenjutsu")
 
 	if current_state == &"Attack":
-		if is_kenjutsu:
-			# Slash Katana terhunus tajam
-			var blade_start = Vector2(5, -6 + bob_y)
-			var blade_tip = Vector2(22, -9 + bob_y)
-			_draw_fighter_arm(Vector2(4, -6 + bob_y), blade_start, col_skin, col_armor)
-			draw_line(blade_start, blade_tip, col_highlight, 2.5)
-			draw_line(blade_start, blade_tip, Color.WHITE, 1.2)
-		else:
-			# Lemparan Shuriken Bayangan
-			var hand_pos = Vector2(16, -4 + bob_y)
-			_draw_fighter_arm(Vector2(4, -6 + bob_y), hand_pos, col_skin, col_armor)
-			draw_circle(hand_pos, 3.5, col_energy)
-			draw_circle(hand_pos, 1.5, Color.WHITE)
+		_draw_kage_attack_pose(bob_y, is_kenjutsu)
 	else:
 		# Pose tangan sigap bela diri ninja
 		_draw_fighter_arm(Vector2(-5, -6 + bob_y), Vector2(-2, -3 + bob_y), col_skin, col_armor)
@@ -593,3 +578,297 @@ func _draw_fighter_arm(shoulder: Vector2, hand: Vector2, skin_c: Color, wrap_c: 
 	draw_line(elbow, hand, wrap_c, thickness)
 	# Kepalan / Tapak tangan
 	draw_circle(hand, thickness * 0.6, skin_c)
+
+## =========================================================================
+## TEKNIK-TEKNIK MENYERANG & EFEK VISUAL SKILL KARAKTER SPESIFIK
+## =========================================================================
+
+## 1. APEX-0 VIPER: BEAM RAPIER COMBAT TECHNIQUES
+func _draw_viper_attack_pose(bob_y: float) -> void:
+	var atk_str := String(attack_type).to_lower()
+
+	if atk_str.contains("deflection") or atk_str.contains("matrix") or atk_str == "skill2":
+		# Skill 2: Deflection Matrix - Holographic Hexagonal Shield Matrix
+		_draw_fighter_arm(Vector2(-4, -6 + bob_y), Vector2(10, -8 + bob_y), col_skin, col_armor)
+		_draw_fighter_arm(Vector2(4, -6 + bob_y), Vector2(12, -2 + bob_y), col_skin, col_armor)
+		var center_hex := Vector2(16.0, -5.0 + bob_y)
+		var hex_r := 12.0
+		var hex_pts := PackedVector2Array()
+		for i in range(6):
+			var a := deg_to_rad(60.0 * float(i) + (float(anim_tick) * 4.0))
+			hex_pts.append(center_hex + Vector2(cos(a), sin(a)) * hex_r)
+		var hex_closed := hex_pts.duplicate()
+		hex_closed.append(hex_pts[0])
+		draw_colored_polygon(hex_pts, Color(col_highlight.r, col_highlight.g, col_highlight.b, 0.25))
+		draw_polyline(hex_closed, col_highlight, 2.0)
+		draw_polyline(hex_closed, Color.WHITE, 1.0)
+		for p in hex_pts:
+			draw_circle(p, 1.5, col_energy)
+
+	elif atk_str.contains("blink") or atk_str == "skill1":
+		# Skill 1: Blink Slash - Low Evasive Phantom Dash with Twin Trailing Rapiers
+		var f_pos1 := Vector2(-16.0, 2.0 + bob_y)
+		var f_pos2 := Vector2(-22.0, 6.0 + bob_y)
+		_draw_fighter_arm(Vector2(-5, -4 + bob_y), f_pos1, col_skin, col_armor)
+		_draw_fighter_arm(Vector2(4, -4 + bob_y), f_pos2, col_skin, col_armor)
+		draw_line(f_pos1, f_pos1 + Vector2(-14, 2), col_energy, 2.5)
+		draw_line(f_pos1, f_pos1 + Vector2(-12, 2), Color.WHITE, 1.2)
+		draw_line(f_pos2, f_pos2 + Vector2(-16, 4), col_energy, 2.5)
+		draw_line(f_pos2, f_pos2 + Vector2(-14, 4), Color.WHITE, 1.2)
+		draw_line(Vector2(8, -8 + bob_y), Vector2(24, -8 + bob_y), Color(col_highlight.r, col_highlight.g, col_highlight.b, 0.6), 1.5)
+		draw_line(Vector2(10, -2 + bob_y), Vector2(28, -2 + bob_y), Color(1, 1, 1, 0.8), 1.5)
+
+	elif atk_str.contains("zero") or atk_str.contains("protocol") or atk_str == "ultimate":
+		# Ultimate: Absolute Zero Protocol - Sub-Zero Cryo Spikes & Ascension Stance
+		_draw_fighter_arm(Vector2(-5, -6 + bob_y), Vector2(-7, 2 + bob_y), col_skin, col_armor)
+		_draw_fighter_arm(Vector2(4, -6 + bob_y), Vector2(7, 2 + bob_y), col_skin, col_armor)
+		draw_colored_polygon(PackedVector2Array([Vector2(-12, 19 + bob_y), Vector2(-9, 6 + bob_y), Vector2(-6, 19 + bob_y)]), col_highlight)
+		draw_colored_polygon(PackedVector2Array([Vector2(8, 19 + bob_y), Vector2(12, 4 + bob_y), Vector2(15, 19 + bob_y)]), col_energy)
+		draw_colored_polygon(PackedVector2Array([Vector2(1, 19 + bob_y), Vector2(4, 9 + bob_y), Vector2(7, 19 + bob_y)]), Color.WHITE)
+
+	elif atk_str.contains("5h") or atk_str.contains("cleave"):
+		# 5H: Plasma Cleave - Overhead 180° Vertical Neon Crescent Arc
+		var hand_pos := Vector2(14.0, 2.0 + bob_y)
+		_draw_fighter_arm(Vector2(4, -7 + bob_y), hand_pos, col_skin, col_armor)
+		draw_arc(Vector2(4, -3 + bob_y), 18.0, -PI * 0.55, PI * 0.35, 12, col_energy, 3.5)
+		draw_arc(Vector2(4, -3 + bob_y), 18.0, -PI * 0.5, PI * 0.3, 10, Color.WHITE, 1.5)
+		draw_circle(Vector2(18, 9 + bob_y), 2.5, col_highlight)
+
+	elif atk_str.contains("5l2") or atk_str.contains("thrust"):
+		# 5L2: Sonic Thrust - Deep Low Forward Lunge with Conical Shockwave Rings
+		var lunge_x := 24.0
+		_draw_fighter_arm(Vector2(4, -4 + bob_y), Vector2(lunge_x, -4 + bob_y), col_skin, col_armor)
+		draw_line(Vector2(lunge_x, -4 + bob_y), Vector2(lunge_x + 22, -4 + bob_y), col_energy, 3.0)
+		draw_line(Vector2(lunge_x, -4 + bob_y), Vector2(lunge_x + 20, -4 + bob_y), Color.WHITE, 1.5)
+		draw_arc(Vector2(lunge_x + 10, -4 + bob_y), 6.0, -PI * 0.5, PI * 0.5, 8, col_highlight, 1.5)
+		draw_arc(Vector2(lunge_x + 16, -4 + bob_y), 9.0, -PI * 0.5, PI * 0.5, 8, Color.WHITE, 1.2)
+
+	else:
+		# 5L / 5L1: Viper Jab - Rapid Precision Rapier Jab with Spark Point
+		draw_circle(Vector2(-3, -2 + bob_y), 2.5, col_skin)
+		var punch_x := 18.0
+		_draw_fighter_arm(Vector2(4, -5 + bob_y), Vector2(punch_x, -5 + bob_y), col_skin, col_armor)
+		draw_line(Vector2(punch_x, -5 + bob_y), Vector2(punch_x + 16, -5 + bob_y), col_energy, 2.5)
+		draw_line(Vector2(punch_x, -5 + bob_y), Vector2(punch_x + 14, -5 + bob_y), Color.WHITE, 1.2)
+		draw_circle(Vector2(punch_x + 16, -5 + bob_y), 2.0, col_highlight)
+
+## 2. TITAN-V BULWARK: HEAVYWEIGHT BRAWLER & GRAPPLER TECHNIQUES
+func _draw_bulwark_attack_pose(bob_y: float) -> void:
+	var atk_str := String(attack_type).to_lower()
+
+	if atk_str.contains("piledriver") or atk_str.contains("hydraulic") or atk_str == "skill1":
+		# Skill 1: Hydraulic Piledriver - Clamping Steel Claws with High-Pressure Steam Piston
+		var cakar_top := Vector2(20.0, -10.0 + bob_y)
+		var cakar_bot := Vector2(20.0, 2.0 + bob_y)
+		_draw_fighter_arm(Vector2(5, -7 + bob_y), cakar_top, col_skin, col_armor, 4.5)
+		_draw_fighter_arm(Vector2(5, -3 + bob_y), cakar_bot, col_skin, col_armor, 4.5)
+		draw_line(cakar_top, cakar_top + Vector2(6, 4), col_highlight, 3.0)
+		draw_line(cakar_bot, cakar_bot + Vector2(6, -4), col_highlight, 3.0)
+		draw_line(Vector2(2, -10 + bob_y), Vector2(-4, -14 + bob_y), Color.WHITE, 2.0)
+		draw_line(Vector2(2, -1 + bob_y), Vector2(-4, 3 + bob_y), Color.WHITE, 2.0)
+
+	elif atk_str.contains("riot") or atk_str.contains("shield") or atk_str == "skill2":
+		# Skill 2: Riot Shield Deploy - Heavy Steel Blast Shield with Hazard Caution Stripes
+		_draw_fighter_arm(Vector2(-4, -5 + bob_y), Vector2(8, -8 + bob_y), col_skin, col_armor, 4.5)
+		_draw_fighter_arm(Vector2(4, -5 + bob_y), Vector2(10, 4 + bob_y), col_skin, col_armor, 4.5)
+		draw_rect(Rect2(11, -18 + bob_y, 8, 36), col_chassis)
+		draw_rect(Rect2(12, -17 + bob_y, 6, 34), col_armor)
+		for i in range(4):
+			var hy := -14.0 + float(i) * 8.0 + bob_y
+			draw_line(Vector2(12, hy), Vector2(18, hy + 5), col_highlight, 1.8)
+		draw_line(Vector2(15, 18 + bob_y), Vector2(15, 23 + bob_y), Color.WHITE, 2.5)
+
+	elif atk_str.contains("orbital") or atk_str.contains("cannon") or atk_str == "ultimate":
+		# Ultimate: Orbital Siege Cannon - Tripod Artillery Lock Aiming Skyward
+		_draw_fighter_arm(Vector2(-5, -5 + bob_y), Vector2(0, 4 + bob_y), col_skin, col_armor, 4.5)
+		_draw_fighter_arm(Vector2(5, -6 + bob_y), Vector2(8, -14 + bob_y), col_skin, col_armor, 4.5)
+		var muzzle := Vector2(8, -26 + bob_y)
+		draw_line(Vector2(6, -8 + bob_y), muzzle, col_armor, 5.0)
+		draw_line(Vector2(6, -8 + bob_y), muzzle, Color.WHITE, 2.0)
+		draw_arc(muzzle, 5.0, -PI, PI, 10, col_highlight, 2.0)
+		draw_arc(muzzle, 8.0, -PI, PI, 10, Color(1.0, 0.85, 0.2, 0.7), 1.5)
+		draw_circle(muzzle, 3.0, Color.WHITE)
+
+	elif atk_str.contains("5h") or atk_str.contains("slam"):
+		# 5H: Earthbreaker Hammer Slam - Intertwined Double Hammer Fists Crashing Down
+		var slam_pos := Vector2(14.0, 10.0 + bob_y)
+		_draw_fighter_arm(Vector2(-2, -8 + bob_y), slam_pos, col_skin, col_armor, 4.5)
+		_draw_fighter_arm(Vector2(6, -8 + bob_y), slam_pos, col_skin, col_armor, 4.5)
+		draw_circle(slam_pos, 5.5, col_armor)
+		draw_circle(slam_pos, 3.0, col_highlight)
+		draw_line(Vector2(slam_pos.x - 6, 19 + bob_y), Vector2(slam_pos.x + 12, 19 + bob_y), Color.WHITE, 2.0)
+		draw_line(Vector2(slam_pos.x + 2, 19 + bob_y), Vector2(slam_pos.x + 8, 24 + bob_y), col_highlight, 1.5)
+
+	else:
+		# 5L: Megaton Straight Punch - Rocket Knuckle with Back Exhaust Flame
+		var punch_pos := Vector2(20.0, -5 + bob_y)
+		_draw_fighter_arm(Vector2(6, -6 + bob_y), punch_pos, col_skin, col_armor, 4.5)
+		draw_circle(punch_pos, 4.5, col_armor)
+		draw_circle(punch_pos + Vector2(2, 0), 2.5, col_highlight)
+		draw_arc(punch_pos + Vector2(3, 0), 6.0, -PI * 0.5, PI * 0.5, 8, col_highlight, 1.5)
+		draw_line(Vector2(-9, -6 + bob_y), Vector2(-16, -6 + bob_y), col_thruster, 3.0)
+		draw_line(Vector2(-9, -6 + bob_y), Vector2(-13, -6 + bob_y), Color.WHITE, 1.5)
+
+## 3. RAY-X PULSAR: SHAOLIN PHOTON & SPATIAL TECHNIQUES
+func _draw_pulsar_attack_pose(bob_y: float) -> void:
+	var atk_str := String(attack_type).to_lower()
+
+	if atk_str.contains("railgun") or atk_str.contains("photon") or atk_str == "skill1":
+		# Skill 1: Photon Railgun - Diamond Focus Prism Mudra with Guiding Laser Ray
+		var prism_pos := Vector2(16.0, -4.0 + bob_y)
+		_draw_fighter_arm(Vector2(-4, -5 + bob_y), prism_pos, col_skin, col_highlight, 3.5)
+		_draw_fighter_arm(Vector2(4, -5 + bob_y), prism_pos, col_skin, col_highlight, 3.5)
+		var prism_poly := PackedVector2Array([
+			prism_pos + Vector2(0, -6),
+			prism_pos + Vector2(5, 0),
+			prism_pos + Vector2(0, 6),
+			prism_pos + Vector2(-5, 0)
+		])
+		draw_colored_polygon(prism_poly, col_energy)
+		draw_polyline(prism_poly, Color.WHITE, 1.5)
+		draw_line(prism_pos, prism_pos + Vector2(28, 0), Color(col_highlight.r, col_highlight.g, col_highlight.b, 0.8), 2.5)
+		draw_line(prism_pos, prism_pos + Vector2(26, 0), Color.WHITE, 1.2)
+
+	elif atk_str.contains("drone") or atk_str.contains("disrupter") or atk_str == "skill2":
+		# Skill 2: Disrupter Drone - Tactical Upward Mudra with Floating Pod & Scanner Cone
+		_draw_fighter_arm(Vector2(-4, -5 + bob_y), Vector2(-1, 0 + bob_y), col_skin, col_highlight)
+		_draw_fighter_arm(Vector2(4, -6 + bob_y), Vector2(10, -18 + bob_y), col_skin, col_highlight)
+		var drone_pos := Vector2(14.0, -26.0 + bob_y)
+		var d_poly := PackedVector2Array([
+			drone_pos + Vector2(0, -5),
+			drone_pos + Vector2(6, 4),
+			drone_pos + Vector2(-6, 4)
+		])
+		draw_colored_polygon(d_poly, col_armor)
+		draw_polyline(d_poly, col_highlight, 1.2)
+		draw_circle(drone_pos, 2.0, col_energy)
+		draw_line(drone_pos, drone_pos + Vector2(-8, 12), Color(col_energy.r, col_energy.g, col_energy.b, 0.5), 1.0)
+		draw_line(drone_pos, drone_pos + Vector2(8, 12), Color(col_energy.r, col_energy.g, col_energy.b, 0.5), 1.0)
+
+	elif atk_str.contains("supernova") or atk_str.contains("horizon") or atk_str == "ultimate":
+		# Ultimate: Supernova Horizon - Levitating Cosmic Zen Meditation
+		var lev_y := bob_y - 8.0
+		_draw_fighter_arm(Vector2(-5, -6 + lev_y), Vector2(-10, -4 + lev_y), col_skin, col_highlight)
+		_draw_fighter_arm(Vector2(4, -6 + lev_y), Vector2(10, -4 + lev_y), col_skin, col_highlight)
+		for i in range(3):
+			var angle := (float(anim_tick) * 0.16) + (float(i) * (TAU / 3.0))
+			var orb_pos := Vector2(cos(angle) * 16.0, sin(angle) * 10.0 - 4.0 + lev_y)
+			draw_circle(orb_pos, 4.0, col_energy)
+			draw_circle(orb_pos, 2.0, Color.WHITE)
+			draw_arc(orb_pos, 6.0, 0, TAU, 8, col_highlight, 1.0)
+		draw_arc(Vector2(0, -4 + lev_y), 20.0, 0, TAU, 16, Color(1.0, 0.85, 0.2, 0.6), 1.5)
+
+	elif atk_str.contains("5h") or atk_str.contains("lance"):
+		# 5H: Plasma Lance - Flying Sweep Thrust with Energy Spiral Helices
+		var lance_pos := Vector2(22.0, -5.0 + bob_y)
+		_draw_fighter_arm(Vector2(4, -6 + bob_y), lance_pos, col_skin, col_highlight)
+		draw_line(Vector2(lance_pos.x - 8, -5 + bob_y), Vector2(lance_pos.x + 24, -5 + bob_y), col_energy, 3.5)
+		draw_line(Vector2(lance_pos.x - 6, -5 + bob_y), Vector2(lance_pos.x + 22, -5 + bob_y), Color.WHITE, 1.5)
+		draw_arc(Vector2(lance_pos.x + 6, -5 + bob_y), 5.0, -PI, PI, 8, col_highlight, 1.2)
+		draw_arc(Vector2(lance_pos.x + 14, -5 + bob_y), 4.0, -PI, PI, 8, col_highlight, 1.2)
+
+	else:
+		# 5L: Twin Photon Palm - Double Shaolin Concentric Waves
+		var palm_pos1 := Vector2(16.0, -8.0 + bob_y)
+		var palm_pos2 := Vector2(18.0, -1.0 + bob_y)
+		_draw_fighter_arm(Vector2(-3, -6 + bob_y), palm_pos1, col_skin, col_highlight)
+		_draw_fighter_arm(Vector2(4, -5 + bob_y), palm_pos2, col_skin, col_highlight)
+		draw_circle(palm_pos1, 3.5, Color(col_energy.r, col_energy.g, col_energy.b, 0.8))
+		draw_circle(palm_pos1, 1.8, Color.WHITE)
+		draw_circle(palm_pos2, 4.0, Color(col_energy.r, col_energy.g, col_energy.b, 0.8))
+		draw_circle(palm_pos2, 2.0, Color.WHITE)
+		draw_arc(Vector2(20, -4 + bob_y), 8.0, -PI * 0.5, PI * 0.5, 8, col_highlight, 1.5)
+
+## 4. PHANTOM-9 KAGE: DUAL-STANCE SHADOW SHINOBI TECHNIQUES
+func _draw_kage_attack_pose(bob_y: float, is_kenjutsu: bool) -> void:
+	var atk_str := String(attack_type).to_lower()
+
+	if atk_str.contains("stance") or atk_str == "skill1":
+		# Skill 1: Stance Shift & Shadow Feint - Ninja Smoke Vanish Silhouette
+		for i in range(5):
+			var a := float(i) * (TAU / 5.0) + (float(anim_tick) * 0.1)
+			var sp := Vector2(cos(a) * 12.0, sin(a) * 8.0 - 6.0 + bob_y)
+			draw_circle(sp, 6.0, Color(0.1, 0.08, 0.12, 0.7))
+			draw_circle(sp, 4.0, Color(col_armor.r, col_armor.g, col_armor.b, 0.4))
+		draw_line(Vector2(2, -15 + bob_y), Vector2(8, -15 + bob_y), col_visor, 2.0)
+
+	elif atk_str.contains("blossom") or atk_str == "ultimate":
+		# Ultimate: Shadow Blossom - Tsukuyomi Multi-Cross Slash with Flying Petals
+		_draw_fighter_arm(Vector2(-4, -6 + bob_y), Vector2(-10, -2 + bob_y), col_skin, col_armor)
+		_draw_fighter_arm(Vector2(4, -6 + bob_y), Vector2(16, -6 + bob_y), col_skin, col_armor)
+		draw_line(Vector2(6, -18 + bob_y), Vector2(26, 6 + bob_y), col_highlight, 3.0)
+		draw_line(Vector2(6, -18 + bob_y), Vector2(26, 6 + bob_y), Color.WHITE, 1.2)
+		draw_line(Vector2(6, 6 + bob_y), Vector2(26, -18 + bob_y), col_highlight, 3.0)
+		draw_line(Vector2(6, 6 + bob_y), Vector2(26, -18 + bob_y), Color.WHITE, 1.2)
+		draw_circle(Vector2(14, -12 + bob_y), 2.0, col_armor)
+		draw_circle(Vector2(22, 2 + bob_y), 1.8, col_armor)
+		draw_circle(Vector2(8, 0 + bob_y), 2.2, col_armor)
+
+	elif is_kenjutsu:
+		if atk_str.contains("iaido") or atk_str == "skill2":
+			# Kenjutsu Skill 2: Iaido Crescent Strike - Extreme Low Dash Crescent Blood Wave
+			var blade_start := Vector2(8, -2 + bob_y)
+			var blade_tip := Vector2(26, -6 + bob_y)
+			_draw_fighter_arm(Vector2(4, -5 + bob_y), blade_start, col_skin, col_armor)
+			draw_line(blade_start, blade_tip, col_highlight, 3.0)
+			draw_line(blade_start, blade_tip, Color.WHITE, 1.5)
+			draw_arc(Vector2(16, -4 + bob_y), 16.0, -PI * 0.6, PI * 0.4, 10, col_armor, 3.0)
+			draw_arc(Vector2(16, -4 + bob_y), 16.0, -PI * 0.55, PI * 0.35, 10, Color.WHITE, 1.5)
+		elif atk_str.contains("5h") or atk_str.contains("cleave"):
+			# Kenjutsu 5H: Katana Cleave - Two-Handed Overhead Executioner Chop
+			var hilt_pos := Vector2(8, -18 + bob_y)
+			var tip_pos := Vector2(18, 10 + bob_y)
+			_draw_fighter_arm(Vector2(-3, -7 + bob_y), hilt_pos, col_skin, col_armor)
+			_draw_fighter_arm(Vector2(4, -7 + bob_y), hilt_pos, col_skin, col_armor)
+			draw_line(hilt_pos, tip_pos, col_highlight, 3.0)
+			draw_line(hilt_pos, tip_pos, Color.WHITE, 1.5)
+			draw_line(Vector2(10, -20 + bob_y), Vector2(20, 8 + bob_y), Color(col_highlight.r, col_highlight.g, col_highlight.b, 0.5), 2.0)
+		else:
+			# Kenjutsu 5L: Katana Slash - Quick-Draw Iaido Horizontal Slash
+			var blade_start := Vector2(5, -6 + bob_y)
+			var blade_tip := Vector2(22, -9 + bob_y)
+			_draw_fighter_arm(Vector2(4, -6 + bob_y), blade_start, col_skin, col_armor)
+			draw_line(blade_start, blade_tip, col_highlight, 2.5)
+			draw_line(blade_start, blade_tip, Color.WHITE, 1.2)
+			draw_line(blade_tip, blade_tip + Vector2(6, -1), col_highlight, 1.5)
+
+	else:
+		# SHINOBI STANCE
+		if atk_str.contains("shuriken") or atk_str.contains("storm") or atk_str == "skill2":
+			# Shinobi Skill 2: Shuriken Storm - Spinning Razor Star Flurry
+			var hand_pos := Vector2(16, -5 + bob_y)
+			_draw_fighter_arm(Vector2(4, -6 + bob_y), hand_pos, col_skin, col_armor)
+			for i in range(3):
+				var sx: float = hand_pos.x + 8.0 + float(i) * 7.0
+				var sy: float = hand_pos.y + float(i % 2) * 6.0 - 3.0
+				_draw_mini_shuriken(Vector2(sx, sy), (float(anim_tick) * 0.3) + float(i))
+		elif atk_str.contains("5h") or atk_str.contains("flurry"):
+			# Shinobi 5H: Kunai Flurry - Tri-Kunai Fan Spread
+			var hand_pos := Vector2(16, -4 + bob_y)
+			_draw_fighter_arm(Vector2(4, -6 + bob_y), hand_pos, col_skin, col_armor)
+			_draw_kunai(hand_pos + Vector2(6, -6), -0.25)
+			_draw_kunai(hand_pos + Vector2(8, 0), 0.0)
+			_draw_kunai(hand_pos + Vector2(6, 6), 0.25)
+		else:
+			# Shinobi 5L: Phantom Kunai - Sharp Wrist Throw
+			var hand_pos := Vector2(16, -4 + bob_y)
+			_draw_fighter_arm(Vector2(4, -6 + bob_y), hand_pos, col_skin, col_armor)
+			_draw_kunai(hand_pos + Vector2(8, 0), 0.0)
+
+func _draw_mini_shuriken(pos: Vector2, rot: float) -> void:
+	var pts := PackedVector2Array([
+		pos + Vector2(0, -4).rotated(rot),
+		pos + Vector2(4, 0).rotated(rot),
+		pos + Vector2(0, 4).rotated(rot),
+		pos + Vector2(-4, 0).rotated(rot)
+	])
+	draw_colored_polygon(pts, col_armor)
+	draw_polyline(pts, Color.WHITE, 1.0)
+	draw_circle(pos, 1.0, Color.BLACK)
+
+func _draw_kunai(pos: Vector2, angle: float) -> void:
+	var tip := pos + Vector2(6, 0).rotated(angle)
+	var base1 := pos + Vector2(-3, -2).rotated(angle)
+	var base2 := pos + Vector2(-3, 2).rotated(angle)
+	draw_colored_polygon(PackedVector2Array([tip, base1, base2]), col_armor)
+	draw_line(pos + Vector2(-3, 0).rotated(angle), pos + Vector2(-6, 0).rotated(angle), Color.WHITE, 1.2)

@@ -17,9 +17,25 @@ func enter() -> void:
 		_consume_buffered_action(&"parry")
 		state_machine.change_state(&"Parry")
 		return
+	if _is_ultimate_pressed():
+		_consume_buffered_action(&"ultimate")
+		if character and character.has_method("execute_ultimate"):
+			character.execute_ultimate()
+		elif character and character.has_method("request_attack_by_name"):
+			character.request_attack_by_name(&"Ultimate")
+		return
+	if _is_skill2_pressed():
+		_consume_buffered_action(&"skill2")
+		if character and character.has_method("execute_skill_2"):
+			character.execute_skill_2()
+		elif character and character.has_method("request_attack_by_name"):
+			character.request_attack_by_name(&"Skill2")
+		return
 	if _is_skill_pressed():
 		_consume_buffered_action(&"skill1")
-		if character and character.has_method("request_attack_by_name"):
+		if character and character.has_method("execute_skill_1"):
+			character.execute_skill_1()
+		elif character and character.has_method("request_attack_by_name"):
 			character.request_attack_by_name(&"Skill1")
 		return
 	if _is_attack_heavy_pressed():
@@ -60,10 +76,30 @@ func physics_update(delta: float) -> void:
 		state_machine.change_state(&"Parry")
 		return
 
-	# Cek input skill (Story 3.1)
+	# Cek input ultimate
+	if _is_ultimate_pressed():
+		_consume_buffered_action(&"ultimate")
+		if character and character.has_method("execute_ultimate"):
+			character.execute_ultimate()
+		elif character and character.has_method("request_attack_by_name"):
+			character.request_attack_by_name(&"Ultimate")
+		return
+
+	# Cek input skill 2
+	if _is_skill2_pressed():
+		_consume_buffered_action(&"skill2")
+		if character and character.has_method("execute_skill_2"):
+			character.execute_skill_2()
+		elif character and character.has_method("request_attack_by_name"):
+			character.request_attack_by_name(&"Skill2")
+		return
+
+	# Cek input skill 1 (Story 3.1)
 	if _is_skill_pressed():
 		_consume_buffered_action(&"skill1")
-		if character and character.has_method("request_attack_by_name"):
+		if character and character.has_method("execute_skill_1"):
+			character.execute_skill_1()
+		elif character and character.has_method("request_attack_by_name"):
 			character.request_attack_by_name(&"Skill1")
 		return
 
@@ -147,6 +183,16 @@ func _is_skill_pressed() -> bool:
 	if character and character.has_method("is_skill_requested"):
 		return character.is_skill_requested()
 	return Input.is_action_just_pressed("skill1")
+
+func _is_skill2_pressed() -> bool:
+	if character and character.has_method("is_skill2_requested"):
+		return character.is_skill2_requested()
+	return Input.is_action_just_pressed("skill2")
+
+func _is_ultimate_pressed() -> bool:
+	if character and character.has_method("is_ultimate_requested"):
+		return character.is_ultimate_requested()
+	return Input.is_action_just_pressed("ultimate")
 
 func _consume_buffered_action(action_name: StringName) -> void:
 	if character and character.has_method("try_consume_buffered_action"):

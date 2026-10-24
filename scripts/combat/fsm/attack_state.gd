@@ -49,8 +49,10 @@ func enter() -> void:
 	if character and character.is_on_floor():
 		character.velocity.x = 0.0
 
+	var atk_name: String = current_attack_data.get("name", "Normal")
+	_sync_visual_sprite_attack(StringName(atk_name), 0)
+
 	if OS.is_debug_build() and character:
-		var atk_name: String = current_attack_data.get("name", "Normal")
 		print("[STATE][%s] Mengeksekusi serangan: %s (Super Armor: %s, Heat: %.1f)" % [
 			character.name, atk_name, str(has_super_armor), heat_cost
 		])
@@ -63,7 +65,7 @@ func physics_update(_delta: float) -> void:
 		state_machine.change_state(&"Idle")
 		return
 
-	# Target Chain Cancel System (Normal 1 -> Normal 2 -> Skill) saat serangan mengenai target
+	# Target Chain Cancel System (Normal 1 -> Normal 2 -> Skill -> Ultimate) saat serangan mengenai target
 	if can_chain_cancel and _check_chain_cancels():
 		return
 
@@ -73,6 +75,7 @@ func physics_update(_delta: float) -> void:
 	var total_frames: int = startup + active + recovery
 
 	current_attack_frame += 1
+	_sync_visual_sprite_frame(current_attack_frame)
 
 	# Selesai total durasi serangan
 	if current_attack_frame >= total_frames:
@@ -97,6 +100,7 @@ func exit() -> void:
 	if character and character.has_method("set_hitbox_active"):
 		character.set_hitbox_active(false)
 	hit_targets.clear()
+	_sync_visual_sprite_attack(&"", 0)
 
 func can_hit_target(target: Node2D) -> bool:
 	if target in hit_targets or target == character:
@@ -111,10 +115,33 @@ func register_hit_target(target: Node2D) -> void:
 func _check_chain_cancels() -> bool:
 	var chain_lvl: int = current_attack_data.get("chain_level", 1)
 
-	# Skill Cancel (Bisa dicancel dari Normal 1 / 5L atau Normal 2 / 5H)
+	# Ultimate Cancel (Dapat dicancel dari Normal atau Skill jika meter penuh)
+	if chain_lvl < 4 and _is_ultimate_requested():
+		_consume_buffered_action(&"ultimate")
+		if character and character.has_method("execute_ultimate"):
+			character.execute_ultimate()
+			return true
+		elif character and character.has_method("request_attack_by_name"):
+			character.request_attack_by_name(&"Ultimate")
+			return true
+
+	# Skill 2 Cancel (Bisa dicancel dari Normal 1 / 5L atau Normal 2 / 5H)
+	if chain_lvl < 3 and _is_skill2_requested():
+		_consume_buffered_action(&"skill2")
+		if character and character.has_method("execute_skill_2"):
+			character.execute_skill_2()
+			return true
+		elif character and character.has_method("request_attack_by_name"):
+			character.request_attack_by_name(&"Skill2")
+			return true
+
+	# Skill 1 Cancel (Bisa dicancel dari Normal 1 / 5L atau Normal 2 / 5H)
 	if chain_lvl < 3 and _is_skill_requested():
 		_consume_buffered_action(&"skill1")
-		if character and character.has_method("request_attack_by_name"):
+		if character and character.has_method("execute_skill_1"):
+			character.execute_skill_1()
+			return true
+		elif character and character.has_method("request_attack_by_name"):
 			character.request_attack_by_name(&"Skill1")
 			return true
 
@@ -130,6 +157,16 @@ func _check_chain_cancels() -> bool:
 
 	return false
 
+func _is_ultimate_requested() -> bool:
+	if character and character.has_method("is_ultimate_requested"):
+		return character.is_ultimate_requested()
+	return Input.is_action_just_pressed("ultimate")
+
+func _is_skill2_requested() -> bool:
+	if character and character.has_method("is_skill2_requested"):
+		return character.is_skill2_requested()
+	return Input.is_action_just_pressed("skill2")
+
 func _is_skill_requested() -> bool:
 	if character and character.has_method("is_skill_requested"):
 		return character.is_skill_requested()
@@ -143,3 +180,22 @@ func _is_attack_heavy_pressed() -> bool:
 func _consume_buffered_action(action_name: StringName) -> void:
 	if character and character.has_method("try_consume_buffered_action"):
 		character.try_consume_buffered_action(action_name)
+
+func _sync_visual_sprite_attack(atk_name: StringName, frame_num: int) -> void:
+	if not character:
+		return
+	var vis = character.get("visual_root")
+	if vis and vis.has_node("Sprite"):
+		var spr = vis.get_node("Sprite")
+		if "attack_type" in spr:
+			spr.attack_type = atk_name
+			spr.attack_frame = frame_num
+
+func _sync_visual_sprite_frame(frame_num: int) -> void:
+	if not character:
+		return
+	var vis = character.get("visual_root")
+	if vis and vis.has_node("Sprite"):
+		var spr = vis.get_node("Sprite")
+		if "attack_frame" in spr:
+			spr.attack_frame = frame_num

@@ -74,3 +74,12 @@ func get_dash_speed() -> float:
 
 func get_dash_duration() -> int:
 	return 12
+
+func execute_skill_1() -> void:
+	request_attack_by_name(&"Skill1")
+
+func execute_skill_2() -> void:
+	request_attack_by_name(&"Skill2")
+
+func execute_ultimate() -> void:
+	request_attack_by_name(&"Ultimate")
