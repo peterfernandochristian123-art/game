@@ -21,6 +21,7 @@ class Debris:
 
 var _debris_list: Array[Debris] = []
 var _fissure_points: Array[PackedVector2Array] = []
+var _smoke_plumes: Array[Dictionary] = []
 
 func _ready() -> void:
 	z_index = 51
@@ -38,19 +39,29 @@ func trigger_impact(pos: Vector2, facing_dir: int = 1, custom_color: Color = Col
 
 	# Hasilkan puing-puing batu terlontar
 	_debris_list.clear()
-	var debris_count := 10
+	var debris_count := 12
 	for i in range(debris_count):
 		var d := Debris.new()
 		d.pos = Vector2.ZERO
 		var spread_x := randf_range(20.0, 160.0) * float(_facing)
 		if randf() < 0.25:
-			spread_x *= -0.5 # Sebagian kecil terlontar ke belakang
-		var vel_y := randf_range(-180.0, -90.0)
+			spread_x *= -0.5
+		var vel_y := randf_range(-210.0, -100.0)
 		d.vel = Vector2(spread_x, vel_y)
-		d.size = randf_range(3.0, 6.0)
+		d.size = randf_range(3.0, 7.0)
 		d.rot = randf_range(0.0, TAU)
 		d.rot_speed = randf_range(-8.0, 8.0)
 		_debris_list.append(d)
+
+	# Hasilkan gumpalan debu dan asap tanah
+	_smoke_plumes.clear()
+	for s in range(6):
+		var frac := float(s) / 6.0
+		_smoke_plumes.append({
+			"pos": Vector2(frac * fissure_length * float(_facing), randf_range(-2.0, 4.0)),
+			"vel": Vector2(randf_range(-20.0, 20.0), randf_range(-65.0, -25.0)),
+			"size": randf_range(6.0, 12.0)
+		})
 
 	# Hasilkan pola retakan tanah bergerigi
 	_fissure_points.clear()
@@ -86,8 +97,14 @@ func _process(delta: float) -> void:
 	# Update posisi puing dengan gravitasi
 	for d in _debris_list:
 		d.pos += d.vel * delta
-		d.vel.y += 450.0 * delta # Gravitasi puing
+		d.vel.y += 480.0 * delta
 		d.rot += d.rot_speed * delta
+
+	# Update gumpalan asap
+	for sm in _smoke_plumes:
+		sm["pos"] += sm["vel"] * delta
+		sm["size"] += 9.0 * delta
+		sm["vel"].y *= 0.94
 
 	if _elapsed >= duration_seconds:
 		_active = false
@@ -102,26 +119,34 @@ func _draw() -> void:
 	var progress := _elapsed / duration_seconds
 	var alpha := clampf(1.0 - progress, 0.0, 1.0)
 
-	# 1. Gambar retakan tanah bercahaya
+	# 1. Gambar retakan tanah bercahaya & pendaran magma dalam
+	var glow_col := Color(impact_color.r, impact_color.g * 0.7, impact_color.b * 0.2, alpha * 0.45)
 	var crack_col := Color(impact_color.r, impact_color.g, impact_color.b, alpha * 0.95)
 	for branch in _fissure_points:
+		draw_polyline(branch, glow_col, 6.0)
 		draw_polyline(branch, crack_col, 3.0)
-		# Inti putih terang retakan
-		draw_polyline(branch, Color(1.0, 1.0, 1.0, alpha * 0.8), 1.2)
+		draw_polyline(branch, Color(1.0, 1.0, 1.0, alpha * 0.85), 1.2)
 
-	# 2. Gelombang kejut tanah horizontal
+	# 2. Gelombang kejut tanah horizontal & busur riak tanah
 	var shock_width := fissure_length * (0.3 + progress * 0.9)
 	var shock_rect := Rect2(0, -6, shock_width * float(_facing), 12)
-	var wave_col := Color(impact_color.r, impact_color.g, impact_color.b, alpha * 0.3)
+	var wave_col := Color(impact_color.r, impact_color.g, impact_color.b, alpha * 0.35)
 	draw_rect(shock_rect, wave_col)
+	draw_arc(Vector2(shock_width * float(_facing) * 0.5, 0), shock_width * 0.4, -PI * 0.6, PI * 0.6, 12, wave_col, 2.0)
 
-	# 3. Puing-puing batu terlontar
+	# 3. Gumpalan debu seismik mengepul ke atas
+	for sm in _smoke_plumes:
+		var sm_col := Color(impact_color.r * 0.4 + 0.3, impact_color.g * 0.4 + 0.3, impact_color.b * 0.4 + 0.3, alpha * 0.5)
+		draw_circle(sm["pos"], sm["size"], sm_col)
+		draw_circle(sm["pos"], sm["size"] * 0.5, Color(1.0, 0.95, 0.7, alpha * 0.3))
+
+	# 4. Puing-puing batu terlontar
 	for d in _debris_list:
 		var deb_col := Color(impact_color.r * 0.8, impact_color.g * 0.8, impact_color.b * 0.8, alpha)
-		var s := d.size * (1.0 - progress * 0.3)
+		var s := d.size * (1.0 - progress * 0.25)
 		var p1 := d.pos + Vector2(-s, -s).rotated(d.rot)
 		var p2 := d.pos + Vector2(s, -s).rotated(d.rot)
 		var p3 := d.pos + Vector2(s, s).rotated(d.rot)
 		var p4 := d.pos + Vector2(-s, s).rotated(d.rot)
 		draw_colored_polygon(PackedVector2Array([p1, p2, p3, p4]), deb_col)
-		draw_circle(d.pos, s * 0.4, Color(1.0, 1.0, 1.0, alpha * 0.7))
+		draw_circle(d.pos, s * 0.4, Color(1.0, 1.0, 1.0, alpha * 0.75))

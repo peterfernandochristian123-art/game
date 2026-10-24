@@ -85,16 +85,30 @@ func _draw() -> void:
 
 	# 3. Inti Sinar Putih Terang
 	var core_col := Color(1.0, 1.0, 1.0, alpha * 0.95)
-	draw_line(Vector2.ZERO, end_pt, core_col, maxf(2.0, current_w * 0.15))
+	draw_line(Vector2.ZERO, end_pt, core_col, maxf(2.0, current_w * 0.18))
 
-	# 4. Cincin Resonansi Foton Bergerak
+	# 4. Pilinan Heliks Plasma Mengitari Sinar (Helical Ion Spiral Strands)
+	var helix_pts_a := PackedVector2Array()
+	var helix_pts_b := PackedVector2Array()
+	var helix_segs := 24
+	for h in range(helix_segs + 1):
+		var frac := float(h) / float(helix_segs)
+		var center_pt := _direction * (beam_length * frac)
+		var phase := frac * TAU * 3.0 + progress * 8.0
+		var r_helix := current_w * 0.45 * sin(frac * PI)
+		helix_pts_a.append(center_pt + perp * sin(phase) * r_helix)
+		helix_pts_b.append(center_pt - perp * sin(phase) * r_helix)
+	var helix_col := Color(beam_color.r, beam_color.g, beam_color.b, alpha * 0.7)
+	draw_polyline(helix_pts_a, helix_col, 1.6)
+	draw_polyline(helix_pts_b, Color(1.0, 1.0, 1.0, alpha * 0.6), 1.2)
+
+	# 5. Cincin Resonansi Foton Bergerak
 	var ring_count := 4
 	for r in range(ring_count):
 		var ring_frac := fposmod(float(r) / float(ring_count) + progress * 2.0, 1.0)
 		var ring_center := _direction * (beam_length * ring_frac)
 		var ring_rad := current_w * 0.6 * (1.0 + ring_frac * 0.4)
 		var ring_col := Color(beam_color.r, beam_color.g, beam_color.b, alpha * 0.8)
-		# Gambar cincin elips tegak lurus arah tembakan
 		var ring_pts := PackedVector2Array()
 		var segs := 12
 		for s in range(segs):
@@ -104,9 +118,14 @@ func _draw() -> void:
 		ring_pts.append(ring_pts[0])
 		draw_polyline(ring_pts, ring_col, 2.0)
 
-	# 5. Kilatan Busur Listrik Flank
+	# 6. Kilatan Busur Listrik Flank
 	for i in range(_sparks.size()):
 		var frac := float(i) / float(_sparks.size())
 		var pt_on_beam := _direction * (beam_length * frac) + _sparks[i]
 		var jitter := Vector2(randf_range(-4.0, 4.0), randf_range(-4.0, 4.0))
 		draw_line(pt_on_beam, pt_on_beam + jitter, Color(1.0, 1.0, 1.0, alpha * 0.85), 1.5)
+
+	# 7. Ledakan Korona Impak di Ujung Sinar (Terminal Impact Corona)
+	var blast_rad := current_w * 1.5 * (0.8 + progress * 0.6)
+	draw_circle(end_pt, blast_rad * 0.5, Color(1.0, 1.0, 1.0, alpha * 0.95))
+	draw_arc(end_pt, blast_rad, 0.0, TAU, 20, Color(beam_color.r, beam_color.g, beam_color.b, alpha * 0.8), 2.5)

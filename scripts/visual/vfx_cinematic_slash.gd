@@ -81,18 +81,30 @@ func _draw() -> void:
 	var alpha := clampf(1.0 - progress, 0.0, 1.0)
 
 	for sl in _slashes:
-		# 1. Garis Tebasan Luar Neon
+		# 1. Garis Tebasan Luar Neon & Busur Sabit Melengkung (Crescent Blade Curve)
 		var outer_col := Color(slash_color.r, slash_color.g, slash_color.b, alpha * 0.9)
-		draw_line(sl.start_pt, sl.end_pt, outer_col, sl.thickness)
+		draw_line(sl.start_pt, sl.end_pt, outer_col, sl.thickness * 1.5)
 
-		# 2. Inti Bilah Putih Tajam
-		var core_col := Color(1.0, 1.0, 1.0, alpha * 0.95)
-		draw_line(sl.start_pt, sl.end_pt, core_col, maxf(1.2, sl.thickness * 0.35))
+		# Busur tebasan sabit lengkung
+		var mid_pt := (sl.start_pt + sl.end_pt) * 0.5
+		var perp_dir := (sl.end_pt - sl.start_pt).orthogonal().normalized()
+		var curve_control := mid_pt + perp_dir * 14.0
+		var curve_pts := PackedVector2Array([sl.start_pt, curve_control, sl.end_pt])
+		draw_polyline(curve_pts, Color(slash_color.r, slash_color.g, slash_color.b, alpha * 0.5), sl.thickness * 0.8)
+
+		# 2. Inti Bilah Putih Tajam Menyilaukan
+		var core_col := Color(1.0, 1.0, 1.0, alpha * 0.98)
+		draw_line(sl.start_pt, sl.end_pt, core_col, maxf(1.4, sl.thickness * 0.45))
 
 		# 3. Garis-garis Kecepatan Manga Paralel
 		var sp_col := Color(slash_color.r, slash_color.g, slash_color.b, alpha * 0.65)
 		for sp in sl.speedlines:
 			draw_line(sp[0], sp[1], sp_col, 1.5)
 
-		# 4. Kilatan Titik Akhir Sayatan
-		draw_circle(sl.end_pt, 4.0 * (1.0 - progress), Color.WHITE)
+		# 4. Percikan Tinta Kaligrafi & Kilatan Titik Akhir Sayatan
+		draw_circle(sl.end_pt, 5.0 * (1.0 - progress), Color.WHITE)
+		draw_circle(sl.start_pt, 3.5 * (1.0 - progress), Color(slash_color.r, slash_color.g, slash_color.b, alpha * 0.8))
+		for k in range(3):
+			var ink_frac := float(k + 1) / 4.0
+			var ink_pos := sl.start_pt.lerp(sl.end_pt, ink_frac) + perp_dir * (randf_range(-8.0, 8.0) * (1.0 + progress))
+			draw_circle(ink_pos, 2.0 * (1.0 - progress * 0.7), Color(slash_color.r, slash_color.g, slash_color.b, alpha * 0.75))

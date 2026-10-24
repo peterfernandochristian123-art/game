@@ -96,6 +96,11 @@ func _draw() -> void:
 	var corona_fill := Color(supernova_color.r, supernova_color.g, supernova_color.b, alpha * 0.22)
 	draw_circle(Vector2.ZERO, current_rad * 0.75, corona_fill)
 
-	# 6. Inti Foton Sphere Terang Menyilaukan
+	# 6. Inti Foton Sphere Terang Menyilaukan & Lubang Hitam Event Horizon
 	var core_rad := (max_radius * 0.35) * (1.0 - progress * 0.6)
-	draw_circle(Vector2.ZERO, core_rad, Color(1.0, 1.0, 1.0, alpha * 0.95))
+	draw_circle(Vector2.ZERO, core_rad * 1.3, Color(supernova_color.r * 1.2, supernova_color.g * 1.2, supernova_color.b * 1.2, alpha * 0.9))
+	draw_circle(Vector2.ZERO, core_rad, Color(1.0, 1.0, 1.0, alpha * 0.98))
+	# Lubang Hitam Singularitas di pusat terdalam
+	var void_rad := core_rad * 0.45 * (1.0 - progress * 0.4)
+	draw_circle(Vector2.ZERO, void_rad, Color(0.04, 0.02, 0.08, alpha * 0.95))
+	draw_arc(Vector2.ZERO, void_rad, 0.0, TAU, 16, Color(1.0, 1.0, 1.0, alpha * 0.9), 1.2)

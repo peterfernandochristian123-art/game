@@ -265,7 +265,31 @@ func _draw_vfx_overlay() -> void:
 		draw_line(p1, p2, Color.WHITE, 1.5)
 		draw_line(p1, p2, col_highlight, 3.0)
 
-	# B. Efek Khusus per Karakter (Overlay)
+	# B. Skill Activation Energy Gathering & Lens Flare (Cinematic Realism)
+	var is_skill := false
+	var atk_lower := String(attack_type).to_lower()
+	if atk_lower.contains("skill") or atk_lower.contains("ultimate") or atk_lower.contains("blink") or atk_lower.contains("deflection") or atk_lower.contains("protocol") or atk_lower.contains("piledriver") or atk_lower.contains("cannon") or atk_lower.contains("shield") or atk_lower.contains("railgun") or atk_lower.contains("supernova") or atk_lower.contains("stance") or atk_lower.contains("iaido") or atk_lower.contains("shuriken") or atk_lower.contains("blossom"):
+		is_skill = true
+
+	if is_skill:
+		# 1. Partikel konvergensi energi (suction streaks ke inti serangan)
+		for sp in range(5):
+			var sp_ang: float = float(sp) * (TAU / 5.0) + t * 4.0
+			var sp_dist: float = 14.0 + sin(t * 8.0 + float(sp)) * 8.0
+			var sp_pt := Vector2(10 + cos(sp_ang) * sp_dist, -2 + sin(sp_ang) * sp_dist)
+			draw_line(sp_pt, Vector2(10, -2), Color(col_highlight.r, col_highlight.g, col_highlight.b, 0.5), 1.2)
+			draw_circle(sp_pt, 1.2, Color.WHITE)
+
+		# 2. Cincin gelombang distorsi kompresi di tangan/senjata
+		var pulse_r: float = 6.0 + sin(t * 12.0) * 3.0
+		draw_arc(Vector2(10, -2), pulse_r, 0.0, TAU, 12, Color(col_armor.r, col_armor.g, col_armor.b, 0.7), 2.0)
+		draw_circle(Vector2(10, -2), 3.0, Color.WHITE)
+
+		# 3. Super Flash Lens Flare jika Ultimate
+		if atk_lower.contains("ultimate") or atk_lower.contains("protocol") or atk_lower.contains("cannon") or atk_lower.contains("supernova") or atk_lower.contains("blossom"):
+			_draw_sparkle_cross(Vector2(10, -2), 12.0, Color.WHITE, col_highlight)
+
+	# C. Efek Khusus per Karakter (Overlay)
 	match archetype:
 		&"viper":
 			# Visor Laser Streak (Kilauan garis mata tajam saat bergerak/menyerang)

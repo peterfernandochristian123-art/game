@@ -25,6 +25,8 @@ const VFXSuperFlashScript = preload("res://scripts/visual/vfx_super_flash.gd")
 const VFXFloatingTextScript = preload("res://scripts/visual/vfx_floating_text.gd")
 const VFXGroundDecalScript = preload("res://scripts/visual/vfx_ground_decal.gd")
 const VFXGhostTrailScript = preload("res://scripts/visual/vfx_ghost_trail.gd")
+const VFXShockwaveScript = preload("res://scripts/visual/vfx_shockwave.gd")
+const VFXLightningArcScript = preload("res://scripts/visual/vfx_lightning.gd")
 
 @export var enabled: bool = true
 
@@ -35,6 +37,10 @@ func _ready() -> void:
 			EventBus.parry_triggered.connect(_on_parry_triggered)
 		if EventBus.has_signal("skill_cast"):
 			EventBus.skill_cast.connect(_on_skill_cast)
+
+func _trigger_camera_shake(intensity: float, frames: int) -> void:
+	if is_instance_valid(EventBus) and EventBus.has_signal("screen_shake_requested"):
+		EventBus.screen_shake_requested.emit(intensity, frames)
 
 func _on_skill_cast(caster: Node2D, skill_name: StringName, pos: Vector2, facing: int) -> void:
 	if not enabled or not is_instance_valid(caster):
@@ -56,8 +62,11 @@ func _on_skill_cast(caster: Node2D, skill_name: StringName, pos: Vector2, facing
 	# 0. Efek Sinematik Super Flash pada Ultimate
 	if is_ult:
 		spawn_super_flash(pos, caster_col, 0.42)
+		_trigger_camera_shake(15.0, 20)
 		if is_instance_valid(EventBus) and EventBus.has_signal("hitstop_requested"):
 			EventBus.hitstop_requested.emit(14)
+	else:
+		_trigger_camera_shake(6.0, 8)
 
 	# 1. Viper Skills
 	if s_name.contains("Blink") or s_name == "BlinkSlash":
@@ -65,58 +74,82 @@ func _on_skill_cast(caster: Node2D, skill_name: StringName, pos: Vector2, facing
 		spawn_cryo_freeze(pos, 38.0, Color(0.2, 0.95, 1.0))
 		spawn_ghost_trail(pos, facing, &"viper", Color(0.2, 0.95, 1.0))
 		spawn_ground_decal(pos, &"frost", Color(0.2, 0.95, 1.0), 65.0)
+		spawn_shockwave(pos, 95.0, Color(0.2, 0.95, 1.0), 0.28, 3.5)
+		spawn_lightning(pos, pos + Vector2(facing * 90.0, -15.0), Color(0.35, 0.95, 1.0), 0.18)
 	elif s_name.contains("Deflection") or s_name == "DeflectionMatrix":
 		spawn_hex_barrier(caster, pos, 0.5, Color(0.2, 0.95, 1.0), 54.0)
+		spawn_shockwave(pos, 75.0, Color(0.2, 0.95, 1.0), 0.24, 2.5)
 	elif s_name.contains("AbsoluteZero") or s_name.contains("Protocol"):
 		spawn_cryo_freeze(pos, 130.0, Color(0.3, 0.98, 1.0))
 		spawn_ground_decal(pos, &"frost", Color(0.3, 0.98, 1.0), 120.0, 2.8)
+		spawn_shockwave(pos, 190.0, Color(0.35, 0.98, 1.0), 0.45, 5.0)
+		spawn_lightning(pos, pos + Vector2(randf_range(-120, 120), -90.0), Color(0.45, 0.98, 1.0), 0.26)
 
 	# 2. Bulwark Skills
 	elif s_name.contains("Piledriver") or s_name.contains("Hydraulic"):
 		spawn_seismic_impact(pos + Vector2(facing * 35.0, 10.0), facing, Color(1.0, 0.55, 0.15), 110.0)
 		spawn_ground_decal(pos + Vector2(facing * 35.0, 10.0), &"cracks", Color(1.0, 0.55, 0.15), 90.0)
+		spawn_shockwave(pos + Vector2(facing * 35.0, 10.0), 125.0, Color(1.0, 0.55, 0.15), 0.32, 4.5)
+		spawn_lightning(pos + Vector2(facing * 35.0, -35.0), pos + Vector2(facing * 35.0, 15.0), Color(1.0, 0.7, 0.2), 0.2)
 	elif s_name.contains("RiotShield") or s_name.contains("Shield"):
 		spawn_hex_barrier(caster, pos, 0.75, Color(1.0, 0.65, 0.2), 60.0)
+		spawn_shockwave(pos, 85.0, Color(1.0, 0.65, 0.2), 0.25, 3.5)
 	elif s_name.contains("Orbital") or s_name.contains("SiegeCannon"):
 		spawn_orbital_beam(pos + Vector2(facing * 60.0, -320.0), Vector2.DOWN, 700.0, 60.0, Color(1.0, 0.6, 0.15))
 		spawn_ground_decal(pos + Vector2(facing * 60.0, 10.0), &"cracks", Color(1.0, 0.6, 0.15), 110.0, 2.5)
+		spawn_shockwave(pos + Vector2(facing * 60.0, 10.0), 180.0, Color(1.0, 0.6, 0.15), 0.45, 5.5)
+		spawn_lightning(pos + Vector2(facing * 60.0, -250.0), pos + Vector2(facing * 60.0, 15.0), Color(1.0, 0.8, 0.25), 0.28)
 
 	# 3. Pulsar Skills
 	elif s_name.contains("Railgun") or s_name.contains("Photon"):
 		spawn_orbital_beam(pos, Vector2(facing, 0.0), 750.0, 36.0, Color(0.75, 0.25, 1.0))
 		spawn_ground_decal(pos + Vector2(facing * 60.0, 0.0), &"scorch", Color(0.75, 0.25, 1.0), 90.0)
+		spawn_shockwave(pos, 105.0, Color(0.75, 0.25, 1.0), 0.3, 4.0)
+		spawn_lightning(pos, pos + Vector2(facing * 280.0, 0.0), Color(0.85, 0.35, 1.0), 0.22)
 	elif s_name.contains("Drone") or s_name.contains("Disrupter"):
 		spawn_disrupter_drone(pos + Vector2(facing * 100.0, -40.0), 2.0, Color(0.7, 0.3, 1.0))
+		spawn_shockwave(pos, 65.0, Color(0.7, 0.3, 1.0), 0.22, 2.5)
 	elif s_name.contains("Supernova") or s_name.contains("Horizon"):
 		spawn_supernova(pos, 200.0, Color(0.8, 0.25, 1.0))
 		spawn_ground_decal(pos, &"scorch", Color(0.8, 0.25, 1.0), 130.0, 2.5)
+		spawn_shockwave(pos, 210.0, Color(0.8, 0.25, 1.0), 0.5, 6.0)
+		spawn_lightning(pos, pos + Vector2(randf_range(-140, 140), randf_range(-140, 140)), Color(0.95, 0.55, 1.0), 0.3)
 
 	# 4. Kage Skills
 	elif s_name.contains("Stance") or s_name == "StanceShift":
 		spawn_shadow_smoke(pos, Color(0.95, 0.15, 0.25), 16, 0.4)
 		spawn_ghost_trail(pos, facing, &"kage", Color(1.0, 0.15, 0.25))
+		spawn_shockwave(pos, 80.0, Color(0.95, 0.15, 0.25), 0.24, 3.0)
 	elif s_name.contains("Iaido") or s_name == "IaidoCrescent":
 		spawn_cinematic_slash(pos, 1, Color(1.0, 0.15, 0.25), 0.35, 200.0)
 		spawn_ground_decal(pos, &"slash", Color(1.0, 0.15, 0.25), 80.0)
+		spawn_shockwave(pos, 115.0, Color(1.0, 0.15, 0.25), 0.3, 4.0)
 	elif s_name.contains("Shuriken") or s_name == "ShurikenStorm":
 		spawn_shuriken_storm(pos, facing, Color(1.0, 0.2, 0.3))
+		spawn_shockwave(pos, 90.0, Color(1.0, 0.2, 0.3), 0.25, 3.0)
 	elif s_name.contains("Blossom") or s_name == "ShadowBlossom":
 		spawn_cinematic_slash(pos, 5, Color(1.0, 0.1, 0.25), 0.45, 260.0)
 		spawn_ground_decal(pos, &"slash", Color(1.0, 0.1, 0.25), 120.0, 2.5)
+		spawn_shockwave(pos, 195.0, Color(1.0, 0.1, 0.25), 0.45, 5.5)
+		spawn_lightning(pos, pos + Vector2(randf_range(-110, 110), randf_range(-90, 90)), Color(1.0, 0.35, 0.45), 0.28)
 
 	# 5. Unit-0 Boss Skills
 	elif s_name.contains("Cataclysm"):
 		spawn_cinematic_slash(pos, 3, Color(1.2, 0.1, 0.3), 0.4, 250.0)
 		spawn_ground_decal(pos, &"slash", Color(1.2, 0.1, 0.3), 110.0)
+		spawn_shockwave(pos, 150.0, Color(1.1, 0.1, 0.3), 0.35, 4.5)
 	elif s_name.contains("Shockwave"):
 		spawn_seismic_impact(pos, facing, Color(0.9, 0.1, 0.3), 120.0)
 		spawn_ground_decal(pos, &"cracks", Color(0.9, 0.1, 0.3), 100.0)
+		spawn_shockwave(pos, 140.0, Color(0.9, 0.1, 0.3), 0.35, 4.5)
 	elif s_name.contains("Overload") or s_name.contains("Zero"):
 		spawn_supernova(pos, 220.0, Color(1.1, 0.1, 0.3))
 		spawn_ground_decal(pos, &"scorch", Color(1.1, 0.1, 0.3), 130.0)
+		spawn_shockwave(pos, 220.0, Color(1.1, 0.1, 0.3), 0.5, 6.0)
 
 	# Fallback untuk Skill1 / Skill2 umum
 	elif s_name == "Skill1":
+		spawn_shockwave(pos, 90.0, caster_col, 0.28, 3.5)
 		if caster_name.contains("viper"):
 			spawn_slash(pos, facing, Color(0.2, 0.95, 1.0))
 			spawn_cryo_freeze(pos, 38.0, Color(0.2, 0.95, 1.0))
@@ -127,6 +160,7 @@ func _on_skill_cast(caster: Node2D, skill_name: StringName, pos: Vector2, facing
 		elif caster_name.contains("kage"):
 			spawn_shadow_smoke(pos, Color(0.95, 0.15, 0.25), 16, 0.4)
 	elif s_name == "Skill2":
+		spawn_shockwave(pos, 85.0, caster_col, 0.26, 3.0)
 		if caster_name.contains("viper"):
 			spawn_hex_barrier(caster, pos, 0.5, Color(0.2, 0.95, 1.0), 54.0)
 		elif caster_name.contains("bulwark"):
@@ -136,6 +170,7 @@ func _on_skill_cast(caster: Node2D, skill_name: StringName, pos: Vector2, facing
 		elif caster_name.contains("kage"):
 			spawn_shuriken_storm(pos, facing, Color(1.0, 0.2, 0.3))
 	elif s_name == "Ultimate":
+		spawn_shockwave(pos, 200.0, caster_col, 0.48, 5.5)
 		if caster_name.contains("viper"):
 			spawn_cryo_freeze(pos, 130.0, Color(0.3, 0.98, 1.0))
 		elif caster_name.contains("bulwark"):
@@ -206,8 +241,11 @@ func _on_hit_confirmed(attacker: Node2D, victim: Node2D, hit_data: Variant) -> v
 	# Munculkan Angka Kerusakan & Status Pop-up Mengambang (Floating Damage Numbers)
 	if is_counter:
 		spawn_floating_text(contact_pos, "%d COUNTER!" % int(dmg), Color(1.0, 0.2, 0.15), true)
+		spawn_shockwave(contact_pos, 115.0, char_col, 0.26, 4.0)
+		spawn_lightning(contact_pos, contact_pos + Vector2(-facing * 55.0, randf_range(-30.0, 30.0)), char_col, 0.18)
 	elif hit_level >= 2:
 		spawn_floating_text(contact_pos, "%d CRITICAL!" % int(dmg), Color(1.0, 0.85, 0.2), true)
+		spawn_shockwave(contact_pos, 75.0, char_col, 0.22, 3.0)
 	else:
 		spawn_floating_text(contact_pos, "%d" % int(dmg), Color(1.0, 0.95, 0.4), false)
 
@@ -359,3 +397,15 @@ func spawn_ghost_trail(pos: Vector2, facing: int = 1, arch: StringName = &"viper
 	add_child(ghost)
 	ghost.setup(pos, facing, arch, custom_color)
 	return ghost
+
+func spawn_shockwave(pos: Vector2, radius: float = 120.0, custom_color: Color = Color.TRANSPARENT, duration: float = 0.35, width: float = 4.0) -> Node2D:
+	var sw = VFXShockwaveScript.new()
+	add_child(sw)
+	sw.trigger_shockwave(pos, radius, custom_color, duration, width)
+	return sw
+
+func spawn_lightning(start_pos: Vector2, end_pos: Vector2, custom_color: Color = Color.TRANSPARENT, duration: float = 0.22, fork_count: int = 3) -> Node2D:
+	var arc = VFXLightningArcScript.new()
+	add_child(arc)
+	arc.trigger_arc(start_pos, end_pos, custom_color, duration, fork_count)
+	return arc
