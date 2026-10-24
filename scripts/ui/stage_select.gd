@@ -446,6 +446,8 @@ func _on_fight_pressed() -> void:
 	is_transitioning = true
 	MenuAudio.play_confirm_chime(self)
 	fight_requested.emit(id)
+	if MatchConfig.game_mode == &"stage_select":
+		MatchConfig.set_mode(&"versus_ai")
 	_go_to(MatchConfig.get_target_scene())
 
 func _on_back_pressed() -> void:
@@ -454,7 +456,10 @@ func _on_back_pressed() -> void:
 	is_transitioning = true
 	MenuAudio.play_cancel_buzz(self)
 	back_requested.emit()
-	_go_to(CHARACTER_SELECT_SCENE)
+	if MatchConfig.game_mode == &"stage_select":
+		_go_to("res://scenes/main_menu.tscn")
+	else:
+		_go_to(CHARACTER_SELECT_SCENE)
 
 func _go_to(path: String) -> void:
 	scene_change_requested.emit(path)

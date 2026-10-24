@@ -58,9 +58,9 @@ func _instantiate_menu() -> MainMenu:
 func _test_scene_structure() -> void:
 	var menu := _instantiate_menu()
 	_check(menu != null, "Scene main_menu.tscn berhasil diinstansiasi.")
-	_check(menu.button_nodes.size() == 6, "Main Menu memiliki 6 tombol navigasi (Ditemukan: %d)." % menu.button_nodes.size())
+	_check(menu.button_nodes.size() == 7, "Main Menu memiliki 7 tombol navigasi (Ditemukan: %d)." % menu.button_nodes.size())
 
-	var expected_ids := [&"arcade", &"versus_ai", &"training", &"local_2p", &"settings", &"exit"]
+	var expected_ids := [&"arcade", &"versus_ai", &"training", &"local_2p", &"stage_select", &"settings", &"exit"]
 	for i in range(expected_ids.size()):
 		_check(MainMenu.MENU_DATA[i]["id"] == expected_ids[i], "ID opsi index %d cocok: %s" % [i, expected_ids[i]])
 
@@ -90,17 +90,18 @@ func _test_navigation_cycle_and_wraparound() -> void:
 	menu._move_focus(1)
 	_check(menu.current_focus_index == 2, "Pergerakan ke bawah memindahkan fokus ke index 2 (TRAINING MODE).")
 
-	# Pindah langsung ke index 5 (EXIT)
-	menu.set_focus_index(5, false)
-	_check(menu.current_focus_index == 5, "Fokus berpindah ke index 5 (EXIT).")
+	# Pindah langsung ke index EXIT (6)
+	var exit_idx := MainMenu.MENU_DATA.size() - 1
+	menu.set_focus_index(exit_idx, false)
+	_check(menu.current_focus_index == exit_idx, "Fokus berpindah ke index EXIT (%d)." % exit_idx)
 
-	# 5 -> Down -> Wrap-around ke 0
+	# Exit -> Down -> Wrap-around ke 0
 	menu._move_focus(1)
-	_check(menu.current_focus_index == 0, "Wrap-around ke bawah dari index 5 berhasil kembali ke index 0.")
+	_check(menu.current_focus_index == 0, "Wrap-around ke bawah dari index EXIT berhasil kembali ke index 0.")
 
-	# 0 -> Up -> Wrap-around ke 5
+	# 0 -> Up -> Wrap-around ke Exit
 	menu._move_focus(-1)
-	_check(menu.current_focus_index == 5, "Wrap-around ke atas dari index 0 berhasil menuju index 5.")
+	_check(menu.current_focus_index == exit_idx, "Wrap-around ke atas dari index 0 berhasil menuju index EXIT.")
 
 	_check(stats["nav"] >= 4, "Sinyal focus_changed terpancar pada setiap perpindahan fokus (%dx)." % stats["nav"])
 	_check(stats["bus"] >= 4, "EventBus.menu_navigated terpancar global (%dx)." % stats["bus"])

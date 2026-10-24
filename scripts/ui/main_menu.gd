@@ -17,8 +17,9 @@ enum MenuItem {
 	VERSUS_AI = 1,
 	TRAINING_MODE = 2,
 	LOCAL_2P = 3,
-	SETTINGS = 4,
-	EXIT = 5
+	STAGE_SELECT = 4,
+	SETTINGS = 5,
+	EXIT = 6
 }
 
 const MENU_DATA: Array[Dictionary] = [
@@ -26,6 +27,7 @@ const MENU_DATA: Array[Dictionary] = [
 	{"id": &"versus_ai", "label": "VERSUS AI", "scene": "res://scenes/character_select.tscn", "subtext": "SOLO DUEL VS AI (NOVICE / VETERAN / ACE)"},
 	{"id": &"training", "label": "TRAINING MODE", "scene": "res://scenes/training_mode.tscn", "subtext": "PRACTICE LAB & FRAME DATA INSPECTOR"},
 	{"id": &"local_2p", "label": "LOCAL 2P VERSUS", "scene": "res://scenes/character_select.tscn", "subtext": "2-PLAYER BATTLE ON A SINGLE SCREEN"},
+	{"id": &"stage_select", "label": "STAGE SELECT", "scene": "res://scenes/menus/stage_select.tscn", "subtext": "BROWSE & PLAY ALL 12 BATTLE ARENAS"},
 	{"id": &"settings", "label": "SETTINGS", "scene": "", "subtext": "AUDIO BUSSES, CONTROLS & DISPLAY"},
 	{"id": &"exit", "label": "EXIT", "scene": "", "subtext": "SHUTDOWN SYSTEM & EXIT GAME"}
 ]
@@ -74,6 +76,7 @@ func _setup_buttons() -> void:
 			btn = children[i] as Button
 		else:
 			btn = Button.new()
+			btn.flat = true
 			menu_container.add_child(btn)
 
 		btn.text = MENU_DATA[i]["label"]
