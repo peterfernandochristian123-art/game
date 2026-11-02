@@ -55,6 +55,10 @@ var _card_nodes: Array[PanelContainer] = []
 
 func _ready() -> void:
 	_setup_audio()
+	if title_label:
+		title_label.text = "PROJECT RETRO ZERO - 2D FIGHTING GAME"
+	if mode_label:
+		mode_label.text = "CHARACTER SELECT  >>>  CHOOSE YOUR FIGHTER"
 	_build_roster_cards()
 	_update_p1_display()
 	_update_p2_display()
@@ -67,6 +71,15 @@ func _setup_audio() -> void:
 	if AudioManagerScript.instance != null:
 		AudioManagerScript.instance.play_bgm(&"title")
 
+func _format_stat_bar(stat_name: String, val: int, max_val: int = 10) -> String:
+	var filled := clampi(val, 0, max_val)
+	var bar := ""
+	for k in range(filled):
+		bar += "■"
+	for k in range(max_val - filled):
+		bar += "░"
+	return "%-3s  [%s]" % [stat_name, bar]
+
 func _build_roster_cards() -> void:
 	_card_nodes.clear()
 	for child in cards_container.get_children():
@@ -75,28 +88,53 @@ func _build_roster_cards() -> void:
 	for i in range(FighterFactoryScript.get_roster_count()):
 		var char_data = FighterFactoryScript.get_character_at(i)
 		var card := PanelContainer.new()
-		card.custom_minimum_size = Vector2(170, 70)
+		card.custom_minimum_size = Vector2(96, 68)
 		card.name = "Card_" + String(char_data["id"])
+		card.mouse_filter = Control.MOUSE_FILTER_STOP
 
 		var vbox := VBoxContainer.new()
 		vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+		vbox.add_theme_constant_override("separation", 2)
+
+		# Mini Portrait Preview Mount
+		var port_mount := Control.new()
+		port_mount.custom_minimum_size = Vector2(30, 30)
+		port_mount.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		var mini_spr := MechaPixelSpriteScript.new()
+		mini_spr.archetype = char_data["id"]
+		mini_spr.set_palette_index(0)
+		mini_spr.position = Vector2(15, 22)
+		mini_spr.scale = Vector2(1.0, 1.0)
+		port_mount.add_child(mini_spr)
+		vbox.add_child(port_mount)
 
 		var lbl_name := Label.new()
 		lbl_name.name = "LabelName"
 		lbl_name.text = char_data["name"]
 		lbl_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		lbl_name.add_theme_color_override("font_color", char_data["theme_color"])
+		lbl_name.add_theme_font_size_override("font_size", 9)
 
 		var lbl_arch := Label.new()
 		lbl_arch.name = "LabelArch"
 		lbl_arch.text = char_data["archetype"]
 		lbl_arch.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		lbl_arch.add_theme_color_override("font_color", Color(0.7, 0.8, 0.9, 0.7))
-		lbl_arch.add_theme_font_size_override("font_size", 9)
+		lbl_arch.add_theme_color_override("font_color", Color(0.75, 0.82, 0.90, 0.75))
+		lbl_arch.add_theme_font_size_override("font_size", 7)
 
 		vbox.add_child(lbl_name)
 		vbox.add_child(lbl_arch)
 		card.add_child(vbox)
+
+		# Click selection
+		var card_idx = i
+		card.gui_input.connect(func(ev: InputEvent):
+			if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
+				if not p1_locked:
+					p1_index = card_idx
+					MenuAudio.play_nav_beep(self)
+					_update_p1_display()
+		)
 
 		cards_container.add_child(card)
 		_card_nodes.append(card)
@@ -106,26 +144,54 @@ func _build_roster_cards() -> void:
 func _highlight_cards() -> void:
 	for i in range(_card_nodes.size()):
 		var card = _card_nodes[i]
-		var border_color: Color = Color(0.3, 0.4, 0.5, 0.4)
-		if i == p1_index and i == p2_index:
-			border_color = Color(1.0, 0.9, 0.2, 1.0) # P1 & P2 sama
-		elif i == p1_index:
-			border_color = Color(0.2, 0.95, 1.0, 1.0) # P1 Cyan
-		elif i == p2_index:
-			border_color = Color(1.0, 0.4, 0.3, 1.0) # P2 Red/Orange
+		var border_color: Color = Color(0.22, 0.25, 0.35, 0.5)
+		var is_p1 := (i == p1_index)
+		var is_p2 := (i == p2_index and MatchConfigScript.game_mode == &"local_2p")
 
-		card.modulate = Color(1.2, 1.2, 1.2, 1.0) if (i == p1_index or i == p2_index) else Color(0.7, 0.7, 0.8, 0.8)
+		var sb := StyleBoxFlat.new()
+		sb.set_corner_radius_all(4)
+		sb.set_content_margin_all(4)
+		sb.bg_color = Color(0.06, 0.07, 0.11, 0.92)
+
+		if is_p1 and is_p2:
+			border_color = Color(1.0, 0.88, 0.25, 1.0)
+			sb.set_border_width_all(2)
+			sb.border_color = border_color
+			card.modulate = Color(1.3, 1.3, 1.1, 1.0)
+		elif is_p1:
+			border_color = Color(0.0, 0.95, 1.0, 1.0)
+			sb.set_border_width_all(2)
+			sb.border_color = border_color
+			card.modulate = Color(1.2, 1.25, 1.3, 1.0)
+		elif is_p2:
+			border_color = Color(1.0, 0.25, 0.35, 1.0)
+			sb.set_border_width_all(2)
+			sb.border_color = border_color
+			card.modulate = Color(1.3, 1.15, 1.15, 1.0)
+		else:
+			sb.set_border_width_all(1)
+			sb.border_color = border_color
+			card.modulate = Color(0.7, 0.72, 0.8, 0.75)
+
+		card.add_theme_stylebox_override("panel", sb)
 
 func _update_p1_display() -> void:
 	var char_data = FighterFactoryScript.get_character_at(p1_index)
 	var pal_name = MatchConfigScript.PALETTE_NAMES[MatchConfigScript.p1_palette]
-	p1_name_label.text = "P1: %s [C: %s]" % [char_data["name"], pal_name]
+	p1_name_label.text = "%s  [C: %s]" % [char_data["name"], pal_name]
 	p1_name_label.add_theme_color_override("font_color", char_data["theme_color"])
-	p1_archetype_label.text = "%s | PALETTE: %s [PRESS C]" % [char_data["archetype"], pal_name]
-	p1_stats_label.text = "HP: %d | SPD: %s | DEF: %s | RNG: %s" % [
-		char_data["hp"], char_data["speed_grade"], char_data["defense_grade"], char_data["range_grade"]
+	p1_archetype_label.text = "%s  |  \"%s\"" % [char_data["archetype"], char_data.get("quote", "Let's fight!")]
+	
+	p1_stats_label.text = "%s    %s\n%s    %s" % [
+		_format_stat_bar("HP", char_data.get("hp_bar", 5)),
+		_format_stat_bar("DEF", char_data.get("def_bar", 5)),
+		_format_stat_bar("SPD", char_data.get("spd_bar", 5)),
+		_format_stat_bar("RNG", char_data.get("rng_bar", 5))
 	]
-	p1_moves_label.text = "\n".join(char_data["signature_moves"])
+	p1_moves_label.text = "QUOTE: \"%s\"\n%s" % [
+		char_data.get("quote", "Let's fight!"),
+		"\n".join(char_data["signature_moves"])
+	]
 
 	if p1_ready_badge:
 		p1_ready_badge.visible = p1_locked
@@ -139,7 +205,7 @@ func _update_p1_display() -> void:
 	spr.archetype = char_data["id"]
 	spr.set_palette_index(MatchConfigScript.p1_palette)
 	spr.position = Vector2(40, 50)
-	spr.scale = Vector2(2.5, 2.5)
+	spr.scale = Vector2(2.8, 2.8)
 	p1_preview_mount.add_child(spr)
 	_p1_sprite = spr
 
@@ -150,9 +216,9 @@ func _update_p2_display() -> void:
 	if MatchConfigScript.game_mode == &"arcade":
 		p2_name_label.text = "ARCADE RIVALS & BOSS"
 		p2_name_label.add_theme_color_override("font_color", Color(1.0, 0.25, 0.35, 1.0))
-		p2_archetype_label.text = "4-Stage Gauntlet"
-		p2_stats_label.text = "Stage 1-3: Rivals | Stage 4: Unit-0"
-		p2_moves_label.text = "Defeat all challengers to conquer the Zero Circuit!"
+		p2_archetype_label.text = "4-Stage Gauntlet | Zero Circuit"
+		p2_stats_label.text = "HP   [■■■■■■■■□□]    DEF  [■■■■■■■□□□]\nSPD  [■■■■■■■■□□]    RNG  [■■■■■■■□□□]"
+		p2_moves_label.text = "Stage 1-3: Rivals | Stage 4: Boss Unit-0\nDefeat all challengers to conquer Retro Zero!"
 		if p2_ready_badge:
 			p2_ready_badge.visible = true
 			p2_ready_badge.text = "[ READY ]"
@@ -160,13 +226,20 @@ func _update_p2_display() -> void:
 
 	var char_data = FighterFactoryScript.get_character_at(p2_index)
 	var pal_name = MatchConfigScript.PALETTE_NAMES[MatchConfigScript.p2_palette]
-	p2_name_label.text = "P2: %s [V: %s]" % [char_data["name"], pal_name]
+	p2_name_label.text = "%s  [V: %s]" % [char_data["name"], pal_name]
 	p2_name_label.add_theme_color_override("font_color", char_data["theme_color"])
-	p2_archetype_label.text = "%s | PALETTE: %s [PRESS V]" % [char_data["archetype"], pal_name]
-	p2_stats_label.text = "HP: %d | SPD: %s | DEF: %s | RNG: %s" % [
-		char_data["hp"], char_data["speed_grade"], char_data["defense_grade"], char_data["range_grade"]
+	p2_archetype_label.text = "%s  |  \"%s\"" % [char_data["archetype"], char_data.get("quote", "This is a divine will.")]
+	
+	p2_stats_label.text = "%s    %s\n%s    %s" % [
+		_format_stat_bar("HP", char_data.get("hp_bar", 5)),
+		_format_stat_bar("DEF", char_data.get("def_bar", 5)),
+		_format_stat_bar("SPD", char_data.get("spd_bar", 5)),
+		_format_stat_bar("RNG", char_data.get("rng_bar", 5))
 	]
-	p2_moves_label.text = "\n".join(char_data["signature_moves"])
+	p2_moves_label.text = "QUOTE: \"%s\"\n%s" % [
+		char_data.get("quote", "This is a divine will."),
+		"\n".join(char_data["signature_moves"])
+	]
 
 	if p2_ready_badge:
 		p2_ready_badge.visible = p2_locked
@@ -179,7 +252,7 @@ func _update_p2_display() -> void:
 	spr.archetype = char_data["id"]
 	spr.set_palette_index(MatchConfigScript.p2_palette)
 	spr.position = Vector2(40, 50)
-	spr.scale = Vector2(-2.5, 2.5) # Hadap kiri
+	spr.scale = Vector2(-2.8, 2.8) # Hadap kiri
 	p2_preview_mount.add_child(spr)
 	_p2_sprite = spr
 

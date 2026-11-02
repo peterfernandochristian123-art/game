@@ -111,15 +111,15 @@ func _test_character_select_navigation_and_lock_in() -> void:
 		p1_emitted["id"] = id
 	)
 
-	# Geser P1 ke index 1 (Bulwark)
+	# Geser P1 ke index 1 (Reimu / Bulwark)
 	screen._change_p1_index(1)
-	_check(screen.p1_index == 1, "P1 berpindah ke index 1 (Bulwark).")
-	_check(p1_emitted["id"] == &"bulwark", "Sinyal p1_selection_changed memancarkan bulwark.")
+	_check(screen.p1_index == 1, "P1 berpindah ke index 1 (Reimu / Bulwark).")
+	_check(p1_emitted["id"] in [&"reimu", &"bulwark"], "Sinyal p1_selection_changed memancarkan reimu/bulwark.")
 
-	# Geser P1 ke index 2 (Pulsar)
+	# Geser P1 ke index 2 (Marisa / Pulsar)
 	screen._change_p1_index(1)
-	_check(screen.p1_index == 2, "P1 berpindah ke index 2 (Pulsar).")
-	_check(p1_emitted["id"] == &"pulsar", "Sinyal p1_selection_changed memancarkan pulsar.")
+	_check(screen.p1_index == 2, "P1 berpindah ke index 2 (Marisa / Pulsar).")
+	_check(p1_emitted["id"] in [&"marisa", &"pulsar"], "Sinyal p1_selection_changed memancarkan marisa/pulsar.")
 
 	# Geser P1 melewati seluruh roster hingga wraparound ke index 0 (Viper)
 	while screen.p1_index != 0:

@@ -57,6 +57,18 @@ func _detect_parent_mecha() -> void:
 	if parent_mecha:
 		if parent_mecha.has_method("get_archetype"):
 			archetype = parent_mecha.get_archetype()
+		elif "Miku" in parent_mecha.name:
+			archetype = &"miku"
+		elif "Reimu" in parent_mecha.name:
+			archetype = &"reimu"
+		elif "Marisa" in parent_mecha.name:
+			archetype = &"marisa"
+		elif "Remilia" in parent_mecha.name:
+			archetype = &"remilia"
+		elif "Sasuke" in parent_mecha.name:
+			archetype = &"sasuke"
+		elif "2B" in parent_mecha.name or "Yorha" in parent_mecha.name:
+			archetype = &"2b"
 		elif "Bulwark" in parent_mecha.name or "Titan" in parent_mecha.name:
 			archetype = &"bulwark"
 		elif "Pulsar" in parent_mecha.name or "Ray" in parent_mecha.name:
@@ -66,7 +78,7 @@ func _detect_parent_mecha() -> void:
 		elif "Trigger" in parent_mecha.name or "Kurogane" in parent_mecha.name:
 			archetype = &"trigger"
 		else:
-			archetype = &"viper"
+			archetype = &"miku"
 		
 		if parent_mecha.has_signal("heat_changed"):
 			if not parent_mecha.heat_changed.is_connected(_on_heat_changed):
@@ -74,6 +86,140 @@ func _detect_parent_mecha() -> void:
 
 func _apply_archetype_palette() -> void:
 	match archetype:
+		&"miku":
+			col_hair = Color(0.0, 0.90, 0.92) # Iconic Cyan Twintails
+			col_chassis = Color(0.18, 0.20, 0.24) # Dark Gray Idol Vest
+			col_armor = Color(0.0, 0.95, 1.0) # Teal Tie & LED Trim
+			col_highlight = Color(0.50, 1.0, 1.0)
+			col_visor = Color(1.0, 0.25, 0.45) # Headset LEDs
+			col_thruster = Color(0.10, 0.90, 1.0)
+			col_energy = Color(0.0, 0.95, 1.0)
+			col_skin = Color(0.98, 0.88, 0.82)
+			col_skin_shadow = Color(0.85, 0.72, 0.65)
+			col_belt = Color(0.12, 0.12, 0.16) # Black Pleated Skirt
+			match palette_index:
+				1: # Void Shadow (Goth Miku)
+					col_hair = Color(0.20, 0.18, 0.25)
+					col_armor = Color(0.75, 0.35, 1.0)
+					col_highlight = Color(0.90, 0.50, 1.0)
+				2: # Monarch Gold (Idol Diva)
+					col_hair = Color(0.95, 0.85, 0.35)
+					col_chassis = Color(0.95, 0.95, 0.98)
+					col_armor = Color(1.0, 0.82, 0.20)
+				3: # Cyber Neon (Magenta Wave)
+					col_hair = Color(1.0, 0.25, 0.75)
+					col_armor = Color(0.10, 0.95, 0.90)
+
+		&"reimu":
+			col_hair = Color(0.10, 0.08, 0.12) # Dark Hair
+			col_chassis = Color(0.96, 0.96, 0.98) # White Kimono Blouse
+			col_armor = Color(0.92, 0.15, 0.22) # Crimson Red Ribbon & Skirt
+			col_highlight = Color(1.0, 0.45, 0.50)
+			col_visor = Color(0.95, 0.20, 0.30)
+			col_thruster = Color(0.90, 0.15, 0.20)
+			col_energy = Color(1.0, 0.85, 0.30) # Divine Gold Aura
+			col_skin = Color(0.98, 0.88, 0.82)
+			col_skin_shadow = Color(0.85, 0.72, 0.65)
+			col_belt = Color(0.92, 0.15, 0.22)
+			match palette_index:
+				1: # Blue Shrine Maiden
+					col_armor = Color(0.20, 0.45, 0.95)
+					col_highlight = Color(0.50, 0.75, 1.0)
+				2: # Autumn Gold
+					col_armor = Color(0.95, 0.65, 0.15)
+					col_highlight = Color(1.0, 0.85, 0.35)
+				3: # Shadow Ink Miko
+					col_chassis = Color(0.15, 0.12, 0.18)
+					col_armor = Color(0.65, 0.15, 0.80)
+
+		&"marisa":
+			col_hair = Color(0.98, 0.84, 0.30) # Golden Blonde Waves
+			col_chassis = Color(0.12, 0.12, 0.15) # Black Witch Hat & Vest
+			col_armor = Color(0.96, 0.96, 0.98) # White Apron & Hat Band
+			col_highlight = Color(1.0, 0.95, 0.55)
+			col_visor = Color(1.0, 0.85, 0.25)
+			col_thruster = Color(0.95, 0.75, 0.15)
+			col_energy = Color(1.0, 0.85, 0.20) # Starlight Magic
+			col_skin = Color(0.98, 0.88, 0.82)
+			col_skin_shadow = Color(0.85, 0.72, 0.65)
+			col_belt = Color(0.55, 0.35, 0.15) # Broom Wood
+			match palette_index:
+				1: # Midnight Violet Witch
+					col_chassis = Color(0.18, 0.12, 0.28)
+					col_energy = Color(0.80, 0.40, 1.0)
+				2: # Crimson Scarlet Witch
+					col_chassis = Color(0.35, 0.10, 0.15)
+					col_energy = Color(1.0, 0.30, 0.30)
+				3: # Toxic Star Witch
+					col_hair = Color(0.60, 0.95, 0.40)
+					col_energy = Color(0.20, 1.0, 0.60)
+
+		&"remilia":
+			col_hair = Color(0.78, 0.74, 0.92) # Lavender Hair
+			col_chassis = Color(0.18, 0.08, 0.18) # Dark Bat Wings
+			col_armor = Color(0.90, 0.22, 0.45) # Scarlet Gothic Dress
+			col_highlight = Color(1.0, 0.50, 0.65)
+			col_visor = Color(0.95, 0.12, 0.20) # Vampire Red Eyes
+			col_thruster = Color(0.85, 0.15, 0.35)
+			col_energy = Color(0.95, 0.15, 0.25) # Blood Crescent Aura
+			col_skin = Color(0.96, 0.92, 0.96) # Pale Skin
+			col_skin_shadow = Color(0.84, 0.78, 0.86)
+			col_belt = Color(0.95, 0.15, 0.25)
+			match palette_index:
+				1: # Midnight Obsidian Wings
+					col_chassis = Color(0.06, 0.05, 0.08)
+					col_armor = Color(0.75, 0.10, 0.20)
+				2: # Royal Ivory Countess
+					col_armor = Color(0.95, 0.92, 0.88)
+					col_highlight = Color(1.0, 0.85, 0.40)
+				3: # Ultraviolet Vampire
+					col_armor = Color(0.65, 0.15, 0.85)
+					col_energy = Color(0.85, 0.30, 1.0)
+
+		&"sasuke":
+			col_hair = Color(0.08, 0.08, 0.14) # Spiky Raven Black Hair
+			col_chassis = Color(0.22, 0.24, 0.30) # Dark Gray Shinobi Coat
+			col_armor = Color(0.35, 0.65, 1.0) # Chidori Electric Blue
+			col_highlight = Color(0.65, 0.50, 1.0) # Susanoo Purple
+			col_visor = Color(0.95, 0.15, 0.20) # Sharingan Red
+			col_thruster = Color(0.40, 0.30, 0.95)
+			col_energy = Color(0.55, 0.35, 0.95)
+			col_skin = Color(0.95, 0.86, 0.80)
+			col_skin_shadow = Color(0.80, 0.68, 0.60)
+			col_belt = Color(0.55, 0.35, 0.85) # Purple Shimenawa Rope
+			match palette_index:
+				1: # Akatsuki Cloak
+					col_chassis = Color(0.08, 0.08, 0.10)
+					col_armor = Color(0.90, 0.15, 0.20)
+				2: # White Snake (Hebi)
+					col_chassis = Color(0.90, 0.90, 0.95)
+					col_armor = Color(0.45, 0.40, 0.80)
+				3: # Curse Mark Purple
+					col_chassis = Color(0.15, 0.10, 0.20)
+					col_armor = Color(0.75, 0.25, 0.95)
+
+		&"2b":
+			col_hair = Color(0.94, 0.94, 0.96) # Platinum White Bob
+			col_chassis = Color(0.10, 0.10, 0.12) # Black YoRHa Dress
+			col_armor = Color(0.88, 0.90, 0.94) # Silver Steel Trim
+			col_highlight = Color(1.0, 1.0, 1.0)
+			col_visor = Color(0.06, 0.06, 0.08) # Blindfold Visor
+			col_thruster = Color(0.70, 0.80, 0.90)
+			col_energy = Color(0.90, 0.94, 1.0) # Virtuous Contract Blade Arc
+			col_skin = Color(0.98, 0.90, 0.86)
+			col_skin_shadow = Color(0.86, 0.76, 0.70)
+			col_belt = Color(0.18, 0.18, 0.20)
+			match palette_index:
+				1: # Kaine Reincarnation (Ivory White Dress)
+					col_chassis = Color(0.92, 0.92, 0.95)
+					col_armor = Color(0.20, 0.20, 0.25)
+				2: # Commander Gold
+					col_chassis = Color(0.15, 0.15, 0.18)
+					col_armor = Color(0.95, 0.80, 0.30)
+				3: # 2P Colorway (White Dress, Tan Skin)
+					col_chassis = Color(0.94, 0.94, 0.96)
+					col_skin = Color(0.78, 0.58, 0.44)
+
 		&"bulwark":
 			match palette_index:
 				1: # Void Shadow (Granite Dark Magma)
@@ -336,7 +482,19 @@ func _draw() -> void:
 	_draw_vfx_underlay()
 
 	# 2. Render Karakter Utama Sesuai Archetype
-	if archetype == &"bulwark":
+	if archetype == &"miku":
+		_draw_miku_fighter()
+	elif archetype == &"reimu":
+		_draw_reimu_fighter()
+	elif archetype == &"marisa":
+		_draw_marisa_fighter()
+	elif archetype == &"remilia":
+		_draw_remilia_fighter()
+	elif archetype == &"sasuke":
+		_draw_sasuke_fighter()
+	elif archetype == &"2b":
+		_draw_2b_fighter()
+	elif archetype == &"bulwark":
 		_draw_bulwark_fighter()
 	elif archetype == &"pulsar":
 		_draw_pulsar_fighter()
@@ -345,7 +503,7 @@ func _draw() -> void:
 	elif archetype == &"trigger":
 		_draw_trigger_fighter()
 	else:
-		_draw_viper_fighter()
+		_draw_miku_fighter()
 
 	# 3. Layer Efek Depan (Overlay VFX: Visor Flare, Kilau Senjata, Busur Serangan, Orbit Depan, Petir Overclock)
 	_draw_vfx_overlay()
@@ -377,6 +535,57 @@ func _draw_vfx_underlay() -> void:
 
 	# B. Efek Khusus per Karakter (Underlay)
 	match archetype:
+		&"miku":
+			# Not balok musik neon cyan yang melayang naik
+			for i in range(3):
+				var nx: float = -12.0 + float(i) * 11.0 + sin(t * 3.0 + float(i)) * 4.0
+				var ny: float = 12.0 - float((anim_tick * 2 + i * 20) % 40)
+				var a: float = clampf(1.0 - (12.0 - ny) / 40.0, 0.0, 0.8)
+				_draw_musical_note(Vector2(nx, ny), Color(0.0, 0.95, 1.0, a))
+			if is_moving:
+				draw_arc(Vector2(-8, 12), 8.0, PI * 0.5, PI * 1.5, 6, Color(0.0, 0.95, 1.0, 0.5), 2.0)
+
+		&"reimu":
+			# Kartu ofuda jimat terbang dan setengah belakang bola Yin-Yang
+			for i in range(3):
+				var ox: float = -14.0 + float(i) * 12.0 + cos(t * 2.5 + float(i)) * 5.0
+				var oy: float = 10.0 - float((anim_tick * 2 + i * 25) % 36)
+				var a: float = clampf(1.0 - (10.0 - oy) / 36.0, 0.0, 0.7)
+				_draw_ofuda_talisman(Vector2(ox, oy), sin(t + float(i)), a)
+			_draw_yin_yang_orb(t, true)
+
+		&"marisa":
+			# Kilau bintang magis dan jejak sapu terbang
+			for i in range(3):
+				var sx: float = -10.0 + float(i) * 10.0 + sin(t * 4.0 + float(i)) * 5.0
+				var sy: float = 14.0 - float((anim_tick * 2 + i * 22) % 35)
+				var a: float = clampf(1.0 - (14.0 - sy) / 35.0, 0.0, 0.8)
+				_draw_sparkle_cross(Vector2(sx, sy), 3.0, Color.WHITE, Color(1.0, 0.85, 0.25, a))
+			if is_moving:
+				draw_line(Vector2(-12, 10), Vector2(-22, 12), Color(1.0, 0.85, 0.25, 0.6), 2.5)
+
+		&"remilia":
+			# Sayap kelelawar hitam mengepak di belakang tubuh
+			var h_y = -14.0 + (sin(anim_tick * 0.15) * 1.5 if current_state == &"Idle" else 0.0)
+			_draw_remilia_bat_wings(h_y, t)
+			# Partikel kabut merah darah
+			for i in range(3):
+				var bx: float = -12.0 + float(i) * 11.0 + sin(t * 3.5 + float(i)) * 4.0
+				var by: float = 8.0 - float((anim_tick * 2 + i * 18) % 32)
+				var a: float = clampf(1.0 - (8.0 - by) / 32.0, 0.0, 0.6)
+				draw_circle(Vector2(bx, by), 2.5, Color(0.85, 0.15, 0.35, a))
+
+		&"sasuke":
+			# Lidah api chakra ungu / Susanoo ribcage aura
+			for i in range(4):
+				var sx: float = -10.0 + float(i) * 7.0
+				var h_aura: float = 18.0 + sin(t * 6.0 + float(i)) * 6.0
+				draw_line(Vector2(sx, 16), Vector2(sx + sin(t * 4.0 + float(i)) * 3.0, 16 - h_aura), Color(0.65, 0.35, 1.0, 0.45), 2.0)
+
+		&"2b":
+			# Pod 042 melayang di belakang bahu
+			_draw_pod_042(Vector2(-14, -16 + sin(t * 2.0) * 3.0), false)
+
 		&"viper":
 			# Percikan plasma cyan di sekitar kaki saat bergerak/kuda-kuda
 			for i in range(3):
@@ -462,6 +671,48 @@ func _draw_vfx_overlay() -> void:
 
 	# C. Efek Khusus per Karakter (Overlay)
 	match archetype:
+		&"miku":
+			if is_attacking:
+				draw_arc(Vector2(14, -2), 18.0, -PI * 0.45, PI * 0.45, 10, Color(0.0, 0.95, 1.0, 0.9), 3.0)
+				draw_arc(Vector2(14, -2), 15.0, -PI * 0.35, PI * 0.35, 8, Color.WHITE, 1.5)
+				_draw_musical_note(Vector2(24, -12), Color(0.0, 0.95, 1.0, 1.0))
+				_draw_musical_note(Vector2(28, 4), Color(0.0, 0.95, 1.0, 1.0))
+
+		&"reimu":
+			_draw_yin_yang_orb(t, false)
+			if is_attacking:
+				draw_arc(Vector2(16, -2), 20.0, -PI * 0.5, PI * 0.5, 10, Color(0.95, 0.15, 0.25, 0.9), 3.0)
+				_draw_ofuda_talisman(Vector2(26, -6), 0.2, 1.0)
+				_draw_ofuda_talisman(Vector2(24, 6), -0.3, 1.0)
+
+		&"marisa":
+			if is_attacking:
+				_draw_sparkle_cross(Vector2(18, -2), 8.0, Color.WHITE, Color(1.0, 0.85, 0.25))
+				draw_circle(Vector2(18, -2), 5.0, Color(1.0, 0.95, 0.4, 0.8))
+				draw_line(Vector2(18, -2), Vector2(38, -2), Color(1.0, 0.95, 0.6), 4.0)
+
+		&"remilia":
+			if is_attacking:
+				draw_arc(Vector2(16, -4), 18.0, -PI * 0.4, PI * 0.3, 8, Color(0.95, 0.12, 0.25), 3.5)
+				draw_arc(Vector2(14, 2), 22.0, -PI * 0.4, PI * 0.3, 8, Color(1.0, 0.3, 0.4), 2.5)
+				draw_line(Vector2(14, -6), Vector2(32, -2), Color.WHITE, 1.5)
+
+		&"sasuke":
+			var f_hand := Vector2(14, -2) if is_attacking else Vector2(8, -1)
+			draw_circle(f_hand, 3.5, Color(0.4, 0.8, 1.0, 0.9))
+			draw_circle(f_hand, 1.8, Color.WHITE)
+			for l in range(3):
+				var p1 = f_hand + Vector2(randf_range(-4, 4), randf_range(-4, 4))
+				var p2 = p1 + Vector2(randf_range(-8, 12), randf_range(-8, 8))
+				draw_line(p1, p2, Color(0.6, 0.3, 1.0), 2.0)
+				draw_line(p1, p2, Color.WHITE, 1.0)
+
+		&"2b":
+			_draw_pod_042(Vector2(-14, -16 + sin(t * 2.0) * 3.0), true)
+			if is_attacking:
+				draw_arc(Vector2(12, -2), 24.0, -PI * 0.5, PI * 0.45, 12, Color(0.92, 0.94, 0.98, 0.95), 3.0)
+				draw_arc(Vector2(12, -2), 21.0, -PI * 0.4, PI * 0.35, 10, Color.WHITE, 1.8)
+
 		&"viper":
 			# Visor Laser Streak (Kilauan garis mata tajam saat bergerak/menyerang)
 			var eye_y := -13.0 + sin(anim_tick * 0.15) * 1.5
@@ -1352,4 +1603,555 @@ func _draw_trigger_attack_pose(bob_y: float) -> void:
 		_draw_energy_revolver(h_pos, 0.0)
 		draw_circle(h_pos + Vector2(9, 0), 3.0, col_energy)
 		draw_circle(h_pos + Vector2(9, 0), 1.5, Color.WHITE)
+
+## =========================================================================
+## HELPER VFX ANIME & MAGICAL ARTIFACTS
+## =========================================================================
+func _draw_musical_note(pos: Vector2, col: Color) -> void:
+	draw_circle(pos, 2.0, col)
+	draw_line(pos + Vector2(1.5, 0), pos + Vector2(1.5, -6), col, 1.2)
+	draw_line(pos + Vector2(1.5, -6), pos + Vector2(4.5, -4), col, 1.2)
+
+func _draw_ofuda_talisman(pos: Vector2, rot: float, alpha: float) -> void:
+	var w := 3.0
+	var h := 5.0
+	var col_paper := Color(0.96, 0.95, 0.90, alpha)
+	var col_seal := Color(0.90, 0.15, 0.20, alpha)
+	var dir := Vector2.RIGHT.rotated(rot)
+	var up := Vector2.UP.rotated(rot)
+	var pts := PackedVector2Array([
+		pos - dir * w - up * h,
+		pos + dir * w - up * h,
+		pos + dir * w + up * h,
+		pos - dir * w + up * h
+	])
+	draw_colored_polygon(pts, col_paper)
+	draw_line(pos - up * 2.0, pos + up * 2.0, col_seal, 1.2)
+
+func _draw_yin_yang_orb(t: float, is_rear_layer: bool) -> void:
+	var orb_ang := t * 2.2
+	var orb_sin := sin(orb_ang)
+	var is_rear := orb_sin < 0.0
+	if is_rear != is_rear_layer:
+		return
+	var orb_pos := Vector2(cos(orb_ang) * 18.0, -2.0 + orb_sin * 7.0)
+	var r := 4.5
+	# Bola Yin Yang berputar
+	draw_circle(orb_pos, r + 1.2, Color(1.0, 0.2, 0.3, 0.5))
+	draw_circle(orb_pos, r, Color.WHITE)
+	draw_arc(orb_pos, r, PI * 0.5, PI * 1.5, 8, Color(0.1, 0.1, 0.14), r)
+	draw_circle(orb_pos + Vector2(0, -r * 0.5), r * 0.5, Color.WHITE)
+	draw_circle(orb_pos + Vector2(0, r * 0.5), r * 0.5, Color(0.1, 0.1, 0.14))
+	draw_circle(orb_pos + Vector2(0, -r * 0.5), 1.0, Color(0.1, 0.1, 0.14))
+	draw_circle(orb_pos + Vector2(0, r * 0.5), 1.0, Color.WHITE)
+
+func _draw_remilia_bat_wings(head_y: float, t: float) -> void:
+	var wing_flap := sin(t * 3.5) * 4.0
+	var wing_col := col_chassis
+	# Sayap Kiri
+	var w_left := PackedVector2Array([
+		Vector2(-4, head_y + 8),
+		Vector2(-14, head_y + 2 + wing_flap),
+		Vector2(-22, head_y + 8 + wing_flap),
+		Vector2(-18, head_y + 14 + wing_flap * 0.5),
+		Vector2(-10, head_y + 12)
+	])
+	draw_colored_polygon(w_left, wing_col)
+	draw_polyline(w_left, col_armor, 1.2)
+	# Sayap Kanan
+	var w_right := PackedVector2Array([
+		Vector2(4, head_y + 8),
+		Vector2(14, head_y + 2 + wing_flap),
+		Vector2(22, head_y + 8 + wing_flap),
+		Vector2(18, head_y + 14 + wing_flap * 0.5),
+		Vector2(10, head_y + 12)
+	])
+	draw_colored_polygon(w_right, wing_col)
+	draw_polyline(w_right, col_armor, 1.2)
+
+func _draw_pod_042(pos: Vector2, is_front: bool) -> void:
+	if not is_front:
+		# Badan Pod 042 & sensor optik
+		draw_rect(Rect2(pos.x - 3, pos.y - 4, 6, 8), Color(0.85, 0.88, 0.92))
+		draw_rect(Rect2(pos.x - 2, pos.y - 3, 4, 6), Color(0.20, 0.22, 0.25))
+		draw_circle(pos + Vector2(0, -1), 1.5, Color(0.0, 0.85, 1.0))
+		# Lengan gantung & pendorong bawah
+		draw_line(pos + Vector2(-3, 0), pos + Vector2(-3, 5), Color(0.6, 0.65, 0.7), 1.2)
+		draw_line(pos + Vector2(3, 0), pos + Vector2(3, 5), Color(0.6, 0.65, 0.7), 1.2)
+		draw_circle(pos + Vector2(0, 5), 1.2, Color(1.0, 0.6, 0.2, 0.8))
+	else:
+		# Laser bidik depan jika sedang menyerang
+		if current_state == &"Attack":
+			draw_line(pos + Vector2(4, 0), pos + Vector2(45, 0), Color(0.2, 0.9, 1.0, 0.8), 1.8)
+			draw_circle(pos + Vector2(45, 0), 2.5, Color.WHITE)
+
+## =========================================================================
+## 1. MIKU HATSUNE: VOCALOID / IDOL RHYTHM DUELIST
+## =========================================================================
+func _draw_miku_fighter() -> void:
+	var bob_y: float = sin(anim_tick * 0.18) * 1.5 if current_state == &"Idle" else (abs(sin(anim_tick * 0.35)) * 1.8 if current_state == &"Walk" else 0.0)
+	var head_center := Vector2(0, -14.0 + bob_y)
+
+	# 1. Twintails Ikonis Cyan (Berkibar dinamis dengan fisika gelombang)
+	var t: float = float(anim_tick) * 0.1
+	var tw_left = PackedVector2Array([
+		Vector2(-4, head_center.y - 1),
+		Vector2(-8 + sin(t * 2.0) * 3.0, head_center.y + 7),
+		Vector2(-12 + sin(t * 2.5) * 4.0, head_center.y + 15),
+		Vector2(-15 + sin(t * 2.8) * 5.0, head_center.y + 24)
+	])
+	draw_polyline(tw_left, col_hair, 3.8)
+	draw_polyline(tw_left, col_highlight, 1.2)
+	# Ikat rambut kubus hitam & merah
+	draw_rect(Rect2(-6, head_center.y - 3, 3, 3), col_chassis)
+	draw_rect(Rect2(-5, head_center.y - 2, 1, 1), col_visor)
+
+	var tw_right = PackedVector2Array([
+		Vector2(4, head_center.y - 1),
+		Vector2(8 + cos(t * 2.0) * 3.0, head_center.y + 7),
+		Vector2(12 + cos(t * 2.5) * 4.0, head_center.y + 15),
+		Vector2(15 + cos(t * 2.8) * 5.0, head_center.y + 24)
+	])
+	draw_polyline(tw_right, col_hair, 3.8)
+	draw_polyline(tw_right, col_highlight, 1.2)
+	draw_rect(Rect2(3, head_center.y - 3, 3, 3), col_chassis)
+	draw_rect(Rect2(4, head_center.y - 2, 1, 1), col_visor)
+
+	# 2. Kaki & Sepatu Boots Tinggi (Thigh-High Boots)
+	if current_state == &"Walk":
+		var stride = sin(anim_tick * 0.35) * 5.0
+		_draw_fighter_leg(Vector2(-4 - stride, 5 + bob_y), Vector2(-5 - stride, 19 + bob_y), col_skin, col_chassis, 3.8)
+		_draw_fighter_leg(Vector2(4 + stride, 5 + bob_y), Vector2(5 + stride, 19 + bob_y), col_skin, col_chassis, 3.8)
+	else:
+		_draw_fighter_leg(Vector2(-4, 5 + bob_y), Vector2(-5, 19 + bob_y), col_skin, col_chassis, 3.8)
+		_draw_fighter_leg(Vector2(4, 5 + bob_y), Vector2(5, 19 + bob_y), col_skin, col_chassis, 3.8)
+	# Aksen garis cyan di atas boot
+	draw_rect(Rect2(-7, 10 + bob_y, 4, 1.5), col_armor)
+	draw_rect(Rect2(3, 10 + bob_y, 4, 1.5), col_armor)
+
+	# 3. Rok Lipit Hitam & Blus Rompi Abu-abu
+	var torso_pts = PackedVector2Array([
+		Vector2(-5, -8 + bob_y),
+		Vector2(5, -8 + bob_y),
+		Vector2(4, 3 + bob_y),
+		Vector2(-4, 3 + bob_y)
+	])
+	draw_colored_polygon(torso_pts, Color(0.75, 0.78, 0.82)) # Rompi perak abu-abu
+	# Dasi Cyan Ikonis
+	draw_line(Vector2(0, -7 + bob_y), Vector2(0, 2 + bob_y), col_armor, 2.0)
+	# Rok Lipit Hitam
+	var skirt_pts = PackedVector2Array([
+		Vector2(-5, 2 + bob_y),
+		Vector2(5, 2 + bob_y),
+		Vector2(7, 7 + bob_y),
+		Vector2(-7, 7 + bob_y)
+	])
+	draw_colored_polygon(skirt_pts, col_belt)
+	draw_line(Vector2(-7, 7 + bob_y), Vector2(7, 7 + bob_y), col_armor, 1.2) # Trim cyan rok
+
+	# 4. Kepala & Wajah
+	draw_circle(Vector2(head_center.x, head_center.y), 4.2, col_skin)
+	# Poni rambut cyan
+	var bangs = PackedVector2Array([
+		Vector2(-5, head_center.y - 1),
+		Vector2(-4, head_center.y - 5),
+		Vector2(4, head_center.y - 5),
+		Vector2(5, head_center.y - 1),
+		Vector2(3, head_center.y + 1),
+		Vector2(0, head_center.y - 1),
+		Vector2(-3, head_center.y + 1)
+	])
+	draw_colored_polygon(bangs, col_hair)
+	# Headset bando & earcup hitam/cyan
+	draw_arc(head_center, 4.5, PI, TAU, 8, col_chassis, 1.5)
+	draw_rect(Rect2(-5.5, head_center.y - 1, 2, 3), col_armor)
+	draw_rect(Rect2(3.5, head_center.y - 1, 2, 3), col_armor)
+	# Mata anime cyan berbinar
+	draw_circle(Vector2(1.5, head_center.y), 1.2, col_armor)
+	draw_circle(Vector2(1.5, head_center.y), 0.5, Color.WHITE)
+
+	# 5. Lengan & Manset Equalizer Digital (Arm Warmers)
+	var arm_l = Vector2(-5, -6 + bob_y)
+	var hand_l = Vector2(-3, -1 + bob_y)
+	var arm_r = Vector2(4, -6 + bob_y)
+	var hand_r = Vector2(7, -3 + bob_y)
+	if current_state == &"Attack":
+		hand_r = Vector2(16, -4 + bob_y)
+	_draw_fighter_arm(arm_l, hand_l, col_skin, col_chassis, 3.0)
+	_draw_fighter_arm(arm_r, hand_r, col_skin, col_chassis, 3.0)
+	# LED Equalizer Bar pada manset
+	draw_rect(Rect2(hand_l.x - 1, hand_l.y - 2, 2, 3), col_armor)
+	draw_rect(Rect2(hand_r.x - 1, hand_r.y - 2, 2, 3), col_armor)
+	# Mikrofon masa depan / beam saber mic
+	draw_line(hand_r, hand_r + Vector2(6, -4), col_armor, 2.0)
+	draw_circle(hand_r + Vector2(7, -5), 2.0, col_highlight)
+
+## =========================================================================
+## 2. REIMU HAKUREI: SHRINE MAIDEN (Divine Amulets & Yin-Yang Orb)
+## =========================================================================
+func _draw_reimu_fighter() -> void:
+	var bob_y: float = sin(anim_tick * 0.15) * 1.5 if current_state == &"Idle" else (abs(sin(anim_tick * 0.32)) * 1.6 if current_state == &"Walk" else 0.0)
+	var head_center := Vector2(0, -14.0 + bob_y)
+
+	# 1. Pita Raksasa Merah di Kepala (Big Red Miko Ribbon)
+	var ribbon_l = PackedVector2Array([
+		Vector2(0, head_center.y - 5),
+		Vector2(-9, head_center.y - 12),
+		Vector2(-6, head_center.y - 4)
+	])
+	draw_colored_polygon(ribbon_l, col_armor)
+	var ribbon_r = PackedVector2Array([
+		Vector2(0, head_center.y - 5),
+		Vector2(9, head_center.y - 12),
+		Vector2(6, head_center.y - 4)
+	])
+	draw_colored_polygon(ribbon_r, col_armor)
+	draw_circle(Vector2(0, head_center.y - 5), 2.0, Color(0.98, 0.85, 0.40)) # Simpul emas
+
+	# 2. Rambut Hitam & Wajah
+	draw_circle(Vector2(head_center.x, head_center.y), 4.2, col_skin)
+	var hair_back = PackedVector2Array([
+		Vector2(-4, head_center.y - 3),
+		Vector2(-6, head_center.y + 6),
+		Vector2(6, head_center.y + 6),
+		Vector2(4, head_center.y - 3)
+	])
+	draw_colored_polygon(hair_back, col_hair)
+	# Rambut poni
+	draw_rect(Rect2(-4, head_center.y - 4, 8, 3), col_hair)
+	# Mata merah kecokelatan
+	draw_circle(Vector2(1.5, head_center.y), 1.2, Color(0.85, 0.20, 0.25))
+	draw_circle(Vector2(1.5, head_center.y), 0.5, Color.WHITE)
+
+	# 3. Kimono Atasan Putih & Hakama Merah (Miko Attire)
+	# Hakama Merah Panjang
+	var hakama_pts = PackedVector2Array([
+		Vector2(-5, 2 + bob_y),
+		Vector2(5, 2 + bob_y),
+		Vector2(8, 17 + bob_y),
+		Vector2(-8, 17 + bob_y)
+	])
+	draw_colored_polygon(hakama_pts, col_armor)
+	# Kaki tabi putih di bawah hakama
+	draw_rect(Rect2(-5, 17 + bob_y, 3, 3), Color.WHITE)
+	draw_rect(Rect2(2, 17 + bob_y, 3, 3), Color.WHITE)
+
+	# Kimono Atasan Putih
+	var top_pts = PackedVector2Array([
+		Vector2(-5, -8 + bob_y),
+		Vector2(5, -8 + bob_y),
+		Vector2(4, 2 + bob_y),
+		Vector2(-4, 2 + bob_y)
+	])
+	draw_colored_polygon(top_pts, Color.WHITE)
+	# Kerah merah V-neck & pita dada
+	draw_line(Vector2(-3, -7 + bob_y), Vector2(0, -2 + bob_y), col_armor, 1.5)
+	draw_line(Vector2(3, -7 + bob_y), Vector2(0, -2 + bob_y), col_armor, 1.5)
+	draw_rect(Rect2(-2, -3 + bob_y, 4, 3), col_armor)
+
+	# 4. Lengan Baju Melayang Terpisah (Detached White Sleeves)
+	var slv_l = PackedVector2Array([
+		Vector2(-6, -6 + bob_y),
+		Vector2(-12, -1 + bob_y),
+		Vector2(-10, 8 + bob_y),
+		Vector2(-5, 3 + bob_y)
+	])
+	draw_colored_polygon(slv_l, Color.WHITE)
+	draw_line(Vector2(-6, -6 + bob_y), Vector2(-5, 3 + bob_y), col_armor, 1.2)
+
+	var slv_r = PackedVector2Array([
+		Vector2(5, -6 + bob_y),
+		Vector2(11, -1 + bob_y),
+		Vector2(10, 8 + bob_y),
+		Vector2(4, 3 + bob_y)
+	])
+	draw_colored_polygon(slv_r, Color.WHITE)
+	draw_line(Vector2(5, -6 + bob_y), Vector2(4, 3 + bob_y), col_armor, 1.2)
+
+	# 5. Tongkat Pemurnian Gohei di Tangan Kanan
+	var hand_pos = Vector2(8, -2 + bob_y) if current_state != &"Attack" else Vector2(16, -6 + bob_y)
+	draw_line(hand_pos + Vector2(-2, 8), hand_pos + Vector2(4, -14), Color(0.85, 0.70, 0.50), 2.0)
+	# Kertas zig-zag putih (Shide) pada ujung Gohei
+	var shide_tip = hand_pos + Vector2(4, -14)
+	draw_line(shide_tip, shide_tip + Vector2(3, 4), Color.WHITE, 1.8)
+	draw_line(shide_tip + Vector2(3, 4), shide_tip + Vector2(0, 7), Color.WHITE, 1.8)
+	draw_line(shide_tip + Vector2(0, 7), shide_tip + Vector2(4, 11), Color.WHITE, 1.8)
+
+## =========================================================================
+## 3. MARISA KIRISAME: ORDINARY MAGICIAN / WIZARD (Starlight Master Spark)
+## =========================================================================
+func _draw_marisa_fighter() -> void:
+	var bob_y: float = sin(anim_tick * 0.16) * 1.5 if current_state == &"Idle" else (abs(sin(anim_tick * 0.35)) * 1.8 if current_state == &"Walk" else 0.0)
+	var head_center := Vector2(0, -14.0 + bob_y)
+
+	# 1. Rambut Pirang Emas Bergelombang & Kepang Samping
+	var hair_back = PackedVector2Array([
+		Vector2(-5, head_center.y - 2),
+		Vector2(-8, head_center.y + 12),
+		Vector2(8, head_center.y + 12),
+		Vector2(5, head_center.y - 2)
+	])
+	draw_colored_polygon(hair_back, col_hair)
+	# Kepang samping pirang dengan pita putih
+	draw_line(Vector2(5, head_center.y + 2), Vector2(8, head_center.y + 10), col_hair, 2.5)
+	draw_circle(Vector2(8, head_center.y + 10), 1.5, Color.WHITE)
+
+	# 2. Wajah & Topi Penyihir Hitam Lebar (Witch Hat)
+	draw_circle(Vector2(head_center.x, head_center.y), 4.2, col_skin)
+	# Mata emas bersemangat
+	draw_circle(Vector2(1.5, head_center.y), 1.2, Color(1.0, 0.82, 0.20))
+	draw_circle(Vector2(1.5, head_center.y), 0.5, Color.WHITE)
+
+	# Topi Penyihir: Pinggiran lebar melengkung & kerucut lancip hitam
+	var hat_brim = PackedVector2Array([
+		Vector2(-11, head_center.y - 3),
+		Vector2(11, head_center.y - 3),
+		Vector2(8, head_center.y - 5),
+		Vector2(-8, head_center.y - 5)
+	])
+	draw_colored_polygon(hat_brim, col_chassis)
+	var hat_cone = PackedVector2Array([
+		Vector2(-6, head_center.y - 5),
+		Vector2(6, head_center.y - 5),
+		Vector2(-4, head_center.y - 18),
+		Vector2(-8, head_center.y - 14)
+	])
+	draw_colored_polygon(hat_cone, col_chassis)
+	# Pita putih lebar pada topi
+	draw_line(Vector2(-6, head_center.y - 5), Vector2(6, head_center.y - 5), Color.WHITE, 2.5)
+
+	# 3. Kostum Hitam & Celemek Putih (Black Robe & White Apron)
+	var dress_pts = PackedVector2Array([
+		Vector2(-5, -8 + bob_y),
+		Vector2(5, -8 + bob_y),
+		Vector2(6, 12 + bob_y),
+		Vector2(-6, 12 + bob_y)
+	])
+	draw_colored_polygon(dress_pts, col_chassis)
+	# Celemek putih berenda di depan
+	var apron_pts = PackedVector2Array([
+		Vector2(-3, -6 + bob_y),
+		Vector2(3, -6 + bob_y),
+		Vector2(4, 11 + bob_y),
+		Vector2(-4, 11 + bob_y)
+	])
+	draw_colored_polygon(apron_pts, Color.WHITE)
+
+	# Kaki & Sepatu Boot Hitam
+	_draw_fighter_leg(Vector2(-4, 10 + bob_y), Vector2(-5, 19 + bob_y), Color(0.95, 0.95, 0.98), col_chassis, 3.8)
+	_draw_fighter_leg(Vector2(4, 10 + bob_y), Vector2(5, 19 + bob_y), Color(0.95, 0.95, 0.98), col_chassis, 3.8)
+
+	# 4. Sapu Terbang Kayu (Flying Broom)
+	var broom_h = Vector2(-16, 10 + bob_y)
+	var broom_tip = Vector2(14, 5 + bob_y)
+	draw_line(broom_h, broom_tip, Color(0.65, 0.45, 0.25), 2.2) # Gagang kayu
+	# Bundel jerami sapu di belakang
+	var straw_pts = PackedVector2Array([
+		broom_h,
+		broom_h + Vector2(-8, -4),
+		broom_h + Vector2(-12, 0),
+		broom_h + Vector2(-8, 5)
+	])
+	draw_colored_polygon(straw_pts, Color(0.90, 0.80, 0.40))
+	draw_line(broom_h + Vector2(-2, -1), broom_h + Vector2(-2, 2), Color.WHITE, 1.5) # Tali pita
+
+	# 5. Mini-Hakkero (Tungku Bintang Magis di Tangan Kanan)
+	var hakkero_pos = Vector2(8, -2 + bob_y) if current_state != &"Attack" else Vector2(17, -4 + bob_y)
+	draw_rect(Rect2(hakkero_pos.x - 3, hakkero_pos.y - 3, 6, 6), Color(0.55, 0.35, 0.15))
+	draw_circle(hakkero_pos, 2.0, col_energy)
+	draw_circle(hakkero_pos, 1.0, Color.WHITE)
+
+## =========================================================================
+## 4. REMILIA SCARLET: VAMPIRE ARISTOCRAT (Bat Wings & Blood Claws)
+## =========================================================================
+func _draw_remilia_fighter() -> void:
+	var bob_y: float = sin(anim_tick * 0.15) * 1.5 if current_state == &"Idle" else (abs(sin(anim_tick * 0.35)) * 1.8 if current_state == &"Walk" else 0.0)
+	var head_center := Vector2(0, -14.0 + bob_y)
+
+	# 1. Rambut Lavender Berombak & Mata Merah Vampir
+	draw_circle(Vector2(head_center.x, head_center.y), 4.2, col_skin)
+	var hair_pts = PackedVector2Array([
+		Vector2(-4, head_center.y - 2),
+		Vector2(-6, head_center.y + 7),
+		Vector2(6, head_center.y + 7),
+		Vector2(4, head_center.y - 2)
+	])
+	draw_colored_polygon(hair_pts, col_hair)
+	# Mata merah vampir berkilau
+	draw_circle(Vector2(1.5, head_center.y), 1.4, Color(0.95, 0.10, 0.20))
+	draw_circle(Vector2(1.5, head_center.y), 0.6, Color.WHITE)
+
+	# 2. Topi Mob Cap / Ruffled Bonnet dengan Pita Merah
+	var cap_pts = PackedVector2Array([
+		Vector2(-7, head_center.y - 2),
+		Vector2(-6, head_center.y - 9),
+		Vector2(6, head_center.y - 9),
+		Vector2(7, head_center.y - 2)
+	])
+	draw_colored_polygon(cap_pts, Color(0.95, 0.92, 0.96))
+	draw_circle(Vector2(4, head_center.y - 5), 2.2, Color(0.92, 0.15, 0.25)) # Pita merah
+
+	# 3. Gaun Gothic Lolita Merah & Merah Muda (Scarlet Frilled Dress)
+	var dress_top = PackedVector2Array([
+		Vector2(-5, -8 + bob_y),
+		Vector2(5, -8 + bob_y),
+		Vector2(4, 2 + bob_y),
+		Vector2(-4, 2 + bob_y)
+	])
+	draw_colored_polygon(dress_top, Color(0.95, 0.80, 0.85)) # Atasan pink muda
+	draw_rect(Rect2(-2, -5 + bob_y, 4, 4), col_armor) # Pita dasi merah
+
+	# Rok Berlapis Ruffle Merah Scarlet
+	var skirt_pts = PackedVector2Array([
+		Vector2(-5, 2 + bob_y),
+		Vector2(5, 2 + bob_y),
+		Vector2(8, 14 + bob_y),
+		Vector2(-8, 14 + bob_y)
+	])
+	draw_colored_polygon(skirt_pts, col_armor)
+	draw_line(Vector2(-8, 14 + bob_y), Vector2(8, 14 + bob_y), Color(0.96, 0.90, 0.95), 1.5) # Ruffle putih bawah
+
+	# Kaki & Sepatu Mary Jane Merah
+	_draw_fighter_leg(Vector2(-4, 13 + bob_y), Vector2(-5, 19 + bob_y), Color.WHITE, col_armor, 3.5)
+	_draw_fighter_leg(Vector2(4, 13 + bob_y), Vector2(5, 19 + bob_y), Color.WHITE, col_armor, 3.5)
+
+	# 4. Tangan Cakaran Vampir / Tombak Gungnir
+	var h_l = Vector2(-4, -2 + bob_y)
+	var h_r = Vector2(8, -4 + bob_y) if current_state != &"Attack" else Vector2(17, -5 + bob_y)
+	_draw_fighter_arm(Vector2(-5, -6 + bob_y), h_l, col_skin, Color(0.95, 0.80, 0.85), 3.0)
+	_draw_fighter_arm(Vector2(4, -6 + bob_y), h_r, col_skin, Color(0.95, 0.80, 0.85), 3.0)
+	# Cakar merah runcing
+	draw_line(h_r, h_r + Vector2(4, -2), Color(0.95, 0.12, 0.25), 1.5)
+	draw_line(h_r, h_r + Vector2(5, 0), Color(0.95, 0.12, 0.25), 1.5)
+	draw_line(h_r, h_r + Vector2(4, 2), Color(0.95, 0.12, 0.25), 1.5)
+
+## =========================================================================
+## 5. SASUKE UCHIHA: SHINOBI AVENGER (Kusanagi & Chidori Blade)
+## =========================================================================
+func _draw_sasuke_fighter() -> void:
+	var bob_y: float = sin(anim_tick * 0.16) * 1.5 if current_state == &"Idle" else (abs(sin(anim_tick * 0.35)) * 1.8 if current_state == &"Walk" else 0.0)
+	var head_center := Vector2(0, -14.0 + bob_y)
+
+	# 1. Rambut Hitam Spiky Sasuke (Fringe Menjuntai & Belakang Menusuk)
+	var hair_back = PackedVector2Array([
+		Vector2(-5, head_center.y - 1),
+		Vector2(-9, head_center.y - 8),
+		Vector2(-3, head_center.y - 9),
+		Vector2(2, head_center.y - 9),
+		Vector2(6, head_center.y - 5),
+		Vector2(4, head_center.y + 4),
+		Vector2(-4, head_center.y + 4)
+	])
+	draw_colored_polygon(hair_back, col_hair)
+	# Wajah kulit & Sharingan
+	draw_circle(Vector2(head_center.x + 0.5, head_center.y), 4.2, col_skin)
+	# Poni hitam membingkai wajah kiri dan kanan
+	draw_line(Vector2(-4, head_center.y - 3), Vector2(-2, head_center.y + 4), col_hair, 2.0)
+	draw_line(Vector2(4, head_center.y - 3), Vector2(2, head_center.y + 4), col_hair, 2.0)
+	# Sharingan Merah dengan Tomoe
+	draw_circle(Vector2(1.5, head_center.y), 1.4, Color(0.95, 0.15, 0.20))
+	draw_circle(Vector2(1.5, head_center.y), 0.6, Color.BLACK)
+
+	# 2. Kerah Tinggi Shinobi & Jubah Abu-abu Gelap
+	var collar_pts = PackedVector2Array([
+		Vector2(-5, head_center.y + 3),
+		Vector2(-6, head_center.y - 1),
+		Vector2(5, head_center.y - 1),
+		Vector2(4, head_center.y + 3)
+	])
+	draw_colored_polygon(collar_pts, col_chassis)
+
+	# Torso & Jubah
+	var tunic_pts = PackedVector2Array([
+		Vector2(-6, -7 + bob_y),
+		Vector2(6, -7 + bob_y),
+		Vector2(5, 5 + bob_y),
+		Vector2(-5, 5 + bob_y)
+	])
+	draw_colored_polygon(tunic_pts, col_chassis)
+	# Lambang Kipas Uchiha di punggung/dada tersirat
+	draw_circle(Vector2(0, -3 + bob_y), 2.2, Color.WHITE)
+	draw_circle(Vector2(0, -1 + bob_y), 1.8, Color(0.90, 0.15, 0.20))
+
+	# 3. Tali Shimenawa Ungu Tebal di Pinggang (Purple Rope Belt)
+	draw_rect(Rect2(-6, 3 + bob_y, 12, 3.5), col_belt)
+	draw_circle(Vector2(0, 5 + bob_y), 2.5, col_belt) # Simpul besar tali
+
+	# 4. Kaki Celana Shinobi & Sandal Ninja
+	_draw_fighter_leg(Vector2(-5, 5 + bob_y), Vector2(-6, 19 + bob_y), Color(0.12, 0.12, 0.16), Color(0.10, 0.10, 0.12), 4.2)
+	_draw_fighter_leg(Vector2(4, 5 + bob_y), Vector2(6, 19 + bob_y), Color(0.12, 0.12, 0.16), Color(0.10, 0.10, 0.12), 4.2)
+
+	# 5. Pedang Kusanagi & Tangan Chidori
+	var h_l = Vector2(-5, -1 + bob_y)
+	var h_r = Vector2(8, -3 + bob_y) if current_state != &"Attack" else Vector2(17, -5 + bob_y)
+	_draw_fighter_arm(Vector2(-5, -6 + bob_y), h_l, col_skin, col_chassis, 3.5)
+	_draw_fighter_arm(Vector2(4, -6 + bob_y), h_r, col_skin, col_chassis, 3.5)
+	# Bilah Pedang Kusanagi Baja Perak
+	draw_line(h_r, h_r + Vector2(16, -4), Color(0.92, 0.94, 0.98), 2.0)
+	draw_line(h_r, h_r + Vector2(16, -4), Color.WHITE, 1.0)
+
+## =========================================================================
+## 6. YORHA 2B: BATTLE ANDROID (Virtuous Contract & Pod 042)
+## =========================================================================
+func _draw_2b_fighter() -> void:
+	var bob_y: float = sin(anim_tick * 0.15) * 1.5 if current_state == &"Idle" else (abs(sin(anim_tick * 0.35)) * 1.8 if current_state == &"Walk" else 0.0)
+	var head_center := Vector2(0, -14.0 + bob_y)
+
+	# 1. Rambut Putih Platinum Bob & Penutup Mata Visor Hitam (Blindfold)
+	draw_circle(Vector2(head_center.x, head_center.y), 4.2, col_skin)
+	# Bob putih platinum dengan poni miring
+	var bob_hair = PackedVector2Array([
+		Vector2(-5, head_center.y - 1),
+		Vector2(-6, head_center.y - 6),
+		Vector2(5, head_center.y - 6),
+		Vector2(6, head_center.y + 4),
+		Vector2(2, head_center.y + 6),
+		Vector2(0, head_center.y - 1),
+		Vector2(-3, head_center.y + 5)
+	])
+	draw_colored_polygon(bob_hair, col_hair)
+	# Bando pita hitam di atas kepala
+	draw_arc(head_center, 4.5, PI * 1.1, PI * 1.9, 8, col_chassis, 1.2)
+	# Visor Blindfold Hitam Ikonis
+	draw_rect(Rect2(-4.5, head_center.y - 1.5, 9, 3), col_visor)
+	draw_line(Vector2(-3, head_center.y - 0.5), Vector2(3, head_center.y - 0.5), Color(0.3, 0.35, 0.4), 1.0) # Kilau visor
+
+	# 2. Gaun Gothic Lolita Hitam YoRHa dengan Belahan & Renda Putih
+	var dress_top = PackedVector2Array([
+		Vector2(-5, -8 + bob_y),
+		Vector2(5, -8 + bob_y),
+		Vector2(4, 2 + bob_y),
+		Vector2(-4, 2 + bob_y)
+	])
+	draw_colored_polygon(dress_top, col_chassis)
+	# Renda putih di dada
+	draw_circle(Vector2(0, -5 + bob_y), 1.5, Color(0.92, 0.94, 0.98))
+
+	# Rok Hitam Berlipit Mengembang dengan Belahan Samping
+	var skirt_pts = PackedVector2Array([
+		Vector2(-5, 2 + bob_y),
+		Vector2(5, 2 + bob_y),
+		Vector2(7, 10 + bob_y),
+		Vector2(-7, 10 + bob_y)
+	])
+	draw_colored_polygon(skirt_pts, col_chassis)
+	draw_line(Vector2(-7, 10 + bob_y), Vector2(7, 10 + bob_y), Color(0.25, 0.25, 0.30), 1.2)
+
+	# 3. Kaki Thigh-High Boots Hitam Mengkilap
+	_draw_fighter_leg(Vector2(-4, 9 + bob_y), Vector2(-5, 19 + bob_y), col_skin, col_chassis, 3.8)
+	_draw_fighter_leg(Vector2(4, 9 + bob_y), Vector2(5, 19 + bob_y), col_skin, col_chassis, 3.8)
+
+	# 4. Lengan Bulu & Katana Virtuous Contract
+	var h_l = Vector2(-4, -1 + bob_y)
+	var h_r = Vector2(8, -4 + bob_y) if current_state != &"Attack" else Vector2(17, -5 + bob_y)
+	_draw_fighter_arm(Vector2(-5, -6 + bob_y), h_l, col_skin, col_chassis, 3.2)
+	_draw_fighter_arm(Vector2(4, -6 + bob_y), h_r, col_skin, col_chassis, 3.2)
+	# Aksen bulu putih pada manset lengan
+	draw_circle(Vector2(-5, -3 + bob_y), 1.5, Color.WHITE)
+	draw_circle(Vector2(4, -3 + bob_y), 1.5, Color.WHITE)
+
+	# Katana Virtuous Contract Melayang / Dipegang
+	draw_line(h_r, h_r + Vector2(16, -6), col_armor, 2.2)
+	draw_line(h_r, h_r + Vector2(16, -6), Color.WHITE, 1.2)
+	draw_line(h_r, h_r - Vector2(4, -1.5), Color(0.1, 0.1, 0.12), 2.2) # Gagang hitam
 
