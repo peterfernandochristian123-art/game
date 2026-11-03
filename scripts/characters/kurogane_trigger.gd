@@ -31,6 +31,8 @@ func _ready() -> void:
 		&"BulletHellZero": preload("res://resources/attacks/trigger_bullet_hell.tres")
 	}
 
+	vfx_profile = preload("res://resources/vfx_profiles/trigger.tres")
+
 	super._ready()
 
 	# Warna visual khas Trigger: Amber Gold / Molten Orange

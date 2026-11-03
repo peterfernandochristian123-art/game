@@ -32,6 +32,8 @@ func _ready() -> void:
 		&"OrbitalSiegeCannon": preload("res://resources/attacks/bulwark_orbital_cannon.tres")
 	}
 
+	vfx_profile = preload("res://resources/vfx_profiles/bulwark.tres")
+
 	super._ready()
 
 	# Warna visual khas Bulwark: Heavy Bronze / Dark Industrial Armor

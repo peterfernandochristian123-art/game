@@ -31,6 +31,8 @@ func _ready() -> void:
 		&"SpearTheGungnir": preload("res://resources/attacks/bulwark_orbital_cannon.tres")
 	}
 
+	vfx_profile = preload("res://resources/vfx_profiles/remilia.tres")
+
 	super._ready()
 
 func get_dash_speed() -> float:

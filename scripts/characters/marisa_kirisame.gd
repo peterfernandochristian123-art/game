@@ -29,6 +29,8 @@ func _ready() -> void:
 		&"FinalMasterSpark": preload("res://resources/attacks/pulsar_supernova.tres")
 	}
 
+	vfx_profile = preload("res://resources/vfx_profiles/marisa.tres")
+
 	super._ready()
 
 func get_dash_speed() -> float:

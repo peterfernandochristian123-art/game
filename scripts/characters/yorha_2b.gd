@@ -29,6 +29,8 @@ func _ready() -> void:
 		&"PodGravityHammer": preload("res://resources/attacks/trigger_bullet_hell.tres")
 	}
 
+	vfx_profile = preload("res://resources/vfx_profiles/yorha_2b.tres")
+
 	super._ready()
 
 func get_dash_speed() -> float:

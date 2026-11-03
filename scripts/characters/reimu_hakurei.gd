@@ -31,6 +31,8 @@ func _ready() -> void:
 		&"FantasySeal": preload("res://resources/attacks/kage_shadow_blossom.tres")
 	}
 
+	vfx_profile = preload("res://resources/vfx_profiles/reimu.tres")
+
 	super._ready()
 
 func get_dash_speed() -> float:

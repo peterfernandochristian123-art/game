@@ -111,6 +111,11 @@ var attack_resources: Dictionary = {
 	&"LedgeStomp": preload("res://resources/attacks/ledge_stomp.tres")
 }
 
+## Tekken 2-style identitas VFX per fighter (spec: Tekken 2 Attack VFX).
+## Diisi tiap script karakter via preload resources/vfx_profiles/<id>.tres.
+## Null = VFXManager memakai fallback (map nama → generic), tidak pernah crash.
+var vfx_profile: VfxProfile = null
+
 # Dash State & Cooldown Variables (Story 1.2)
 var can_air_dash: bool = true
 var dash_cooldown_frames: int = 0

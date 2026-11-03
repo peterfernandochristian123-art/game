@@ -32,6 +32,8 @@ func _ready() -> void:
 		&"WorldIsMine": preload("res://resources/attacks/viper_blink_slash.tres")
 	}
 
+	vfx_profile = preload("res://resources/vfx_profiles/miku.tres")
+
 	super._ready()
 
 	if visual_root and visual_root.has_node("Sprite"):

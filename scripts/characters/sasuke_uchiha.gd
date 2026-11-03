@@ -29,6 +29,8 @@ func _ready() -> void:
 		&"KirinDragon": preload("res://resources/attacks/kage_shadow_blossom.tres")
 	}
 
+	vfx_profile = preload("res://resources/vfx_profiles/sasuke.tres")
+
 	super._ready()
 
 func get_dash_speed() -> float:

@@ -32,6 +32,8 @@ func _ready() -> void:
 		&"AbsoluteZeroProtocol": preload("res://resources/attacks/viper_blink_slash.tres")
 	}
 
+	vfx_profile = preload("res://resources/vfx_profiles/viper.tres")
+
 	super._ready()
 
 	# Warna visual khas Viper: Cyan / Neon Blue

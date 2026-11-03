@@ -34,6 +34,8 @@ func _ready() -> void:
 		&"SupernovaHorizon": preload("res://resources/attacks/pulsar_supernova.tres")
 	}
 
+	vfx_profile = preload("res://resources/vfx_profiles/pulsar.tres")
+
 	super._ready()
 
 	# Warna visual khas Pulsar: Neon Violet / Deep Purple

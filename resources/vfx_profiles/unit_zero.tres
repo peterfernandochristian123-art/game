@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="VfxProfile" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/vfx_profile.gd" id="1_vfx"]
+
+[resource]
+script = ExtResource("1_vfx")
+character_id = &"unit_zero"
+display_name = "Unit-0 Shadow Core"
+primary_color = Color(0.78, 0.03, 0.1, 1.0)
+secondary_color = Color(0.3, 0.01, 0.05, 1.0)
+spark_color = Color(0.9, 0.3, 0.33, 1.0)
+flash_color = Color(0.95, 0.66, 0.66, 1.0)
+impact_style = 4
+signature_effect = &"overload"

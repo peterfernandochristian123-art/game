@@ -62,7 +62,9 @@ $testScenes = @(
     # 12 Stages & Stage Select Screen
     "res://tests/test_stage_select.tscn",
     # Kurogane Trigger, Palette Swatches & Dramatic Finish
-    "res://tests/test_kurogane_trigger.tscn"
+    "res://tests/test_kurogane_trigger.tscn",
+    # Tekken 2 Attack VFX — VfxProfile resolution
+    "res://tests/test_vfx_profiles.tscn"
 )
 
 Write-Host "==========================================================" -ForegroundColor Cyan

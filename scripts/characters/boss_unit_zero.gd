@@ -31,6 +31,8 @@ func _ready() -> void:
 		&"ShadowBlossom": preload("res://resources/attacks/kage_shadow_blossom.tres")
 	}
 
+	vfx_profile = preload("res://resources/vfx_profiles/unit_zero.tres")
+
 	super._ready()
 
 	# Lock heat to 90% (Overclock Zone tanpa meltdown)

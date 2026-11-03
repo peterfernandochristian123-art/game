@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="VfxProfile" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/vfx_profile.gd" id="1_vfx"]
+
+[resource]
+script = ExtResource("1_vfx")
+character_id = &"yorha_2b"
+display_name = "YoRHa No.2 Type B"
+primary_color = Color(0.92, 0.94, 0.98, 1.0)
+secondary_color = Color(0.48, 0.5, 0.57, 1.0)
+spark_color = Color(1.0, 1.0, 1.0, 1.0)
+flash_color = Color(1.0, 1.0, 1.0, 1.0)
+impact_style = 0
+signature_effect = &"pod_042"

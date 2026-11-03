@@ -34,6 +34,8 @@ func _ready() -> void:
 
 	_sync_stance_moves()
 
+	vfx_profile = preload("res://resources/vfx_profiles/kage.tres")
+
 	super._ready()
 
 	# Modulasi warna visual Kage jika ada visual sprite fallback
