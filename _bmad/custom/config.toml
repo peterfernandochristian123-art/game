@@ -1,7 +1,11 @@
 # Team / enterprise overrides for _bmad/config.toml.
-# Committed to the repo — applies to every developer on the project.
-# Tables deep-merge over base config; keyed entries merge by key.
-# Example: override an agent descriptor, or add a new agent.
-#
-# [agents.bmad-agent-pm]
-# description = "Prefers short, bulleted PRDs over narrative drafts."
+# Committed to the repo - applies to every developer on the project.
+
+# Disambiguate keys duplicated in [modules.bmm] and [modules.gds] of the
+# installer-managed _bmad/config.toml (identical values in both; GDS is the
+# active module for this game project). Empty tables remove the bmm copies
+# from scalar resolution so the render script finds a single source of truth.
+[modules.bmm]
+implementation_artifacts = {}
+planning_artifacts = {}
+project_knowledge = {}
