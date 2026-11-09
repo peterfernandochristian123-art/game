@@ -58,6 +58,11 @@ func _draw() -> void:
 	var current_rad := max_radius * (0.2 + progress * 0.8)
 	var vortex_rot := _elapsed * 6.0
 
+	# 0. Bloom cahaya luar supernova (pancaran cahaya besar)
+	var bloom_a := alpha * (0.16 if progress < 0.5 else 0.16 * (1.0 - (progress - 0.5) / 0.5))
+	draw_circle(Vector2.ZERO, current_rad * 1.55, Color(supernova_color.r, supernova_color.g, supernova_color.b, bloom_a))
+	draw_circle(Vector2.ZERO, current_rad * 1.15, Color(supernova_color.r, supernova_color.g, supernova_color.b, bloom_a * 1.5))
+
 	# 1. Lengan Spiral Piringan Akresi Kosmik (Accretion Vortex Arms)
 	for arm in range(_spiral_arms):
 		var arm_base_angle := (TAU / float(_spiral_arms)) * float(arm) + vortex_rot
@@ -71,6 +76,8 @@ func _draw() -> void:
 		var arm_col := Color(supernova_color.r, supernova_color.g, supernova_color.b, alpha * 0.65)
 		draw_polyline(arm_pts, arm_col, 2.5)
 		draw_polyline(arm_pts, Color(1.0, 1.0, 1.0, alpha * 0.85), 1.0)
+		# Glow lembut pada lengan spiral
+		draw_polyline(arm_pts, Color(supernova_color.r, supernova_color.g, supernova_color.b, alpha * 0.22), 6.0)
 
 	# 2. Suar Radiasi Kosmik Tajam (Relativistic Flares)
 	for i in range(_flare_angles.size()):

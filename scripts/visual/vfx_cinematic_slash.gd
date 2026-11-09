@@ -82,6 +82,9 @@ func _draw() -> void:
 
 	for sl in _slashes:
 		# 1. Garis Tebasan Luar Neon & Busur Sabit Melengkung (Crescent Blade Curve)
+		# Glow bloom di belakang bilah
+		var glow_col := Color(slash_color.r, slash_color.g, slash_color.b, alpha * 0.22)
+		draw_line(sl.start_pt, sl.end_pt, glow_col, sl.thickness * 4.5)
 		var outer_col := Color(slash_color.r, slash_color.g, slash_color.b, alpha * 0.9)
 		draw_line(sl.start_pt, sl.end_pt, outer_col, sl.thickness * 1.5)
 
@@ -91,6 +94,7 @@ func _draw() -> void:
 		var curve_control := mid_pt + perp_dir * 14.0
 		var curve_pts := PackedVector2Array([sl.start_pt, curve_control, sl.end_pt])
 		draw_polyline(curve_pts, Color(slash_color.r, slash_color.g, slash_color.b, alpha * 0.5), sl.thickness * 0.8)
+		draw_polyline(curve_pts, Color(slash_color.r, slash_color.g, slash_color.b, alpha * 0.18), sl.thickness * 2.8)
 
 		# 2. Inti Bilah Putih Tajam Menyilaukan
 		var core_col := Color(1.0, 1.0, 1.0, alpha * 0.98)

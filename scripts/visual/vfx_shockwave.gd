@@ -75,17 +75,24 @@ func _draw() -> void:
 	var alpha := clampf(1.0 - progress, 0.0, 1.0)
 	var current_w := maxf(1.0, ring_width * (1.0 - progress * 0.7))
 
-	# 1. Cincin Refraksi Luar (Outer Bloom Halo)
-	var halo_col := Color(wave_color.r, wave_color.g, wave_color.b, alpha * 0.4)
-	draw_arc(Vector2.ZERO, current_rad, 0.0, TAU, 32, halo_col, current_w * 2.2)
+	# 0. Flash cahaya pusat saat awal ledakan
+	if progress < 0.35:
+		var flash_a := alpha * (1.0 - progress / 0.35) * 0.22
+		draw_circle(Vector2.ZERO, max_radius * 0.45 * (1.0 - progress), Color(wave_color.r, wave_color.g, wave_color.b, flash_a))
+		draw_circle(Vector2.ZERO, max_radius * 0.22 * (1.0 - progress), Color(1.0, 1.0, 1.0, flash_a * 1.2))
+
+	# 1. Cincin Refraksi Luar (Outer Bloom Halo) - diperkuat
+	var halo_col := Color(wave_color.r, wave_color.g, wave_color.b, alpha * 0.5)
+	draw_arc(Vector2.ZERO, current_rad, 0.0, TAU, 32, halo_col, current_w * 3.0)
+	draw_arc(Vector2.ZERO, current_rad * 1.04, 0.0, TAU, 32, Color(wave_color.r, wave_color.g, wave_color.b, alpha * 0.18), current_w * 5.5)
 
 	# 2. Cincin Kompresi Utama (Main Shock Ring)
-	var main_col := Color(wave_color.r, wave_color.g, wave_color.b, alpha * 0.85)
+	var main_col := Color(wave_color.r, wave_color.g, wave_color.b, alpha * 0.9)
 	draw_arc(Vector2.ZERO, current_rad, 0.0, TAU, 32, main_col, current_w)
 
 	# 3. Inti Plasma Putih Terang
 	var core_col := Color(1.0, 1.0, 1.0, alpha * 0.95)
-	draw_arc(Vector2.ZERO, current_rad, 0.0, TAU, 32, core_col, maxf(1.0, current_w * 0.4))
+	draw_arc(Vector2.ZERO, current_rad, 0.0, TAU, 32, core_col, maxf(1.0, current_w * 0.45))
 
 	# 4. Cincin Riak Sekunder Mengikuti di Belakang (Secondary Echo Ripple)
 	if current_rad > 15.0:

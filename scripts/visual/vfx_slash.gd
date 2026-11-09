@@ -81,16 +81,21 @@ func _draw() -> void:
 		var trail_col := Color(slash_color.r, slash_color.g, slash_color.b, alpha * 0.35)
 		draw_polyline(trail_points, trail_col, 3.0)
 
-	# 4. Gambar badan bilah energi neon
+	# 4. Gambar badan bilah energi neon + glow bloom
+	var core_points := PackedVector2Array()
+	for i in range(num_segments + 1):
+		core_points.append(points[i])
+	# Outer glow halo di sekitar bilah
+	if core_points.size() > 1:
+		var glow_col := Color(slash_color.r, slash_color.g, slash_color.b, alpha * 0.2)
+		draw_polyline(core_points, glow_col, 7.0)
 	var draw_col := Color(slash_color.r, slash_color.g, slash_color.b, alpha * 0.88)
 	draw_colored_polygon(points, draw_col)
 
 	# 5. Garis inti putih bilah tajam di tepi luar (Razor Core Polyline)
-	var core_points := PackedVector2Array()
-	for i in range(num_segments + 1):
-		core_points.append(points[i])
 	var core_col := Color(1.0, 1.0, 1.0, alpha * 0.96)
 	draw_polyline(core_points, core_col, 2.2)
+	draw_polyline(core_points, Color(slash_color.r, slash_color.g, slash_color.b, alpha * 0.35), 4.5)
 
 	# 6. Percikan energi foton di kedua ujung bilah (Tip Sparkles)
 	if points.size() > 0:

@@ -137,9 +137,16 @@ func _draw() -> void:
 		var sec_star_col := Color(spark_color.r, spark_color.g, spark_color.b, alpha * 0.8)
 		_draw_star(Vector2.ZERO, current_size * 0.7, current_size * 0.16, 4, _rotation_angle + PI * 0.25, sec_star_col)
 
-	# 6. Inti Titik Silau Putih Pusat (Center Flash Glow)
+	# 6. Inti Titik Silau Putih Pusat (Center Flash Glow) + Bloom Cahaya
 	var core_rad := maxf(2.0, current_size * 0.22 * (1.0 - progress * 0.6))
+	# Bloom halo luar
+	draw_circle(Vector2.ZERO, core_rad * 3.0, Color(spark_color.r, spark_color.g, spark_color.b, alpha * 0.14))
+	draw_circle(Vector2.ZERO, core_rad * 1.9, Color(spark_color.r, spark_color.g, spark_color.b, alpha * 0.28))
 	draw_circle(Vector2.ZERO, core_rad, Color(1.0, 1.0, 1.0, alpha * 0.95))
+	# Glow ring tipis
+	if progress < 0.6:
+		var gr := current_size * (0.5 + progress * 1.1)
+		draw_arc(Vector2.ZERO, gr, 0.0, TAU, 28, Color(spark_color.r, spark_color.g, spark_color.b, alpha * 0.22 * (1.0 - progress / 0.6)), 2.0)
 
 func _draw_star(center: Vector2, outer_rad: float, inner_rad: float, points: int, rot: float, col: Color) -> void:
 	var poly := PackedVector2Array()

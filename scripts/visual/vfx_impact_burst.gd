@@ -96,8 +96,11 @@ func _draw() -> void:
 
 	var dir_angle := hit_direction.angle()
 
-	# 1. FLASH PUTIH INTI — selalu ada, tebal, snap-in
+	# 1. FLASH PUTIH INTI + BLOOM CAHAYA — selalu ada, tebal, snap-in
 	var core_rad := maxf(2.0, radius * (0.55 - progress * 0.3))
+	# Bloom luar besar (efek cahaya menyebar)
+	draw_circle(Vector2.ZERO, core_rad * 3.2, Color(primary_color.r, primary_color.g, primary_color.b, alpha * 0.12))
+	draw_circle(Vector2.ZERO, core_rad * 2.4, Color(flash_color.r, flash_color.g, flash_color.b, alpha * 0.22))
 	draw_circle(Vector2.ZERO, core_rad * 1.6, Color(flash_color.r, flash_color.g, flash_color.b, alpha * 0.55))
 	draw_circle(Vector2.ZERO, core_rad, Color(1.0, 1.0, 1.0, alpha * 0.95))
 
@@ -133,10 +136,15 @@ func _draw() -> void:
 			draw_line(a, tip, col, 2.2 + float(intensity_level))
 			draw_line(b, tip, col, 2.2 + float(intensity_level))
 
-	# 4. Cincin syok luar (semua style) — sell the weight
+	# 4. Cincin syok luar (semua style) — sell the weight + glow
 	var ring_rad := radius * (1.0 + progress * 1.3)
 	var ring_col := Color(primary_color.r, primary_color.g, primary_color.b, alpha * 0.75)
 	draw_arc(Vector2.ZERO, ring_rad, 0.0, TAU, 40, ring_col, 2.0 + float(intensity_level) * 1.2)
+	draw_arc(Vector2.ZERO, ring_rad, 0.0, TAU, 40, Color(flash_color.r, flash_color.g, flash_color.b, alpha * 0.28), 5.0 + float(intensity_level) * 1.5)
+	# Bloom halo tambahan di puncak tumbukan
+	if progress < 0.5:
+		var halo_a := alpha * (1.0 - progress / 0.5) * 0.18
+		draw_circle(Vector2.ZERO, ring_rad * 0.75, Color(primary_color.r, primary_color.g, primary_color.b, halo_a))
 
 func _draw_starburst(radius: float, progress: float, alpha: float) -> void:
 	# Sinar radial tajam + bintang 4-titik utama (✦)

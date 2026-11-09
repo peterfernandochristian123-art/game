@@ -32,6 +32,8 @@ const VFXShockwaveScript = preload("res://scripts/visual/vfx_shockwave.gd")
 const VFXLightningArcScript = preload("res://scripts/visual/vfx_lightning.gd")
 const VFXDramaticFinishScript = preload("res://scripts/visual/vfx_dramatic_finish.gd")
 const VFXImpactBurstScript = preload("res://scripts/visual/vfx_impact_burst.gd")
+const VFXCharacterAuraScript = preload("res://scripts/visual/vfx_character_aura.gd")
+const VFXAuraBurstScript = preload("res://scripts/visual/vfx_aura_burst.gd")
 
 ## Peta discoverable: id fighter → path profil (satu-satunya daftar; bukan string-matching tersebar)
 const PROFILE_PATHS := {
@@ -40,6 +42,7 @@ const PROFILE_PATHS := {
 	&"pulsar": "res://resources/vfx_profiles/pulsar.tres",
 	&"kage": "res://resources/vfx_profiles/kage.tres",
 	&"trigger": "res://resources/vfx_profiles/trigger.tres",
+	&"death_kam": "res://resources/vfx_profiles/death_kam.tres",
 	&"unit_zero": "res://resources/vfx_profiles/unit_zero.tres",
 	&"miku": "res://resources/vfx_profiles/miku.tres",
 	&"reimu": "res://resources/vfx_profiles/reimu.tres",
@@ -57,6 +60,7 @@ const NAME_HINTS: Array = [
 	["bulwark", &"bulwark"], ["titan", &"bulwark"],
 	["pulsar", &"pulsar"],
 	["kage", &"kage"],
+	["death_kam", &"death_kam"], ["deathkam", &"death_kam"],
 	["unit_zero", &"unit_zero"], ["unitzero", &"unit_zero"], ["unit-0", &"unit_zero"], ["boss", &"unit_zero"],
 	["trigger", &"trigger"],
 	["viper", &"viper"],
@@ -72,6 +76,7 @@ const NAME_HINTS: Array = [
 
 var _profile_cache: Dictionary = {}
 var _warned_missing: Dictionary = {}
+var _combat_auras: Dictionary = {} # instance_id -> VFXCharacterAura (heat-aware, persistent per fighter)
 
 func _ready() -> void:
 	if is_instance_valid(EventBus):
@@ -84,6 +89,10 @@ func _ready() -> void:
 			EventBus.dramatic_finish_triggered.connect(_on_dramatic_finish_triggered)
 		if EventBus.has_signal("wall_splat_triggered"):
 			EventBus.wall_splat_triggered.connect(_on_wall_splat_triggered)
+		if EventBus.has_signal("overclock_triggered"):
+			EventBus.overclock_triggered.connect(_on_overclock_triggered)
+		if EventBus.has_signal("state_changed"):
+			EventBus.state_changed.connect(_on_state_changed)
 
 func _trigger_camera_shake(intensity: float, frames: int) -> void:
 	if is_instance_valid(EventBus) and EventBus.has_signal("screen_shake_requested"):
@@ -174,10 +183,61 @@ func _on_wall_splat_triggered(pos: Vector2, normal: Vector2) -> void:
 	spawn_ground_decal(pos, &"cracks", Color(0.9, 0.9, 1.0), 95.0, 2.5)
 	spawn_cyber_debris(pos, normal, 14, Color(0.8, 0.85, 0.95))
 
+func _ensure_combat_aura(character: Node2D) -> void:
+	if not enabled or not is_instance_valid(character):
+		return
+	# Hanya fighter tempur (punya heat/state/vfx context) — hindari dummy Node2D generik bila memungkinkan.
+	if character.get("state_machine") == null and character.get("heat_component") == null and character.get("vfx_profile") == null:
+		return
+	var cid := character.get_instance_id()
+	if _combat_auras.has(cid):
+		var existing = _combat_auras[cid]
+		if is_instance_valid(existing) and existing.has_method("is_active") and existing.is_active():
+			return
+		_combat_auras.erase(cid)
+	var profile := get_profile_for(character)
+	var aura = spawn_character_aura(character, Vector2(0, -4), profile.primary_color, profile.secondary_color, 0.4, 0.0, true)
+	_combat_auras[cid] = aura
+
+func _remove_combat_aura(character: Node2D) -> void:
+	if not is_instance_valid(character):
+		return
+	var cid := character.get_instance_id()
+	if _combat_auras.has(cid):
+		var aura = _combat_auras[cid]
+		if is_instance_valid(aura) and aura.has_method("deactivate"):
+			aura.deactivate()
+		_combat_auras.erase(cid)
+
+func _on_state_changed(character: Node2D, previous_state: StringName, new_state: StringName) -> void:
+	if not enabled or not is_instance_valid(character):
+		return
+	_ensure_combat_aura(character)
+	var profile := get_profile_for(character)
+	if new_state == &"Meltdown":
+		# Alarm cahaya redup/merah (aura heat-aware menangani visual persisten; ini burst transisi)
+		spawn_aura_burst(character.global_position + Vector2(0, -8), Color(1.0, 0.22, 0.12, 1.0), 80.0, 0.34, 1.25, Color(1.0, 0.6, 0.2, 1.0))
+		spawn_shockwave(character.global_position, 65.0, Color(1.0, 0.3, 0.15, 1.0), 0.26, 3.0)
+	elif previous_state == &"Meltdown" and new_state != &"Meltdown":
+		# Keluar meltdown: flare pemulihan dengan warna karakter
+		spawn_aura_burst(character.global_position + Vector2(0, -8), profile.primary_color, 60.0, 0.24, 1.0, profile.flash_color)
+
+func _on_overclock_triggered(character: Node2D, is_active: bool) -> void:
+	if not enabled or not is_instance_valid(character):
+		return
+	_ensure_combat_aura(character)
+	var profile := get_profile_for(character)
+	if is_active:
+		spawn_aura_burst(character.global_position + Vector2(0, -8), profile.flash_color, 85.0, 0.32, 1.4, Color.WHITE)
+		spawn_shockwave(character.global_position, 70.0, profile.primary_color, 0.22, 2.5)
+	else:
+		spawn_aura_burst(character.global_position + Vector2(0, -8), profile.primary_color, 60.0, 0.24, 1.0, profile.flash_color)
+
 func _on_skill_cast(caster: Node2D, skill_name: StringName, pos: Vector2, facing: int) -> void:
 	if not enabled or not is_instance_valid(caster):
 		return
 
+	_ensure_combat_aura(caster)
 	var s_name := String(skill_name)
 	var profile := get_profile_for(caster)
 
@@ -187,12 +247,17 @@ func _on_skill_cast(caster: Node2D, skill_name: StringName, pos: Vector2, facing
 
 	var is_ult: bool = (s_name == "Ultimate" or s_name.contains("Protocol") or s_name.contains("Cannon") or s_name.contains("Supernova") or s_name.contains("Blossom") or s_name.contains("Overload") or s_name.contains("HellZero") or s_name.contains("BulletHell"))
 
-	# 0. Efek Sinematik Super Flash pada Ultimate
+	# 0. Efek Sinematik Super Flash pada Ultimate + Aura Cahaya Karakter saat Skill
+	# Denyut cahaya (light burst) di posisi caster agar karakter "menyala" saat mengeluarkan skill
 	if is_ult:
 		spawn_super_flash(pos, p_col, 0.42)
+		spawn_aura_burst(pos + Vector2(0, -6), p_col, 95.0, 0.38, 1.6, flash_col)
+		spawn_character_aura(caster, Vector2.ZERO, p_col, profile.secondary_color, 1.45, 0.55)
 		_trigger_camera_shake(15.0, 20)
 		_request_hitstop(14)
 	else:
+		spawn_aura_burst(pos + Vector2(0, -6), p_col, 55.0, 0.26, 1.0, flash_col)
+		spawn_character_aura(caster, Vector2.ZERO, p_col, profile.secondary_color, 1.0, 0.32)
 		_trigger_camera_shake(6.0, 8)
 
 	var handled := true
@@ -370,6 +435,19 @@ func _spawn_profile_signature(profile: VfxProfile, slot: StringName, pos: Vector
 					for i in range(8):
 						var ang := i * (PI / 4.0)
 						spawn_lightning(pos, pos + Vector2(cos(ang), sin(ang)) * 260.0, spark, 0.3, 2)
+		&"reaper_chain": # Death Kam — manen putih & rantai gaib crimson: Skill1 chain, Skill2 risolve barrier, Ultimate nova
+			match slot:
+				&"Skill1":
+					spawn_lightning(pos, pos + Vector2(facing * 320.0, -12.0), spark, 0.25, 3)
+					spawn_ghost_trail(pos, facing, profile.character_id, c)
+					spawn_shockwave(pos, 70.0, c, 0.25, 3.0)
+				&"Skill2":
+					spawn_hex_barrier(caster, pos, 0.65, c, 56.0)
+					spawn_shockwave(pos, 78.0, spark, 0.24, 3.0)
+				_:
+					spawn_supernova(pos, 210.0, c)
+					spawn_super_flash(pos, spark, 0.4)
+					spawn_ground_decal(pos, &"scorch", c, 130.0, 2.5)
 		&"overload": # Unit-0 — crimson overclock corruption
 			match slot:
 				&"Skill1":
@@ -541,7 +619,9 @@ func _on_hit_confirmed(attacker: Node2D, victim: Node2D, hit_data: Variant) -> v
 
 	# 5. FEEL B — punch ekstra Tekken-style hanya untuk skill/ultimate yang mendarat.
 	# Normal attack & base hitstop TIDAK berubah; shake/flash kecil & terukur lewat EventBus.
+	# Ditambah cahaya ledakan aura agar tumbukan skill terasa lebih "menyala".
 	if _is_skill_or_ult_hit(data_dict, atk_name):
+		spawn_aura_burst(contact_pos, char_col, 78.0, 0.28, 1.25, flash_col)
 		if _is_ultimate_hit(data_dict, atk_name):
 			_trigger_camera_shake(13.0, 14)
 			_request_hitstop(6)
@@ -690,3 +770,18 @@ func spawn_lightning(start_pos: Vector2, end_pos: Vector2, custom_color: Color =
 	add_child(arc)
 	arc.trigger_arc(start_pos, end_pos, custom_color, duration, fork_count)
 	return arc
+
+func spawn_character_aura(target: Node2D = null, offset: Vector2 = Vector2.ZERO, custom_color: Color = Color.TRANSPARENT, custom_secondary: Color = Color.TRANSPARENT, power: float = 1.0, duration: float = 0.0, heat_aware: bool = false) -> Node2D:
+	var aura = VFXCharacterAuraScript.new()
+	add_child(aura)
+	var pos := Vector2.ZERO
+	if is_instance_valid(target):
+		pos = target.global_position
+	aura.setup(target, pos, custom_color, custom_secondary, power, duration, offset, heat_aware)
+	return aura
+
+func spawn_aura_burst(pos: Vector2, custom_color: Color = Color.TRANSPARENT, radius: float = 70.0, duration: float = 0.3, power: float = 1.0, custom_flash: Color = Color.TRANSPARENT) -> Node2D:
+	var burst = VFXAuraBurstScript.new()
+	add_child(burst)
+	burst.trigger_burst(pos, custom_color, radius, duration, power, custom_flash)
+	return burst

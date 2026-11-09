@@ -67,17 +67,27 @@ func _draw() -> void:
 	draw_arc(Vector2.ZERO, ring_radius, 0.0, TAU, 32, ring_col, 3.0, true)
 	draw_arc(Vector2.ZERO, ring_radius * 0.7, 0.0, TAU, 24, Color(1.0, 1.0, 1.0, 0.9 * fade_alpha), 1.5, true)
 	
+	# 3b. Pendaran cahaya radial di pusat (light bloom) — "cahaya pada karakter"
+	var bloom_r := ring_radius * (1.6 + 0.3 * sin(progress * PI * 2.0))
+	var bloom_a := 0.22 * fade_alpha * (1.0 - progress * 0.45)
+	draw_circle(Vector2.ZERO, bloom_r, Color(flare_color.r, flare_color.g, flare_color.b, bloom_a))
+	draw_circle(Vector2.ZERO, bloom_r * 0.55, Color(flare_color.r, flare_color.g, flare_color.b, bloom_a * 1.4))
+	draw_circle(Vector2.ZERO, bloom_r * 0.28, Color(1.0, 1.0, 1.0, bloom_a * 1.6))
+
 	# 4. Cross Flare / Bintang Kilat di titik pusat mecha
 	var flare_col := Color(flare_color.r, flare_color.g, flare_color.b, 0.95 * fade_alpha)
-	var flare_len: float = (30.0 + 40.0 * sin(progress * PI)) * fade_alpha
-	var flare_thick: float = 2.5 * fade_alpha
+	var flare_len: float = (38.0 + 55.0 * sin(progress * PI)) * fade_alpha
+	var flare_thick: float = 2.8 * fade_alpha
 	var core_white := Color(1.0, 1.0, 1.0, fade_alpha)
 	
-	# Garis kilat horizontal & vertikal
+	# Garis kilat horizontal & vertikal + glow
+	draw_line(Vector2(-flare_len, 0), Vector2(flare_len, 0), Color(flare_color.r, flare_color.g, flare_color.b, 0.35 * fade_alpha), flare_thick * 3.5)
+	draw_line(Vector2(0, -flare_len), Vector2(0, flare_len), Color(flare_color.r, flare_color.g, flare_color.b, 0.35 * fade_alpha), flare_thick * 3.5)
 	draw_line(Vector2(-flare_len, 0), Vector2(flare_len, 0), flare_col, flare_thick)
 	draw_line(Vector2(0, -flare_len), Vector2(0, flare_len), flare_col, flare_thick)
 	draw_line(Vector2(-flare_len * 0.4, 0), Vector2(flare_len * 0.4, 0), core_white, flare_thick + 1.0)
 	draw_line(Vector2(0, -flare_len * 0.4), Vector2(0, flare_len * 0.4), core_white, flare_thick + 1.0)
 	
 	# Titik pusat pijar
-	draw_circle(Vector2.ZERO, 6.0 * fade_alpha, core_white)
+	draw_circle(Vector2.ZERO, 7.0 * fade_alpha, core_white)
+	draw_circle(Vector2.ZERO, 14.0 * fade_alpha, Color(flare_color.r, flare_color.g, flare_color.b, 0.22 * fade_alpha))

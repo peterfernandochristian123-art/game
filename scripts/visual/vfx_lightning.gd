@@ -14,6 +14,9 @@ var _branches: Array[PackedVector2Array] = []
 
 func _ready() -> void:
 	z_index = 59
+	var mat := CanvasItemMaterial.new()
+	mat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+	material = mat
 
 func trigger_arc(start_pos: Vector2, end_pos: Vector2, custom_color: Color = Color.TRANSPARENT, duration: float = 0.22, fork_count: int = 3) -> void:
 	global_position = start_pos

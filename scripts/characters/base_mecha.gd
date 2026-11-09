@@ -224,6 +224,8 @@ func get_archetype() -> StringName:
 		return &"kage"
 	elif "Trigger" in name or "Kurogane" in name:
 		return &"trigger"
+	elif "DeathKam" in name or "Kam" in name:
+		return &"death_kam"
 	return &"viper"
 
 func trigger_hit_flash(frames: int = 4) -> void:
@@ -345,16 +347,6 @@ func _setup_combat_colliders() -> void:
 		hitbox.add_child(shape)
 		add_child(hitbox)
 
-	# Visual Slash Effect untuk feedback pukulan
-	if not hitbox.has_node("SlashVisual"):
-		var slash := ColorRect.new()
-		slash.name = "SlashVisual"
-		slash.size = Vector2(30, 20)
-		slash.position = Vector2(6 * facing_direction, -10)
-		slash.color = Color(1.0, 0.9, 0.2, 0.9) # Golden energy blade
-		slash.visible = false
-		hitbox.add_child(slash)
-
 	hitbox.collision_layer = 1 << (CombatConstants.LAYER_STRIKE_HITBOX - 1)
 	hitbox.collision_mask = 1 << (CombatConstants.LAYER_HURTBOX - 1)
 	hitbox.monitoring = false
@@ -388,13 +380,6 @@ func set_hitbox_active(active: bool) -> void:
 		if hitbox.has_node("CollisionShape2D"):
 			var shape = hitbox.get_node("CollisionShape2D")
 			shape.position.x = absf(shape.position.x) * float(facing_direction)
-		if hitbox.has_node("SlashVisual"):
-			var slash = hitbox.get_node("SlashVisual") as ColorRect
-			slash.visible = active
-			if facing_direction > 0:
-				slash.position.x = 4.0
-			else:
-				slash.position.x = -34.0
 
 func is_hitbox_active() -> bool:
 	return hitbox != null and hitbox.monitoring

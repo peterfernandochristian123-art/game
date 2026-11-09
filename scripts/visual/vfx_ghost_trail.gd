@@ -21,6 +21,8 @@ func _ready() -> void:
 		trail_color = Color(0.75, 0.25, 1.0, initial_alpha)
 	elif archetype == &"kage":
 		trail_color = Color(1.0, 0.15, 0.25, initial_alpha)
+	elif archetype == &"death_kam":
+		trail_color = Color(0.93, 0.93, 1.0, initial_alpha)
 	else:
 		trail_color = Color(0.2, 0.9, 1.0, initial_alpha)
 
@@ -37,6 +39,8 @@ func setup(pos: Vector2, facing: int, arch: StringName, custom_color: Color = Co
 		trail_color = Color(0.75, 0.25, 1.0, initial_alpha)
 	elif archetype == &"kage":
 		trail_color = Color(1.0, 0.15, 0.25, initial_alpha)
+	elif archetype == &"death_kam":
+		trail_color = Color(0.93, 0.93, 1.0, initial_alpha)
 	else:
 		trail_color = Color(0.2, 0.9, 1.0, initial_alpha)
 	queue_redraw()
@@ -56,6 +60,12 @@ func _draw() -> void:
 	if trail_color.a <= 0.01:
 		return
 
+	# Aura cahaya di sekitar siluet (glow outline lembut)
+	var glow_col := Color(trail_color.r, trail_color.g, trail_color.b, trail_color.a * 0.22)
+	draw_circle(Vector2(0, -2), 26.0, Color(trail_color.r, trail_color.g, trail_color.b, trail_color.a * 0.08))
+	draw_arc(Vector2(0, -2), 22.0, 0.0, TAU, 24, glow_col, 2.5)
+	draw_arc(Vector2(0, -2), 16.0, 0.0, TAU, 20, Color(1.0, 1.0, 1.0, trail_color.a * 0.12), 1.2)
+
 	# Menggambar siluet mecha 32-bit pixel art transparan
 	if archetype == &"bulwark":
 		_draw_bulwark_silhouette()
@@ -63,6 +73,8 @@ func _draw() -> void:
 		_draw_pulsar_silhouette()
 	elif archetype == &"kage":
 		_draw_kage_silhouette()
+	elif archetype == &"death_kam":
+		_draw_death_kam_silhouette()
 	else:
 		_draw_viper_silhouette()
 
@@ -117,4 +129,19 @@ func _draw_kage_silhouette() -> void:
 	draw_rect(Rect2(1, 4, 4, 14), trail_color)
 	# Siluet Katana di punggung
 	draw_line(Vector2(-6, -15), Vector2(-12, 2), Color(trail_color.r, trail_color.g, trail_color.b, trail_color.a * 0.9), 1.5)
+
+func _draw_death_kam_silhouette() -> void:
+	# Bodi Coat Panjang Pria Berambut Putih
+	draw_rect(Rect2(-7, -10, 14, 16), trail_color)
+	# Kepala
+	draw_rect(Rect2(-5, -18, 10, 8), trail_color)
+	# Mane putih panjang mengalir ke belakang
+	draw_line(Vector2(-2, -12), Vector2(-12, -7), Color(trail_color.r, trail_color.g, trail_color.b, trail_color.a * 0.9), 3.0)
+	draw_line(Vector2(-12, -7), Vector2(-17, -1), Color(trail_color.r, trail_color.g, trail_color.b, trail_color.a * 0.6), 2.2)
+	draw_line(Vector2(-2, -9), Vector2(-11, -2), Color(trail_color.r, trail_color.g, trail_color.b, trail_color.a * 0.7), 2.0)
+	# Rantai gaib melingkar di pinggang
+	draw_arc(Vector2(0, 2), 7.0, 0.0, PI, 8, Color(trail_color.r, trail_color.g, trail_color.b, trail_color.a * 0.8), 1.5)
+	# Kaki
+	draw_rect(Rect2(-6, 6, 5, 13), trail_color)
+	draw_rect(Rect2(1, 6, 5, 13), trail_color)
 
