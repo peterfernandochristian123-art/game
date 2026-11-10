@@ -30,6 +30,12 @@ const PORTRAITS: Dictionary = {
 		"theme_color": Color(0.95, 0.15, 0.25, 1.0),
 		"bust_symbol": "刃"
 	},
+	&"death_kam": {
+		"name": "DEATH KAM",
+		"title": "The White Mane Reaper",
+		"theme_color": Color(0.93, 0.93, 1.0, 1.0),
+		"bust_symbol": "⛓"
+	},
 	&"unit_zero": {
 		"name": "UNIT-0 SHADOW CORE",
 		"title": "Unbound Overclock Proto-Core",
@@ -95,6 +101,24 @@ const MATCHUP_INTROS: Dictionary = {
 		"p2": "Illusion crumbles before true clarity. Draw your sword."
 	},
 
+	# P1: Death Kam
+	"death_kam_vs_viper": {
+		"p1": "Blink all you want. The chain always finds something to hold on to.",
+		"p2": "Grappling with a teleporter? Fine. Let's see you catch the wind."
+	},
+	"death_kam_vs_bulwark": {
+		"p1": "An iron mountain pretends not to bleed. My chain loves cliffside climbs.",
+		"p2": "Pull on me all you like, Reaper! I was built to hold the line!"
+	},
+	"death_kam_vs_pulsar": {
+		"p1": "Your light blinds your eyes. You never see the chain coming.",
+		"p2": "Even perfect harmony falls before the silent reaping. Proceed."
+	},
+	"death_kam_vs_kage": {
+		"p1": "Shadow or reaping, brother? Only one of us walks out whole.",
+		"p2": "The chain sings at midnight, Death Kam. A duet, perhaps."
+	},
+
 	# Final Boss Intros (vs Unit-0)
 	"viper_vs_unit_zero": {
 		"p1": "The syndicate's rogue prototype... Absolute Zero Protocol engaged!",
@@ -111,6 +135,10 @@ const MATCHUP_INTROS: Dictionary = {
 	"kage_vs_unit_zero": {
 		"p1": "A mindless phantom machine. Time to sever your neural circuits.",
 		"p2": "ANOMALY DETECTED. EXECUTE TSUKUYOMI COUNTERMEASURE."
+	},
+	"death_kam_vs_unit_zero": {
+		"p1": "Another overclocked ghost. I'll put you back to rest, permanently.",
+		"p2": "BIOMASS: RANKED. THREAT LEVEL: TERMINAL. PROCEED, REAPER."
 	}
 }
 
@@ -135,6 +163,12 @@ const VICTORY_QUOTES: Dictionary = {
 		"The katana speaks in silence. Your technique was found wanting.",
 		"A dance of blades ended in a heartbeat."
 	],
+	&"death_kam": [
+		"The chain never misses twice. It barely missed once.",
+		"You should have run when you had the chance.",
+		"Death doesn't chase, friend. It pulls you in.",
+		"Buried with honors, or simply buried. Your choice was made."
+	],
 	&"unit_zero": [
 		"ERROR: INSUFFICIENT BIOMASS RESISTANCE. PURGE CONTINUES."
 	]
@@ -156,6 +190,10 @@ const EPILOGUES: Dictionary = {
 	&"kage": {
 		"headline": "THE SHADOW DISPERSAL",
 		"body": "Phantom-9 Kage calmly sheathes the crimson katana as Unit-0 dissolves into glowing crimson embers. Without claiming fame or trophy, the ninja fades into the digital darknet—the silent protector awaiting the next tremor beneath the steel megalopolis."
+	},
+	&"death_kam": {
+		"headline": "THE REAPER'S LAST TALLY",
+		"body": "As Unit-0's burning core collapses into a silent crater, Death Kam lets his chain fall loose, the white mane settling at last. New Babel-01 exhales a city-wide sigh of relief—somewhere in the neon dark, a man with white hair already walks toward the next name on his ledger."
 	}
 }
 

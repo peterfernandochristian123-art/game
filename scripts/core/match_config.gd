@@ -92,6 +92,8 @@ static func get_target_scene() -> String:
 			return "res://scenes/versus_ai_mode.tscn"
 		&"local_2p":
 			return "res://scenes/local_versus_mode.tscn"
+		&"online":
+			return "res://scenes/online_versus_mode.tscn"
 		&"training":
 			return "res://scenes/training_mode.tscn"
 		_:

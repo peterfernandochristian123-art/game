@@ -34,7 +34,8 @@ const DEFAULT_RECORDS: Dictionary = {
 		"viper": 0,
 		"bulwark": 0,
 		"pulsar": 0,
-		"kage": 0
+		"kage": 0,
+		"death_kam": 0
 	}
 }
 

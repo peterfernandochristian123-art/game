@@ -117,6 +117,7 @@ func _ready() -> void:
 	if MatchConfigScript.game_mode == &"arcade" and mode_label:
 		mode_label.text = "MODE: ARCADE GAUNTLET (4-STAGE)"
 	call_deferred("_scroll_to_index", p1_index, false)
+	_update_prompt()
 	_fade_in()
 
 func _setup_vfx_preview_root() -> void:
@@ -248,14 +249,15 @@ func _update_p1_display() -> void:
 	p1_name_label.add_theme_color_override("font_color", char_data["theme_color"])
 	p1_archetype_label.text = "%s  |  \"%s\"" % [char_data["archetype"], char_data.get("quote", "Let's fight!")]
 	
-	p1_stats_label.text = "%s    %s\n%s    %s" % [
+	p1_stats_label.text = "STATS\n%s    %s\n%s    %s" % [
 		_format_stat_bar("HP", char_data.get("hp_bar", 5)),
 		_format_stat_bar("DEF", char_data.get("def_bar", 5)),
 		_format_stat_bar("SPD", char_data.get("spd_bar", 5)),
 		_format_stat_bar("RNG", char_data.get("rng_bar", 5))
 	]
 	var counter = _get_counterplay_tip(char_data["id"])
-	p1_moves_label.text = "TIP: %s\n%s" % [counter, "\n".join(char_data["signature_moves"])]
+	var moves: Array = char_data.get("signature_moves", [])
+	p1_moves_label.text = "TIP: %s\nMOVES:\n- %s" % [counter, "\n- ".join(moves)] if moves.size() > 0 else "TIP: %s" % counter
 
 	if p1_ready_badge:
 		p1_ready_badge.visible = p1_locked
@@ -277,6 +279,7 @@ func _update_p1_display() -> void:
 	_play_showcase_preview(1, char_data["id"], spr)
 
 	_highlight_cards()
+	_update_prompt()
 	p1_selection_changed.emit(p1_index, char_data["id"])
 
 func _update_p2_display() -> void:
@@ -285,10 +288,11 @@ func _update_p2_display() -> void:
 		p2_name_label.add_theme_color_override("font_color", Color(1.0, 0.25, 0.35, 1.0))
 		p2_archetype_label.text = "4-Stage Gauntlet | Zero Circuit"
 		p2_stats_label.text = "HP   [■■■■■■■■□□]    DEF  [■■■■■■■□□□]\nSPD  [■■■■■■■■□□]    RNG  [■■■■■■■□□□]"
-		p2_moves_label.text = "TIP: Hadapi rival bertahap, simpan resource untuk Boss.\nStage 1-3: Rivals | Stage 4: Boss Unit-0"
+		p2_moves_label.text = "INFO: Hadapi rival bertahap, simpan resource untuk Boss.\nStage 1-3: Rivals | Stage 4: Boss Unit-0"
 		if p2_ready_badge:
 			p2_ready_badge.visible = true
 			p2_ready_badge.text = "[ READY ]"
+		_update_prompt()
 		return
 
 	var char_data = FighterFactoryScript.get_character_at(p2_index)
@@ -297,14 +301,15 @@ func _update_p2_display() -> void:
 	p2_name_label.add_theme_color_override("font_color", char_data["theme_color"])
 	p2_archetype_label.text = "%s  |  \"%s\"" % [char_data["archetype"], char_data.get("quote", "This is a divine will.")]
 	
-	p2_stats_label.text = "%s    %s\n%s    %s" % [
+	p2_stats_label.text = "STATS\n%s    %s\n%s    %s" % [
 		_format_stat_bar("HP", char_data.get("hp_bar", 5)),
 		_format_stat_bar("DEF", char_data.get("def_bar", 5)),
 		_format_stat_bar("SPD", char_data.get("spd_bar", 5)),
 		_format_stat_bar("RNG", char_data.get("rng_bar", 5))
 	]
 	var counter = _get_counterplay_tip(char_data["id"])
-	p2_moves_label.text = "TIP: %s\n%s" % [counter, "\n".join(char_data["signature_moves"])]
+	var moves: Array = char_data.get("signature_moves", [])
+	p2_moves_label.text = "TIP: %s\nMOVES:\n- %s" % [counter, "\n- ".join(moves)] if moves.size() > 0 else "TIP: %s" % counter
 
 	if p2_ready_badge:
 		p2_ready_badge.visible = p2_locked
@@ -325,6 +330,7 @@ func _update_p2_display() -> void:
 	_play_showcase_preview(2, char_data["id"], spr)
 
 	_highlight_cards()
+	_update_prompt()
 	p2_selection_changed.emit(p2_index, char_data["id"])
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -417,6 +423,22 @@ func _update_stage_ui() -> void:
 				stage_label.text = "[TAB] ARENA: ORBITAL SPACE STATION | [M] BROWSE 12 MAPS"
 				stage_label.modulate = Color(0.3, 0.9, 1.0, 1.0)
 			&"highway":
+				stage_label.text = "[TAB] ARENA: CYBER HIGHWAY | [M] BROWSE 12 MAPS"
+				stage_label.modulate = Color(1.0, 0.2, 0.6, 1.0)
+			_:
+				stage_label.text = "[TAB] ARENA: ZERO-G SKYSCRAPER | [M] BROWSE 12 MAPS"
+				stage_label.modulate = Color(0.2, 0.9, 1.0, 1.0)
+	_update_prompt()
+
+func _update_prompt() -> void:
+	if not prompt_label or is_transitioning:
+		return
+	var mode_txt: String = String(MatchConfigScript.game_mode).to_upper()
+	var controls: String = "←→/A D: Pilih  |  Enter/Space: Konfirmasi  |  C/V: Palette  |  M/Tab: Stage/Map  |  Esc: Kembali"
+	if MatchConfigScript.game_mode == &"local_2p":
+		controls = "P1: ←→ Pilih, Enter OK, C Palette  |  P2: A/D Pilih, Spasi OK, V Palette  |  M/Tab: Stage  |  Esc: Kembali"
+	prompt_label.text = "MODE: %s\n%s" % [mode_txt, controls]
+	prompt_label.modulate = Color(0.85, 0.95, 1.0, 0.95)
 				stage_label.text = "[TAB] ARENA: NEO-SHIBUYA HIGHWAY | [M] BROWSE 12 MAPS"
 				stage_label.modulate = Color(1.0, 0.25, 0.65, 1.0)
 			_:

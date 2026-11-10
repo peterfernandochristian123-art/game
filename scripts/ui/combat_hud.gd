@@ -60,6 +60,20 @@ var _hud_time: float = 0.0
 var p1_fighter: Node2D = null
 var p2_fighter: Node2D = null
 var match_manager: Node = null
+# Combo & Damage display
+@onready var p1_combo_label: Label = get_node_or_null("P1ComboLabel")
+@onready var p1_combo_detail: Label = get_node_or_null("P1ComboDetail")
+@onready var p2_combo_label: Label = get_node_or_null("P2ComboLabel")
+@onready var p2_combo_detail: Label = get_node_or_null("P2ComboDetail")
+
+var p1_combo_hits: int = 0
+var p1_combo_damage: int = 0
+var p1_combo_timer: float = 0.0
+var p2_combo_hits: int = 0
+var p2_combo_damage: int = 0
+var p2_combo_timer: float = 0.0
+const COMBO_DISPLAY_TIME: float = 1.2
+
 var is_sudden_death: bool = false
 
 func _ready() -> void:
@@ -68,6 +82,9 @@ func _ready() -> void:
 	_setup_skill_command_dock()
 	if is_instance_valid(EventBus) and EventBus.has_signal("skill_cast"):
 		EventBus.skill_cast.connect(_on_hud_skill_cast)
+	if is_instance_valid(EventBus) and EventBus.has_signal("hit_confirmed"):
+		if not EventBus.hit_confirmed.is_connected(_on_hit_confirmed_combo):
+			EventBus.hit_confirmed.connect(_on_hit_confirmed_combo)
 
 func _process(delta: float) -> void:
 	_hud_time += delta
@@ -75,6 +92,70 @@ func _process(delta: float) -> void:
 	if ultimate_card and p1_ultimate_bar and p1_ultimate_bar.value >= p1_ultimate_bar.max_value:
 		var pulse: float = 0.85 + 0.35 * sin(_hud_time * 6.0)
 		ultimate_card.modulate = Color(1.0 + pulse * 0.3, 1.0 + pulse * 0.3, 0.9 + pulse * 0.1, 1.0)
+	_update_combo_timers(delta)
+
+func _update_combo_timers(delta: float) -> void:
+	if p1_combo_timer > 0.0:
+		p1_combo_timer -= delta
+		if p1_combo_timer <= 0.0:
+			p1_combo_hits = 0
+			p1_combo_damage = 0
+	if p2_combo_timer > 0.0:
+		p2_combo_timer -= delta
+		if p2_combo_timer <= 0.0:
+			p2_combo_hits = 0
+			p2_combo_damage = 0
+	_refresh_combo_display()
+
+func _refresh_combo_display() -> void:
+	if p1_combo_label:
+		if p1_combo_hits > 1:
+			p1_combo_label.text = "%d HITS!" % p1_combo_hits
+			if p1_combo_detail:
+				p1_combo_detail.text = "TOTAL %d DMG" % p1_combo_damage
+		else:
+			p1_combo_label.text = ""
+			if p1_combo_detail:
+				p1_combo_detail.text = ""
+	if p2_combo_label:
+		if p2_combo_hits > 1:
+			p2_combo_label.text = "%d HITS!" % p2_combo_hits
+			if p2_combo_detail:
+				p2_combo_detail.text = "TOTAL %d DMG" % p2_combo_damage
+		else:
+			p2_combo_label.text = ""
+			if p2_combo_detail:
+				p2_combo_detail.text = ""
+
+func _on_hit_confirmed_combo(attacker: Node2D, victim: Node2D, hit_data: Variant) -> void:
+	if attacker == null or victim == null:
+		return
+	# Abaikan block murni sebagai combo hit (chip damage tidak dihitung sebagai combo lanjutan visual)
+	if hit_data is Dictionary and bool(hit_data.get("blocked", false)):
+		return
+	var dmg: int = 0
+	if hit_data is Dictionary:
+		dmg = int(hit_data.get("damage", 0))
+		if dmg <= 0:
+			dmg = int(hit_data.get("chip_damage", 0))
+	elif hit_data is Resource and "damage" in hit_data:
+		dmg = int(hit_data.damage)
+	if dmg <= 0:
+		dmg = 1
+
+	var hits: int = 1
+	if victim and "combo_hit_count" in victim:
+		hits = maxi(int(victim.combo_hit_count), 1)
+
+	if attacker == p1_fighter and victim == p2_fighter:
+		p1_combo_hits = hits
+		p1_combo_damage += dmg
+		p1_combo_timer = COMBO_DISPLAY_TIME
+	elif attacker == p2_fighter and victim == p1_fighter:
+		p2_combo_hits = hits
+		p2_combo_damage += dmg
+		p2_combo_timer = COMBO_DISPLAY_TIME
+	_refresh_combo_display()
 
 func _on_hud_skill_cast(caster: Node2D, skill_name: StringName, _pos: Vector2, _facing: int) -> void:
 	if caster != p1_fighter and (not is_instance_valid(p1_fighter) or caster.name != p1_fighter.name):
@@ -285,6 +366,8 @@ func _detect_and_bind_p1_skills(fighter: Node2D) -> void:
 		set_p1_skills("STANCE SHIFT", "IAIDO CRESCENT", "SHADOW BLOSSOM", Color(1.0, 0.15, 0.25))
 		if fighter.has_signal("stance_changed") and not fighter.stance_changed.is_connected(_on_kage_stance_changed):
 			fighter.stance_changed.connect(_on_kage_stance_changed)
+	elif arch.contains("death_kam") or f_name.contains("death_kam") or f_name.contains("deathkam"):
+		set_p1_skills("GRAVE CHAIN", "DEATH'S RESOLVE", "FINAL REQUIEM", Color(0.93, 0.93, 1.0))
 	elif f_name.contains("boss") or f_name.contains("unit_zero"):
 		set_p1_skills("SHADOW SHOCKWAVE", "CATACLYSM SLASH", "ZERO OVERLOAD", Color(1.1, 0.1, 0.3))
 	else:

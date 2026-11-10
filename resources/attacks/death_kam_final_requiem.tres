@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3 uid="uid://kam_final_requiem_01"]
+
+[ext_resource type="Script" path="res://scripts/combat/resources/attack_data.gd" id="1_atk"]
+
+[resource]
+script = ExtResource("1_atk")
+attack_name = &"Ultimate"
+startup = 16
+active = 6
+recovery = 28
+damage = 400
+hitstun = 30
+blockstun = 20
+knockback = 420.0
+heat_cost = 0.0
+is_energy = true
+causes_ground_bounce = false
+causes_wall_bounce = true
+chain_level = 4

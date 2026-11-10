@@ -20,6 +20,7 @@ const TrainingDummyControllerScript = preload("res://scripts/training/training_d
 @onready var btn_hitbox_toggle: Button = $UI/TrainingToolbar/BtnToggleHitbox
 @onready var btn_dummy_mode: Button = $UI/TrainingToolbar/BtnDummyMode
 @onready var btn_reset: Button = $UI/TrainingToolbar/BtnReset
+@onready var btn_frame_data: Button = $UI/TrainingToolbar/BtnFrameData
 
 func _ready() -> void:
 	if not p1 or not dummy:
@@ -64,6 +65,11 @@ func _ready() -> void:
 		btn_reset.pressed.connect(func():
 			if dummy_controller:
 				dummy_controller.reset_positions()
+		)
+	if btn_frame_data:
+		btn_frame_data.pressed.connect(func():
+			if frame_inspector:
+				frame_inspector.visible = not frame_inspector.visible
 		)
 
 	# 5. Hubungkan EventBus untuk mendeteksi serangan & Frame Inspector
@@ -134,11 +140,21 @@ func _on_dummy_mode_changed(mode: TrainingDummyControllerScript.DummyMode) -> vo
 			mode_name = "BLOCK ALL"
 		TrainingDummyControllerScript.DummyMode.RANDOM_PARRY:
 			mode_name = "RANDOM PARRY"
+		TrainingDummyControllerScript.DummyMode.JUMP:
+			mode_name = "JUMP"
 
-	dummy_status_label.text = "DUMMY: " + mode_name
+	dummy_status_label.text = "DUMMY: " + mode_name + "  |  F1 Hitbox  F2 Dummy  F3 Reset  F4 Data  Esc Menu"
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
-		if event.keycode == KEY_ESCAPE:
+		if event.keycode == KEY_F1:
+			if collision_overlay and collision_overlay.has_method("toggle_overlay"):
+				collision_overlay.toggle_overlay()
+			get_viewport().set_input_as_handled()
+		elif event.keycode == KEY_F4:
+			if frame_inspector:
+				frame_inspector.visible = not frame_inspector.visible
+			get_viewport().set_input_as_handled()
+		elif event.keycode == KEY_ESCAPE:
 			get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
 			get_viewport().set_input_as_handled()

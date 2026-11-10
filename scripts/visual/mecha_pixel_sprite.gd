@@ -7,7 +7,7 @@ extends Node2D
 ## - Animasi pose bela diri autentik (idle bounce, stepping walk, martial arts guard, snap punch, X-block, ledge struggle)
 ## - 3 Persona Petarung: Apex-0 Viper (Cyber-Ninja), Titan-V Bulwark (Heavy Brawler), Ray-X Pulsar (Shaolin Master)
 
-@export var archetype: StringName = &"viper" # &"viper", &"bulwark", &"pulsar", &"kage", &"trigger"
+@export var archetype: StringName = &"viper" # &"viper", &"bulwark", &"pulsar", &"kage", &"trigger", &"death_kam"
 @export var palette_index: int = 0
 
 # Warna Palet Karakter & Kostum Bela Diri
@@ -77,6 +77,8 @@ func _detect_parent_mecha() -> void:
 			archetype = &"kage"
 		elif "Trigger" in parent_mecha.name or "Kurogane" in parent_mecha.name:
 			archetype = &"trigger"
+		elif "Kam" in parent_mecha.name or "Dead" in parent_mecha.name:
+			archetype = &"death_kam"
 		else:
 			archetype = &"miku"
 		
@@ -384,6 +386,53 @@ func _apply_archetype_palette() -> void:
 					col_hair = Color(0.15, 0.12, 0.10)
 					col_belt = Color(0.40, 0.25, 0.12)
 
+		&"death_kam":
+			match palette_index:
+				1: # Void Shadow (Eclipse Reaper — Monokrom Putih Tulang)
+					col_chassis = Color(0.05, 0.05, 0.07)
+					col_armor = Color(0.20, 0.20, 0.26)
+					col_highlight = Color(0.90, 0.92, 0.98)
+					col_visor = Color(1.00, 1.00, 1.00)
+					col_thruster = Color(0.55, 0.58, 0.68)
+					col_energy = Color(0.85, 0.85, 1.00)
+					col_skin = Color(0.82, 0.78, 0.75)
+					col_skin_shadow = Color(0.62, 0.58, 0.55)
+					col_hair = Color(0.99, 0.99, 1.00)
+					col_belt = Color(0.80, 0.82, 0.90)
+				2: # Monarch Gold (Gilded Grave — Mantel Brokat Emas & Gading)
+					col_chassis = Color(0.14, 0.11, 0.08)
+					col_armor = Color(0.92, 0.75, 0.20)
+					col_highlight = Color(1.00, 0.88, 0.45)
+					col_visor = Color(1.00, 0.95, 0.30)
+					col_thruster = Color(0.85, 0.65, 0.15)
+					col_energy = Color(1.00, 0.80, 0.25)
+					col_skin = Color(0.92, 0.84, 0.78)
+					col_skin_shadow = Color(0.72, 0.62, 0.55)
+					col_hair = Color(0.97, 0.96, 0.90)
+					col_belt = Color(0.95, 0.75, 0.20)
+				3: # Cyber Neon (Neon Requiem — Pirus Toksik & Magenta Laser)
+					col_chassis = Color(0.06, 0.07, 0.12)
+					col_armor = Color(0.10, 0.90, 0.88)
+					col_highlight = Color(1.00, 0.25, 0.65)
+					col_visor = Color(1.00, 0.15, 0.60)
+					col_thruster = Color(0.10, 0.95, 0.90)
+					col_energy = Color(1.00, 0.30, 0.80)
+					col_skin = Color(0.90, 0.85, 0.80)
+					col_skin_shadow = Color(0.68, 0.62, 0.57)
+					col_hair = Color(0.95, 0.98, 1.00)
+					col_belt = Color(1.00, 0.20, 0.65)
+				_: # Default White Mane Reaper (Charcoal Coat & Crimson Sash)
+					col_chassis = Color(0.10, 0.10, 0.14)
+					col_armor = Color(0.78, 0.12, 0.18)
+					col_highlight = Color(0.96, 0.96, 1.00)
+					col_visor = Color(1.00, 0.14, 0.18)
+					col_thruster = Color(0.85, 0.10, 0.15)
+					col_energy = Color(1.00, 0.40, 0.18)
+					col_skin = Color(0.94, 0.80, 0.68)
+					col_skin_shadow = Color(0.78, 0.60, 0.48)
+					col_hair = Color(0.96, 0.96, 0.99)
+					col_belt = Color(0.45, 0.07, 0.12)
+
 		_: # Viper (Default Cyan Rushdown)
 			match palette_index:
 				1: # Void Shadow (Carbon Obsidian & Amethyst Violet)
@@ -502,6 +551,8 @@ func _draw() -> void:
 		_draw_kage_fighter()
 	elif archetype == &"trigger":
 		_draw_trigger_fighter()
+	elif archetype == &"death_kam":
+		_draw_death_kam_fighter()
 	else:
 		_draw_miku_fighter()
 
@@ -630,6 +681,16 @@ func _draw_vfx_underlay() -> void:
 			var petal_x := -12.0 + sin(t * 3.0) * 5.0
 			var petal_y := 4.0 + cos(t * 2.5) * 6.0
 			draw_rect(Rect2(petal_x, petal_y, 3, 2), Color(0.95, 0.15, 0.25, 0.8))
+
+		&"death_kam":
+			# Helaian mane putih yang melayang naik perlahan
+			for i in range(3):
+				var mx: float = -14.0 + float(i) * 12.0 + sin(t * 2.6 + float(i)) * 4.0
+				var my: float = 10.0 - float((anim_tick * 2 + i * 24) % 38)
+				var ma: float = clampf(1.0 - (10.0 - my) / 38.0, 0.0, 0.7)
+				draw_circle(Vector2(mx, my), 1.6, Color(0.96, 0.96, 1.0, ma))
+			# Bara crimson rendah yang membara di tanah (rage embers)
+			draw_arc(Vector2(0, 19), 12.0 + sin(t * 4.0) * 3.0, 0.0, PI, 8, Color(1.0, 0.25, 0.15, 0.4), 1.5)
 
 ## =========================================================================
 ## LAYER EFEK VISUAL DEPAN (OVERLAY VFX)
@@ -766,6 +827,17 @@ func _draw_vfx_overlay() -> void:
 				var kage_arc_rad := 22.0
 				draw_arc(Vector2(8, -2), kage_arc_rad, -PI * 0.5, PI * 0.4, 10, Color(0.95, 0.15, 0.25), 3.0)
 				draw_arc(Vector2(8, -2), kage_arc_rad - 2.0, -PI * 0.4, PI * 0.3, 8, Color.WHITE, 1.5)
+
+		&"death_kam":
+			# Jejak Mata Murka (Crimson Reaper Eye Streak)
+			var kam_eye_y := -13.0 + sin(anim_tick * 0.15) * 1.5
+			draw_line(Vector2(1, kam_eye_y), Vector2(10, kam_eye_y), Color(1.0, 0.12, 0.16), 2.0)
+			draw_line(Vector2(3, kam_eye_y), Vector2(8, kam_eye_y), Color.WHITE, 1.0)
+			# Bara di kepalan tangan saat menyerang (rage fist glow)
+			if is_attacking:
+				var fist_pos := Vector2(13, -3)
+				draw_circle(fist_pos, 3.4, Color(col_energy.r, col_energy.g, col_energy.b, 0.75))
+				draw_circle(fist_pos, 1.5, Color.WHITE)
 
 ## Gambar 3 Bola Foton Magatama yang mengorbit tubuh Pulsar secara dinamis
 func _draw_pulsar_orbit_beads(t: float, is_rear_layer: bool) -> void:
@@ -1486,6 +1558,143 @@ func _draw_kunai(pos: Vector2, angle: float) -> void:
 	var base2 := pos + Vector2(-3, 2).rotated(angle)
 	draw_colored_polygon(PackedVector2Array([tip, base1, base2]), col_armor)
 	draw_line(pos + Vector2(-3, 0).rotated(angle), pos + Vector2(-6, 0).rotated(angle), Color.WHITE, 1.2)
+
+## =========================================================================
+## 6. DEATH KAM: WHITE MANE REAPER / PULL & RAGE BRAWLER
+## =========================================================================
+func _draw_death_kam_fighter() -> void:
+	var bob_y: float = 0.0
+	if current_state == &"Idle":
+		bob_y = sin(anim_tick * 0.15) * 1.4
+	elif current_state == &"Walk":
+		bob_y = abs(sin(anim_tick * 0.34)) * 1.6
+	elif current_state == &"Cliffhanger":
+		bob_y = 6.0
+
+	var head_center := Vector2(0, -14.0 + bob_y)
+	if current_state == &"Meltdown":
+		head_center.y += 3.0
+
+	# 1. Mane Putih Panjang (rambut mengalir ke belakang, ciri khas Death Kam)
+	var mane_base := Vector2(-2, head_center.y - 1)
+	var wave_a := sin(anim_tick * 0.18) * 2.5
+	var wave_b := cos(anim_tick * 0.24) * 3.0
+	var mane_pts := PackedVector2Array([
+		mane_base,
+		Vector2(-8, head_center.y + 1 + wave_a),
+		Vector2(-14, head_center.y + 5 + wave_b),
+		Vector2(-18, head_center.y + 10 + wave_a)
+	])
+	draw_polyline(mane_pts, col_hair, 3.5)
+	draw_polyline(mane_pts, col_highlight, 1.2)
+	# Helaian mane kedua
+	var mane_pts2 := PackedVector2Array([
+		Vector2(-1, head_center.y + 0),
+		Vector2(-6, head_center.y + 3 + wave_b),
+		Vector2(-11, head_center.y + 8 + wave_a)
+	])
+	draw_polyline(mane_pts2, col_hair, 2.2)
+
+	# 2. Kaki & Celana Tempur Gelap
+	if current_state == &"Walk":
+		var stride := sin(anim_tick * 0.34) * 4.8
+		_draw_fighter_leg(Vector2(-5 - stride, 5 + bob_y), Vector2(-6 - stride, 19 + bob_y), col_chassis, col_armor, 4.5)
+		_draw_fighter_leg(Vector2(4 + stride, 5 + bob_y), Vector2(5 + stride, 19 + bob_y), col_chassis, col_armor, 4.5)
+	else:
+		_draw_fighter_leg(Vector2(-5, 5 + bob_y), Vector2(-7, 19 + bob_y), col_chassis, col_armor, 4.5)
+		_draw_fighter_leg(Vector2(4, 5 + bob_y), Vector2(6, 19 + bob_y), col_chassis, col_armor, 4.5)
+
+	# 3. Torso Mantel Panjang / Coat Reaper (charcoal)
+	var coat_pts := PackedVector2Array([
+		Vector2(-7, -8 + bob_y),
+		Vector2(7, -8 + bob_y),
+		Vector2(9, 8 + bob_y),
+		Vector2(-9, 8 + bob_y)
+	])
+	draw_colored_polygon(coat_pts, col_chassis)
+	# Lapisan dalam coat
+	var inner_pts := PackedVector2Array([
+		Vector2(-4, -7 + bob_y),
+		Vector2(4, -7 + bob_y),
+		Vector2(3, 4 + bob_y),
+		Vector2(-3, 4 + bob_y)
+	])
+	draw_colored_polygon(inner_pts, Color(col_chassis.r * 0.7, col_chassis.g * 0.7, col_chassis.b * 0.7))
+	# Sash / selempang crimson (ikat pinggang reaper)
+	draw_rect(Rect2(-7, 2 + bob_y, 14, 3), col_belt)
+	draw_line(Vector2(-7, 3 + bob_y), Vector2(7, 3 + bob_y), col_armor, 1.0)
+
+	# 4. Rantai Gaib Melingkar di Pinggang (motif Death Kam)
+	var chain_c := Color(col_armor.r, col_armor.g, col_armor.b, 0.9)
+	draw_arc(Vector2(0, 4 + bob_y), 6.5, 0.15, PI - 0.15, 8, chain_c, 1.6)
+	draw_circle(Vector2(6, 4 + bob_y), 1.2, chain_c)
+	draw_circle(Vector2(-6, 4 + bob_y), 1.2, chain_c)
+
+	# 5. Kepala, Wajah & Visor Crimson
+	draw_circle(head_center, 4.3, col_skin)
+	# Bayangan dagu/rambut depan
+	draw_arc(head_center, 4.3, PI * 0.15, PI * 0.85, 6, col_hair, 2.0)
+	# Mata murka crimson
+	draw_line(Vector2(0, head_center.y - 0.5), Vector2(4, head_center.y - 0.5), col_visor, 1.5)
+	draw_circle(Vector2(3, head_center.y - 0.5), 0.9, Color.WHITE)
+
+	# 6. Lengan & Pose Tarung Rage Brawler
+	var is_pull_attack := false
+	var pull_progress := 0.0
+	var pull_reach_px := 0.0
+	if current_state == &"Attack":
+		var atk_name := String(attack_type).to_lower()
+		if atk_name == "5l" or atk_name.contains("pull") or atk_name.contains("grave") or atk_name.contains("chain"):
+			is_pull_attack = true
+		if parent_mecha and parent_mecha.has_method("is_death_kam_pulling") and parent_mecha.is_death_kam_pulling():
+			is_pull_attack = true
+			pull_progress = parent_mecha.get_pull_visual_progress() if parent_mecha.has_method("get_pull_visual_progress") else 1.0
+			# Konversi jangkauan dunia ke visual lokal (diskalakan agar tetap terbaca)
+			if parent_mecha.has_method("get_pull_visual_reach"):
+				pull_reach_px = clampf(parent_mecha.get_pull_visual_reach() * 0.16, 26.0, 72.0)
+
+	if current_state == &"Attack":
+		if is_pull_attack:
+			# Pose tarikan: tangan kanan Death Kam menjulur jauh ke depan untuk mencengkeram & menarik
+			var reach: float = pull_reach_px
+			if reach <= 0.0:
+				reach = 34.0 + sin(float(anim_tick) * 0.6) * 3.0
+			var retract: float = (1.0 - pull_progress) * 10.0 if pull_progress > 0.0 else 0.0
+			var hand_pos := Vector2(6.0 + reach - retract, -3.0 + bob_y)
+			var shoulder_r := Vector2(4, -5 + bob_y)
+			# Tangan kiri menjaga tubuh
+			_draw_fighter_arm(Vector2(-4, -5 + bob_y), Vector2(-6, 0 + bob_y), col_skin, col_chassis, 3.8)
+			# Lengan kanan menjulur (efek tangan menarik)
+			_draw_fighter_arm(shoulder_r, hand_pos, col_skin, col_chassis, 4.4)
+			# Tangan/cengkeraman yang terlihat jelas
+			draw_circle(hand_pos, 3.2, col_skin)
+			draw_circle(hand_pos + Vector2(1.5, 0.5), 1.3, col_energy)
+			draw_circle(hand_pos + Vector2(-0.8, 1.0), 1.1, col_skin)
+			# Rantai/energi tarikan dari bahu ke tangan (menunjukkan gaya tarik)
+			draw_line(Vector2(1, -1 + bob_y), hand_pos, chain_c, 2.0)
+			draw_line(Vector2(1, -1 + bob_y), hand_pos, Color(col_highlight.r, col_highlight.g, col_highlight.b, 0.55), 1.0)
+			# Garis arah tarikan kembali ke tubuh
+			var hook_dir := (Vector2(0, 1 + bob_y) - hand_pos).normalized()
+			draw_line(hand_pos, hand_pos + hook_dir * 8.0, Color(col_energy.r, col_energy.g, col_energy.b, 0.8), 1.6)
+		else:
+			# Haymaker / chain punch ke depan
+			var punch_reach := 8.0 + sin(float(anim_tick) * 0.5) * 2.0
+			_draw_fighter_arm(Vector2(-4, -5 + bob_y), Vector2(-7, -1 + bob_y), col_skin, col_chassis, 3.8)
+			_draw_fighter_arm(Vector2(4, -5 + bob_y), Vector2(8 + punch_reach, -4 + bob_y), col_skin, col_chassis, 4.2)
+			# Kepalan membara saat rage
+			draw_circle(Vector2(8 + punch_reach, -4 + bob_y), 2.6, col_energy)
+			# Kilatan rantai dari kepalan
+			draw_line(Vector2(2, -2 + bob_y), Vector2(8 + punch_reach, -4 + bob_y), chain_c, 1.2)
+	elif current_state == &"Block":
+		_draw_fighter_arm(Vector2(-4, -5 + bob_y), Vector2(-1, -9 + bob_y), col_skin, col_chassis, 4.0)
+		_draw_fighter_arm(Vector2(4, -5 + bob_y), Vector2(2, -9 + bob_y), col_skin, col_chassis, 4.0)
+		draw_rect(Rect2(-3, -11 + bob_y, 6, 5), Color(col_chassis.r, col_chassis.g, col_chassis.b, 0.8))
+	else:
+		# Guard brawler: satu tangan depan, satu menjaga dagu
+		_draw_fighter_arm(Vector2(-5, -5 + bob_y), Vector2(-2, -2 + bob_y), col_skin, col_chassis, 3.6)
+		_draw_fighter_arm(Vector2(4, -5 + bob_y), Vector2(7, -3 + bob_y), col_skin, col_chassis, 3.6)
+		# Lilitan rantai di lengan depan
+		draw_arc(Vector2(6, -3 + bob_y), 2.2, 0.0, TAU, 6, chain_c, 1.2)
 
 ## =========================================================================
 ## 5. KUROGANE "TRIGGER": CYBER-GUNSLINGER / DUAL REVOLVER ACROBAT

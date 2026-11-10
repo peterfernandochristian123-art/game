@@ -3,7 +3,7 @@ extends RefCounted
 
 ## Fighter Factory & Roster Registry
 ## Menyediakan metadata karakter anime crossover terpusat dan pembuat instance siap tarung
-## Mendukung: Miku Hatsune, Reimu Hakurei, Marisa Kirisame, Remilia Scarlet, Sasuke Uchiha, 2B
+## Mendukung: Miku Hatsune, Reimu Hakurei, Marisa Kirisame, Remilia Scarlet, Sasuke Uchiha, 2B, Death Kam
 
 const MikuHatsuneScript = preload("res://scripts/characters/miku_hatsune.gd")
 const ReimuHakureiScript = preload("res://scripts/characters/reimu_hakurei.gd")
@@ -11,6 +11,7 @@ const MarisaKirisameScript = preload("res://scripts/characters/marisa_kirisame.g
 const RemiliaScarletScript = preload("res://scripts/characters/remilia_scarlet.gd")
 const SasukeUchihaScript = preload("res://scripts/characters/sasuke_uchiha.gd")
 const Yorha2BScript = preload("res://scripts/characters/yorha_2b.gd")
+const DeathKamScript = preload("res://scripts/characters/death_kam.gd")
 
 # Backward Compatibility Scripts
 const ApexViperScript = preload("res://scripts/characters/apex_viper.gd")
@@ -186,6 +187,33 @@ const ROSTER: Array[Dictionary] = [
 			"[O] Ultimate: Pod Program: Gravity Hammer & Self-Destruct Rupture",
 			"[L] Spark Parry | [X / Shift] Android Glide Dash"
 		]
+	},
+	{
+		"id": &"death_kam",
+		"name": "Death Kam",
+		"archetype": "White Mane Reaper / Pull & Rage Brawler",
+		"quote": "Death doesn't chase. It pulls.",
+		"hp": 960,
+		"walk_speed": 330.0,
+		"dash_speed": 790.0,
+		"speed_grade": "A",
+		"defense_grade": "B",
+		"range_grade": "C",
+		"complexity": "Medium",
+		"hp_bar": 6,
+		"spd_bar": 7,
+		"def_bar": 5,
+		"rng_bar": 4,
+		"theme_color": Color(0.93, 0.93, 1.0, 1.0), # Pale Silver-White (Manenya)
+		"description": "White-haired reaper who drags his victims in with gaib chain grapples, then answers with rage-fueled haymakers wrapped in ember energy.",
+		"signature_moves": [
+			"[J / Z] Normal Light: Death Pull Punch (Gaib Chain Yank & Haymaker)",
+			"[K] Normal Heavy: Death Kam Rage (Armored Ember Fist, Chip Damage & Wall Bounce)",
+			"[U] Skill 1: Grave Chain (Long-Range Anti-Block Pull Grab)",
+			"[I] Skill 2: Death's Resolve (40F Full Super Armor)",
+			"[O] Ultimate: Final Requiem (Cataclysmic Crimson Nova)",
+			"[L] Spark Parry | [X / Shift] Reaper Dash"
+		]
 	}
 ]
 
@@ -262,6 +290,9 @@ static func create_fighter(char_id: StringName, player_idx: int = 1) -> Characte
 		&"2b":
 			fighter = Yorha2BScript.new()
 			fighter.name = "Yorha2B_P%d" % player_idx
+		&"death_kam":
+			fighter = DeathKamScript.new()
+			fighter.name = "DeathKam_P%d" % player_idx
 		&"bulwark":
 			fighter = TitanBulwarkScript.new()
 			fighter.name = "Bulwark_P%d" % player_idx

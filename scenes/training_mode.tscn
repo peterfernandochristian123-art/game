@@ -200,9 +200,11 @@ alignment = 2
 
 [node name="DummyStatus" type="Label" parent="UI/TrainingToolbar"]
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_colors/font_color = Color(1, 0.8, 0.2, 1)
-theme_override_font_sizes/font_size = 9
-text = "DUMMY: STAND"
+theme_override_font_sizes/font_size = 8
+text = "DUMMY: STAND  |  F1 Hitbox  F2 Dummy  F3 Reset  F4 Data  Esc Menu"
+clip_text = true
 
 [node name="BtnToggleHitbox" type="Button" parent="UI/TrainingToolbar"]
 layout_mode = 2
@@ -221,3 +223,9 @@ layout_mode = 2
 focus_mode = 0
 theme_override_font_sizes/font_size = 8
 text = "[F3] RESET"
+
+[node name="BtnFrameData" type="Button" parent="UI/TrainingToolbar"]
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 8
+text = "[F4] DATA"

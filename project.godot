@@ -25,6 +25,7 @@ busses/default_bus_layout="res://default_bus_layout.tres"
 
 EventBus="*res://scripts/core/event_bus.gd"
 InputBuffer="*res://scripts/core/input_buffer.gd"
+NetworkManager="*res://scripts/core/network_manager.gd"
 
 [display]
 

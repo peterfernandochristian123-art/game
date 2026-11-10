@@ -12,6 +12,7 @@ const TitanBulwarkScript = preload("res://scripts/characters/titan_bulwark.gd")
 const RayPulsarScript = preload("res://scripts/characters/ray_pulsar.gd")
 const PhantomKageScript = preload("res://scripts/characters/phantom_kage.gd")
 const KuroganeTriggerScript = preload("res://scripts/characters/kurogane_trigger.gd")
+const DeathKamScript = preload("res://scripts/characters/death_kam.gd")
 const BossUnitZeroScript = preload("res://scripts/characters/boss_unit_zero.gd")
 const MikuHatsuneScript = preload("res://scripts/characters/miku_hatsune.gd")
 const ReimuHakureiScript = preload("res://scripts/characters/reimu_hakurei.gd")
@@ -21,7 +22,7 @@ const SasukeUchihaScript = preload("res://scripts/characters/sasuke_uchiha.gd")
 const Yorha2BScript = preload("res://scripts/characters/yorha_2b.gd")
 
 const PROFILE_IDS: Array[StringName] = [
-	&"viper", &"bulwark", &"pulsar", &"kage", &"trigger", &"unit_zero",
+	&"viper", &"bulwark", &"pulsar", &"kage", &"trigger", &"death_kam", &"unit_zero",
 	&"miku", &"reimu", &"marisa", &"remilia", &"sasuke", &"yorha_2b",
 ]
 
@@ -94,6 +95,7 @@ func _roster_scripts() -> Dictionary:
 		"Pulsar": RayPulsarScript,
 		"Kage": PhantomKageScript,
 		"Trigger": KuroganeTriggerScript,
+		"DeathKam": DeathKamScript,
 		"UnitZero": BossUnitZeroScript,
 		"Miku_P1": MikuHatsuneScript,
 		"Reimu_P1": ReimuHakureiScript,
@@ -111,6 +113,7 @@ func _expected_character_ids() -> Dictionary:
 		"Pulsar": &"pulsar",
 		"Kage": &"kage",
 		"Trigger": &"trigger",
+		"DeathKam": &"death_kam",
 		"UnitZero": &"unit_zero",
 		"Miku_P1": &"miku",
 		"Reimu_P1": &"reimu",
@@ -135,6 +138,7 @@ func _real_cast_names() -> Dictionary:
 		"Pulsar": &"SupernovaHorizon",
 		"Kage": &"ShadowBlossom",
 		"Trigger": &"BulletHellZero",
+		"DeathKam": &"FinalRequiem",
 		"UnitZero": &"ShadowBlossom",
 		"Miku_P1": &"WorldIsMine",
 		"Reimu_P1": &"FantasySeal",

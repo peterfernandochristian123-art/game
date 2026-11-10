@@ -40,6 +40,9 @@ var sfx_meltdown_shutdown: AudioStreamWAV = null
 var sfx_heavy_impact: AudioStreamWAV = null
 var sfx_wall_bounce: AudioStreamWAV = null
 
+# Voice/SFX Khusus Death Kam
+var sfx_death_kam_sini_amu: AudioStreamWAV = null
+
 # Audio Streams Sintetis BGM (Story 8.1)
 var bgm_title: AudioStreamWAV = null
 var bgm_arena: AudioStreamWAV = null
@@ -128,6 +131,9 @@ func _init_synthesized_sounds() -> void:
 	sfx_meltdown_shutdown = AudioSynthesizerScript.generate_meltdown_shutdown(0.45)
 	sfx_heavy_impact = AudioSynthesizerScript.generate_heavy_impact(0.28)
 	sfx_wall_bounce = AudioSynthesizerScript.generate_wall_bounce(0.25)
+
+	# Voice Khusus Death Kam - teriakan lantang "sini amu"
+	sfx_death_kam_sini_amu = AudioSynthesizerScript.generate_sini_amu_voice(0.62)
 
 func _ensure_bgm_streams() -> void:
 	if bgm_title == null:
@@ -268,6 +274,10 @@ func play_heavy_impact() -> void:
 
 func play_wall_bounce() -> void:
 	play_sfx(sfx_wall_bounce, BUS_SFX)
+
+func play_death_kam_pull_voice() -> void:
+	# Mainkan teriakan lantang Death Kam melalui bus MechaVoice agar lebih menonjol
+	play_sfx(sfx_death_kam_sini_amu, BUS_MECHA_VOICE)
 
 func _on_hit_confirmed(_attacker: Node2D, _victim: Node2D, hit_data: Variant) -> void:
 	var dmg: float = 0.0

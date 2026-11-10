@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3 uid="uid://kam_grave_chain_01"]
+
+[ext_resource type="Script" path="res://scripts/combat/resources/attack_data.gd" id="1_atk"]
+
+[resource]
+script = ExtResource("1_atk")
+attack_name = &"Skill1"
+startup = 10
+active = 3
+recovery = 22
+damage = 35
+hitstun = 20
+blockstun = 12
+knockback = 60.0
+heat_cost = 20.0
+is_energy = false
+is_grab = true
+causes_ground_bounce = false
+causes_wall_bounce = false
+chain_level = 3

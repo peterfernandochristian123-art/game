@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3 uid="uid://kam_pull_punch_01"]
+
+[ext_resource type="Script" path="res://scripts/combat/resources/attack_data.gd" id="1_atk"]
+
+[resource]
+script = ExtResource("1_atk")
+attack_name = &"5L"
+startup = 7
+active = 3
+recovery = 12
+damage = 55
+hitstun = 16
+blockstun = 10
+knockback = 140.0
+heat_cost = 8.0
+is_energy = false
+causes_ground_bounce = false
+causes_wall_bounce = false
+chain_level = 1

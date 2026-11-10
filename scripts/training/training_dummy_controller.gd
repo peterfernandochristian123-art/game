@@ -11,7 +11,8 @@ enum DummyMode {
 	STAND,
 	CROUCH,
 	BLOCK_ALL,
-	RANDOM_PARRY
+	RANDOM_PARRY,
+	JUMP
 }
 
 @export var current_mode: DummyMode = DummyMode.STAND
@@ -51,6 +52,19 @@ func _process_dummy_behavior() -> void:
 					_trigger_dummy_parry()
 		DummyMode.CROUCH:
 			dummy_fighter.set("simulated_horizontal_input", 0.0)
+			# Crouch visual/input hint (jika fighter mendukung)
+			dummy_fighter.set("simulated_vertical_input", 1.0)
+		DummyMode.JUMP:
+			dummy_fighter.set("simulated_horizontal_input", 0.0)
+			if dummy_fighter.is_on_floor():
+				# Lompat berkala untuk latihan anti-air
+				if randf() < 0.08:
+					var jv = dummy_fighter.jump_velocity if "jump_velocity" in dummy_fighter else -420.0
+					if "velocity" in dummy_fighter:
+						dummy_fighter.velocity.y = jv
+			if not dummy_fighter.is_on_floor():
+				# lepaskan crouch hint saat di udara
+				dummy_fighter.set("simulated_vertical_input", 0.0)
 
 func _is_p1_attacking() -> bool:
 	if not p1_fighter or not ("state_machine" in p1_fighter):

@@ -118,6 +118,19 @@ const KAGE_SHURIKEN_STORM_DAMAGE: int = 105
 const KAGE_SHURIKEN_STORM_HEAT_COST: float = 20.0
 const KAGE_SHADOW_BLOSSOM_DAMAGE: int = 420
 
+# Karakter Death Kam Parameters (White Mane Reaper - Pull & Rage)
+const DEATH_KAM_MAX_HP: int = 960
+const DEATH_KAM_WALK_SPEED: float = 330.0
+const DEATH_KAM_DASH_SPEED: float = 790.0
+const DEATH_KAM_DASH_DURATION_FRAMES: int = 13
+const DEATH_KAM_PULL_MIN_RANGE: float = 80.0 # Jarak minimum agar tarikan bisa dilakukan (tidak bisa tarik jika terlalu dekat)
+const DEATH_KAM_PULL_RANGE: float = 300.0 # Jangkauan maksimum 5L Death Pull Punch
+const DEATH_KAM_GRAVE_CHAIN_MIN_RANGE: float = 120.0 # Jarak minimum Grave Chain
+const DEATH_KAM_GRAVE_CHAIN_RANGE: float = 520.0 # Jangkauan maksimum Skill 1 Grave Chain
+const DEATH_KAM_PULL_CLOSE_DISTANCE: float = 30.0 # Jarak lawan setelah ditarik (dalam jangkauan hitbox)
+const DEATH_KAM_RAGE_ARMOR_FRAMES: int = 12 # Super armor saat startup 5H Death Kam Rage
+const DEATH_KAM_RESOLVE_ARMOR_FRAMES: int = 40 # Super armor Skill 2 Death's Resolve
+
 # Toleransi Input (Buffer & Coyote Time)
 const INPUT_BUFFER_WINDOW_FRAMES: int = 5
 const COYOTE_TIME_FRAMES: int = 5

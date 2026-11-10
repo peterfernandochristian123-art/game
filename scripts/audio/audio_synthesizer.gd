@@ -261,3 +261,76 @@ static func generate_wall_bounce(duration: float = 0.25) -> AudioStreamWAV:
 	stream.data = data
 	return stream
 
+## Menghasilkan teriakan lantang "SINI AMU!" untuk tarikan Death Kam.
+## Sintesis vokal agresif dua suku-kata (SI-NI / A-MU) dengan amplitudo tinggi.
+static func generate_sini_amu_voice(duration: float = 0.62) -> AudioStreamWAV:
+	var total_samples: int = int(SAMPLE_RATE * duration)
+	var data := PackedByteArray()
+	data.resize(total_samples)
+
+	for i in range(total_samples):
+		var t: float = float(i) / float(SAMPLE_RATE)
+		var progress: float = float(i) / float(total_samples)
+		var val: float = 0.0
+
+		# Segment 1: "SI-NI!" (teriakan tajam, pitch lebih tinggi)
+		if t < 0.26:
+			var st: float = t
+			var sp: float = st / 0.26
+			var env: float = 1.0
+			if sp < 0.08:
+				env = sp / 0.08
+			else:
+				env = exp(-(sp - 0.08) * 4.5)
+			var f0: float = lerpf(210.0, 170.0, sp)
+			var vowel_mod: float = sin(2.0 * PI * 6.0 * st)
+			var f1: float = lerpf(2300.0, 1900.0, sp) + vowel_mod * 80.0 # "i"
+			var f2: float = lerpf(3200.0, 2500.0, sp)
+			var src: float = sin(2.0 * PI * f0 * st) * 0.55 + (1.0 if sin(2.0 * PI * f0 * st) >= 0.0 else -1.0) * 0.25
+			src += sin(2.0 * PI * f0 * 2.0 * st) * 0.18
+			var formant: float = sin(2.0 * PI * f1 * st) * 0.35 + sin(2.0 * PI * f2 * st) * 0.22
+			var noise: float = (randf() * 2.0 - 1.0) * 0.12 * exp(-sp * 3.0)
+			# Penekanan konsonan "s" di awal
+			var hiss_env: float = exp(-st * 28.0)
+			var hiss: float = (randf() * 2.0 - 1.0) * 0.35 * hiss_env
+			val = (src * 0.55 + formant * 0.45 + noise + hiss) * env
+
+		# Jeda napas singkat
+		elif t < 0.32:
+			val = (randf() * 2.0 - 1.0) * 0.02
+
+		# Segment 2: "AMU!" (teriakan berat/lantang, lebih rendah & bertenaga)
+		elif t < 0.60:
+			var st: float = t - 0.32
+			var sp: float = st / 0.28
+			var env: float = 1.0
+			if sp < 0.06:
+				env = sp / 0.06
+			else:
+				env = exp(-(sp - 0.06) * 3.8)
+			var f0: float = lerpf(165.0, 120.0, sp)
+			var vowel_mod: float = sin(2.0 * PI * 5.0 * st)
+			var f1: float = lerpf(750.0, 500.0, sp) + vowel_mod * 60.0 # "a" -> "u"
+			var f2: float = lerpf(1200.0, 900.0, sp)
+			var src: float = sin(2.0 * PI * f0 * st) * 0.50 + (1.0 if sin(2.0 * PI * f0 * st) >= 0.0 else -1.0) * 0.30
+			src += sin(2.0 * PI * f0 * 2.0 * st) * 0.22
+			var formant: float = sin(2.0 * PI * f1 * st) * 0.42 + sin(2.0 * PI * f2 * st) * 0.20
+			var noise: float = (randf() * 2.0 - 1.0) * 0.10 * env
+			val = (src * 0.55 + formant * 0.45 + noise) * env * 1.15
+		else:
+			# Ekor gema singkat
+			var tail_p: float = (t - 0.60) / 0.02
+			var env: float = exp(-tail_p * 10.0)
+			val = sin(2.0 * PI * 120.0 * t) * 0.15 * env
+
+		# Amplitudo lantang (boost) lalu clamp agar tetap terdengar jelas
+		val = clampf(val * 1.35, -0.98, 0.98)
+		data[i] = clampi(int(128.0 + val * 126.0), 0, 255)
+
+	var stream := AudioStreamWAV.new()
+	stream.format = AudioStreamWAV.FORMAT_8_BITS
+	stream.mix_rate = SAMPLE_RATE
+	stream.stereo = false
+	stream.data = data
+	return stream
+
