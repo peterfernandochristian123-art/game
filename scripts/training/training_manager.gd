@@ -8,6 +8,9 @@ const CombatHUDScript = preload("res://scripts/ui/combat_hud.gd")
 const CollisionDebugOverlayScript = preload("res://scripts/training/collision_debug_overlay.gd")
 const FrameInspectorScript = preload("res://scripts/training/frame_inspector.gd")
 const TrainingDummyControllerScript = preload("res://scripts/training/training_dummy_controller.gd")
+const MatchConfigScript = preload("res://scripts/core/match_config.gd")
+const FighterFactoryScript = preload("res://scripts/characters/fighter_factory.gd")
+const PauseMenuScene = preload("res://scenes/pause_menu.tscn")
 
 @onready var p1: Node2D = $Fighters/P1
 @onready var dummy: Node2D = $Fighters/Dummy
@@ -27,6 +30,7 @@ func _ready() -> void:
 		return
 
 	_apply_arena_selection()
+	_apply_roster_selection()
 
 	# 1. Setup HUD & Bindings
 	if hud:
@@ -81,6 +85,26 @@ func _ready() -> void:
 		var atk_state = p1.state_machine.get_node_or_null("Attack")
 		if atk_state and atk_state.has_signal("attack_started"):
 			atk_state.attack_started.connect(_on_p1_attack_started)
+
+func _apply_roster_selection() -> void:
+	var fighters_node := get_node_or_null("Fighters")
+	if not fighters_node:
+		return
+	if p1 and p1.has_method("get_archetype") and p1.get_archetype() != MatchConfigScript.p1_character:
+		var pos := p1.global_position
+		fighters_node.remove_child(p1)
+		p1.queue_free()
+		p1 = FighterFactoryScript.create_fighter(MatchConfigScript.p1_character, 1)
+		p1.global_position = pos
+		fighters_node.add_child(p1)
+	if dummy and dummy.has_method("get_archetype") and dummy.get_archetype() != MatchConfigScript.p2_character:
+		var pos2 := dummy.global_position
+		fighters_node.remove_child(dummy)
+		dummy.queue_free()
+		dummy = FighterFactoryScript.create_fighter(MatchConfigScript.p2_character, 2)
+		dummy.name = "Dummy"
+		dummy.global_position = pos2
+		fighters_node.add_child(dummy)
 
 func _apply_arena_selection() -> void:
 	if MatchConfig.selected_arena == &"skyscraper":

@@ -26,7 +26,7 @@ enum MenuItem {
 const MENU_DATA: Array[Dictionary] = [
 	{"id": &"arcade", "label": "ARCADE LADDER", "scene": "res://scenes/character_select.tscn", "subtext": "4-STAGE GAUNTLET & FINAL BOSS BATTLE"},
 	{"id": &"versus_ai", "label": "VERSUS AI", "scene": "res://scenes/character_select.tscn", "subtext": "SOLO DUEL VS AI (NOVICE / VETERAN / ACE)"},
-	{"id": &"training", "label": "TRAINING MODE", "scene": "res://scenes/training_mode.tscn", "subtext": "PRACTICE LAB & FRAME DATA INSPECTOR"},
+	{"id": &"training", "label": "TRAINING MODE", "scene": "res://scenes/character_select.tscn", "subtext": "PRACTICE LAB & FRAME DATA INSPECTOR"},
 	{"id": &"local_2p", "label": "LOCAL 2P VERSUS", "scene": "res://scenes/character_select.tscn", "subtext": "2-PLAYER BATTLE ON A SINGLE SCREEN"},
 	{"id": &"online", "label": "ONLINE VERSUS", "scene": "res://scenes/menus/online_lobby.tscn", "subtext": "HOST OR JOIN MATCH OVER INTERNET/LAN"},
 	{"id": &"stage_select", "label": "STAGE SELECT", "scene": "res://scenes/menus/stage_select.tscn", "subtext": "BROWSE & PLAY ALL 12 BATTLE ARENAS"},

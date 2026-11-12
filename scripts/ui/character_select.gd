@@ -197,15 +197,30 @@ func _build_roster_cards() -> void:
 		vbox.add_child(lbl_arch)
 		card.add_child(vbox)
 
-		# Click selection
+		# Click selection (klik kartu aktif sekali lagi = konfirmasi / lock-in, klik kanan = pilih P2)
 		var card_idx = i
 		card.gui_input.connect(func(ev: InputEvent):
-			if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
-				if not p1_locked:
-					p1_index = card_idx
+			if ev is InputEventMouseButton and ev.pressed:
+				if ev.button_index == MOUSE_BUTTON_LEFT:
+					if not p1_locked:
+						if p1_index == card_idx and ev.double_click:
+							_confirm_selection()
+						else:
+							p1_index = card_idx
+							MenuAudio.play_nav_beep(self)
+							_update_p1_display()
+							_scroll_to_index(p1_index, true)
+					elif MatchConfigScript.game_mode == &"local_2p" and not p2_locked:
+						if p2_index == card_idx and ev.double_click:
+							_confirm_selection()
+						else:
+							p2_index = card_idx
+							MenuAudio.play_nav_beep(self)
+							_update_p2_display()
+				elif ev.button_index == MOUSE_BUTTON_RIGHT and not p2_locked and MatchConfigScript.game_mode != &"arcade":
+					p2_index = card_idx
 					MenuAudio.play_nav_beep(self)
-					_update_p1_display()
-					_scroll_to_index(p1_index, true)
+					_update_p2_display()
 		)
 
 		cards_container.add_child(card)
@@ -349,12 +364,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		elif event.is_action_pressed("ui_down") or (event is InputEventKey and event.pressed and event.keycode == KEY_S):
 			_change_p1_index(cols)
 
-	# P2 Navigasi (Untuk mode Local 2P / AI pick): J / L atau Up/Down
-	if not p2_locked and MatchConfigScript.game_mode == &"local_2p":
+	# P2 Navigasi (Untuk mode Local 2P / AI pick): J / L
+	if not p2_locked and MatchConfigScript.game_mode != &"arcade":
 		if event is InputEventKey and event.pressed:
-			if event.keycode == KEY_J or event.keycode == KEY_LEFT:
+			if event.keycode == KEY_J or (MatchConfigScript.game_mode == &"local_2p" and event.keycode == KEY_LEFT):
 				_change_p2_index(-1)
-			elif event.keycode == KEY_L or event.keycode == KEY_RIGHT:
+			elif event.keycode == KEY_L or (MatchConfigScript.game_mode == &"local_2p" and event.keycode == KEY_RIGHT):
 				_change_p2_index(1)
 
 	# Ganti Palette P1: C
@@ -439,11 +454,6 @@ func _update_prompt() -> void:
 		controls = "P1: ←→ Pilih, Enter OK, C Palette  |  P2: A/D Pilih, Spasi OK, V Palette  |  M/Tab: Stage  |  Esc: Kembali"
 	prompt_label.text = "MODE: %s\n%s" % [mode_txt, controls]
 	prompt_label.modulate = Color(0.85, 0.95, 1.0, 0.95)
-				stage_label.text = "[TAB] ARENA: NEO-SHIBUYA HIGHWAY | [M] BROWSE 12 MAPS"
-				stage_label.modulate = Color(1.0, 0.25, 0.65, 1.0)
-			_:
-				stage_label.text = "[TAB] ARENA: ZERO-G SKYSCRAPER | [M] BROWSE 12 MAPS"
-				stage_label.modulate = Color(0.2, 0.9, 1.0, 1.0)
 
 func _on_stage_label_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
@@ -478,7 +488,7 @@ func _confirm_selection() -> void:
 		p1_locked = true
 		MenuAudio.play_confirm_chime(self)
 		_update_p1_display()
-		if MatchConfigScript.game_mode == &"versus_ai" or MatchConfigScript.game_mode == &"arcade":
+		if MatchConfigScript.game_mode != &"local_2p":
 			p2_locked = true
 			_update_p2_display()
 
@@ -559,12 +569,9 @@ func _play_showcase_preview(player_idx: int, char_id: StringName, sprite: Node2D
 	# Pose singkat: kedipan state agar terasa "showcase" (idle tetap berjalan)
 	if sprite.has_method("set_current_state"):
 		sprite.set_current_state(&"Walk")
-		var t := create_tween()
+		var t := sprite.create_tween()
 		t.tween_interval(0.18)
-		t.tween_callback(func():
-			if is_instance_valid(sprite) and sprite.has_method("set_current_state"):
-				sprite.set_current_state(&"Idle")
-		)
+		t.tween_callback(sprite.set_current_state.bind(&"Idle"))
 
 	# Bersihkan aura showcase sisi ini, lalu pasang aura idle+glow
 	var aura_ref: Node2D = _p1_showcase_aura if player_idx == 1 else _p2_showcase_aura

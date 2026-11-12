@@ -123,9 +123,13 @@ func _test_dummy_mode_cycling() -> void:
 	dc.cycle_dummy_mode()
 	_check(dc.current_mode == TrainingDummyControllerScript.DummyMode.RANDOM_PARRY, "Cycle 3 mengubah mode ke RANDOM_PARRY.")
 
-	# Cycle 4 -> Wrap around kembali ke STAND
+	# Cycle 4 -> JUMP
 	dc.cycle_dummy_mode()
-	_check(dc.current_mode == TrainingDummyControllerScript.DummyMode.STAND, "Cycle 4 wrap around kembali ke STAND.")
+	_check(dc.current_mode == TrainingDummyControllerScript.DummyMode.JUMP, "Cycle 4 mengubah mode ke JUMP.")
+
+	# Cycle 5 -> Wrap around kembali ke STAND
+	dc.cycle_dummy_mode()
+	_check(dc.current_mode == TrainingDummyControllerScript.DummyMode.STAND, "Cycle 5 wrap around kembali ke STAND.")
 
 	tm.queue_free()
 

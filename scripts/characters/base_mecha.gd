@@ -375,7 +375,7 @@ func _on_hitbox_area_entered(area: Area2D) -> void:
 func set_hitbox_active(active: bool) -> void:
 	if hitbox:
 		hitbox.monitoring = active
-		hitbox.monitorable = active
+		hitbox.set_deferred("monitorable", active)
 		# Sinkronisasi posisi offset hitbox dengan arah hadap mecha
 		if hitbox.has_node("CollisionShape2D"):
 			var shape = hitbox.get_node("CollisionShape2D")

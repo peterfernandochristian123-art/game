@@ -138,6 +138,12 @@ focus_mode = 0
 text = "   LOCAL 2P VERSUS   "
 flat = true
 
+[node name="BtnOnline" type="Button" parent="MenuContainer/OptionsList"]
+layout_mode = 2
+focus_mode = 0
+text = "   ONLINE VERSUS   "
+flat = true
+
 [node name="BtnStageSelect" type="Button" parent="MenuContainer/OptionsList"]
 layout_mode = 2
 focus_mode = 0

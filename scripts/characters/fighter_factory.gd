@@ -214,6 +214,136 @@ const ROSTER: Array[Dictionary] = [
 			"[O] Ultimate: Final Requiem (Cataclysmic Crimson Nova)",
 			"[L] Spark Parry | [X / Shift] Reaper Dash"
 		]
+	},
+	{
+		"id": &"viper",
+		"name": "Apex-0 \"Viper\"",
+		"archetype": "Rushdown / High-Speed Striker",
+		"quote": "Target locked. Engaging at maximum velocity.",
+		"hp": 900,
+		"walk_speed": 350.0,
+		"dash_speed": 820.0,
+		"speed_grade": "A+",
+		"defense_grade": "C",
+		"range_grade": "C",
+		"complexity": "Medium",
+		"hp_bar": 5,
+		"spd_bar": 9,
+		"def_bar": 4,
+		"rng_bar": 5,
+		"theme_color": Color(0.2, 0.9, 1.0, 1.0), # Cyan
+		"description": "High-velocity duelist equipped with dual beam rapiers, 400px Blink Slash teleport, and Absolute Zero heat lock.",
+		"signature_moves": [
+			"[J / Z] Normal Attack: Beam Rapier 3-Hit Combo",
+			"[U] Skill 1: Blink Slash (400px Teleport Cut)",
+			"[I] Skill 2: Deflection Matrix (Hex Shield)",
+			"[O] Ultimate: Absolute Zero Protocol (Heat Lock)",
+			"[L] Spark Parry | [X / Shift] Thruster Dash"
+		]
+	},
+	{
+		"id": &"bulwark",
+		"name": "Titan-V \"Bulwark\"",
+		"archetype": "Heavy Grappler / Iron Juggernaut",
+		"quote": "Unbreakable iron. Immovable fortress.",
+		"hp": 1200,
+		"walk_speed": 260.0,
+		"dash_speed": 650.0,
+		"speed_grade": "C",
+		"defense_grade": "S+",
+		"range_grade": "D",
+		"complexity": "Low",
+		"hp_bar": 10,
+		"spd_bar": 4,
+		"def_bar": 10,
+		"rng_bar": 4,
+		"theme_color": Color(0.95, 0.45, 0.15, 1.0), # Industrial Orange
+		"description": "Armored colossus with passive -5% damage reduction, unblockable Hydraulic Piledriver command grab, and Riot Shield.",
+		"signature_moves": [
+			"[J / Z] Normal Attack: Heavy Iron Hammer Strike",
+			"[U] Skill 1: Hydraulic Piledriver (Command Grab)",
+			"[I] Skill 2: Riot Shield Deploy (Super Armor)",
+			"[O] Ultimate: Orbital Siege Cannon (450 Dmg)",
+			"[L] Spark Parry | [X / Shift] Heavy Dash"
+		]
+	},
+	{
+		"id": &"pulsar",
+		"name": "Ray-X \"Pulsar\"",
+		"archetype": "Long-Range Zoner / Spatial Trapper",
+		"quote": "Calculating trajectory... firing photon array.",
+		"hp": 950,
+		"walk_speed": 300.0,
+		"dash_speed": 720.0,
+		"speed_grade": "B",
+		"defense_grade": "B",
+		"range_grade": "S+",
+		"complexity": "High",
+		"hp_bar": 6,
+		"spd_bar": 6,
+		"def_bar": 6,
+		"rng_bar": 10,
+		"theme_color": Color(0.7, 0.3, 1.0, 1.0), # Neon Violet
+		"description": "Spatial control specialist wielding high-caliber photon railguns, floating disrupter drone pods, and 360° supernova.",
+		"signature_moves": [
+			"[J / Z] Normal Attack: Plasma Pulse & Beam Lance",
+			"[U] Skill 1: Photon Railgun (Linear Beam 110 Dmg)",
+			"[I] Skill 2: Disrupter Drone (120f Area Denial)",
+			"[O] Ultimate: Supernova Horizon (360° Singularity)",
+			"[L] Spark Parry | [X / Shift] Warp Dash"
+		]
+	},
+	{
+		"id": &"kage",
+		"name": "Phantom-9 \"Kage\"",
+		"archetype": "Cyber-Shinobi / Dual-Stance Assassin",
+		"quote": "From the neon shadows, one strike suffices.",
+		"hp": 920,
+		"walk_speed": 360.0,
+		"dash_speed": 840.0,
+		"speed_grade": "S",
+		"defense_grade": "C",
+		"range_grade": "A",
+		"complexity": "High",
+		"hp_bar": 5,
+		"spd_bar": 10,
+		"def_bar": 4,
+		"rng_bar": 7,
+		"theme_color": Color(0.95, 0.15, 0.25, 1.0), # Crimson Red
+		"description": "Shadow assassin mastering dual combat stances: close-quarters Kenjutsu Katana and ranged Shinobi Shurikens with evasive feints.",
+		"signature_moves": [
+			"[J / Z] Normal Attack: Katana Slash (Kenjutsu) / Kunai (Shinobi)",
+			"[U] Skill 1: Stance Shift & Shadow Feint (Dual Stance Swap)",
+			"[I] Skill 2: Iaido Crescent (Kenjutsu) / Shuriken Storm (Shinobi)",
+			"[O] Ultimate: Tsukuyomi Shadow Blossom (420 Dmg Full Screen)",
+			"[L] Spark Parry | [X / Shift] Shadow Dash"
+		]
+	},
+	{
+		"id": &"trigger",
+		"name": "Kurogane \"Trigger\"",
+		"archetype": "Cyber-Gunslinger / Dual Revolver Acrobat",
+		"quote": "Every ricochet is already calculated.",
+		"hp": 940,
+		"walk_speed": 340.0,
+		"dash_speed": 820.0,
+		"speed_grade": "A",
+		"defense_grade": "B",
+		"range_grade": "S",
+		"complexity": "Medium",
+		"hp_bar": 6,
+		"spd_bar": 8,
+		"def_bar": 5,
+		"rng_bar": 9,
+		"theme_color": Color(0.95, 0.65, 0.15, 1.0), # Amber Gold
+		"description": "Acrobatic gunslinger armed with twin energy magnums, ricochet trajectory bullets, evasive rolls, and Bullet Hell Zero.",
+		"signature_moves": [
+			"[J / Z] Normal Attack: Twin Magnum Double-Tap Combo",
+			"[U] Skill 1: Ricochet Orbit (Bouncing Energy Round)",
+			"[I] Skill 2: Gunslinger Vault (Invulnerable Evasive Roll)",
+			"[O] Ultimate: Bullet Hell Zero (360° Barrage 430 Dmg)",
+			"[L] Spark Parry | [X / Shift] Gunslinger Dash"
+		]
 	}
 ]
 

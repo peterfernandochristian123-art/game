@@ -58,9 +58,9 @@ func _instantiate_menu() -> MainMenu:
 func _test_scene_structure() -> void:
 	var menu := _instantiate_menu()
 	_check(menu != null, "Scene main_menu.tscn berhasil diinstansiasi.")
-	_check(menu.button_nodes.size() == 7, "Main Menu memiliki 7 tombol navigasi (Ditemukan: %d)." % menu.button_nodes.size())
+	_check(menu.button_nodes.size() == 8, "Main Menu memiliki 8 tombol navigasi (Ditemukan: %d)." % menu.button_nodes.size())
 
-	var expected_ids := [&"arcade", &"versus_ai", &"training", &"local_2p", &"stage_select", &"settings", &"exit"]
+	var expected_ids := [&"arcade", &"versus_ai", &"training", &"local_2p", &"online", &"stage_select", &"settings", &"exit"]
 	for i in range(expected_ids.size()):
 		_check(MainMenu.MENU_DATA[i]["id"] == expected_ids[i], "ID opsi index %d cocok: %s" % [i, expected_ids[i]])
 
