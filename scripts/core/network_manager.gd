@@ -1,4 +1,3 @@
-class_name NetworkManager
 extends Node
 
 ## Autoload: manajemen koneksi multiplayer online (ENet, host/join internet/LAN).

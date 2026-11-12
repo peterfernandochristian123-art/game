@@ -19,6 +19,7 @@ Thumbs.db
 test_*results.txt
 test_*_results.txt
 builds/
+itch_io_upload/
 .vscode/*
 !.vscode/tasks.json
 !.vscode/settings.json

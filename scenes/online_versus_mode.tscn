@@ -1,4 +1,4 @@
-﻿[gd_scene load_steps=17 format=3 uid="uid://onlineversus01zero"]
+[gd_scene load_steps=17 format=3 uid="uid://onlineversus01zero"]
 
 [ext_resource type="Script" path="res://scripts/core/online_versus_manager.gd" id="1_mgr"]
 [ext_resource type="PackedScene" path="res://scenes/arena_skyscraper.tscn" id="2_arena"]
